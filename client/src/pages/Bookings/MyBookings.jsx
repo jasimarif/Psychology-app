@@ -26,6 +26,7 @@ import {
   StatsIcon,
   ArrowRightIcon
 } from "@/components/icons/DuoTuneIcons"
+import { formatDateOnlyEST, formatTime24to12, formatTimeRangeEST } from "@/lib/timezone"
 
 const MyBookings = () => {
   const navigate = useNavigate()
@@ -395,12 +396,7 @@ const MyBookings = () => {
                           <div>
                             <p className="text-xs text-gray-500 font-medium">Date</p>
                             <p className="text-sm font-semibold text-gray-900">
-                              {new Date(booking.appointmentDate).toLocaleDateString('en-US', {
-                                weekday: 'short',
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric'
-                              })}
+                              {formatDateOnlyEST(booking.appointmentDate, 'medium')}
                             </p>
                           </div>
                         </div>
@@ -410,9 +406,9 @@ const MyBookings = () => {
                             <TimeIcon className="w-5 h-5 text-customGreen" />
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 font-medium">Time</p>
+                            <p className="text-xs text-gray-500 font-medium">Time (EST)</p>
                             <p className="text-sm font-semibold text-gray-900">
-                              {booking.startTime} - {booking.endTime}
+                              {formatTime24to12(booking.startTime)} - {formatTime24to12(booking.endTime)}
                             </p>
                           </div>
                         </div>

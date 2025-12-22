@@ -1,8 +1,9 @@
 import pkg from 'nodemailer';
 const { createTransport } = pkg;
 import ical from 'ical-generator';
+import { formatDateEST, formatTime24to12, APP_TIMEZONE } from '../utils/timezone.js';
 
-
+const EST_TIMEZONE = 'America/New_York';
 
 class EmailCalendarService {
   constructor() {
@@ -63,8 +64,14 @@ class EmailCalendarService {
         startTime,
         endTime,
         location,
-        timezone
+        timezone,
+        // Pre-formatted strings for display (to avoid timezone conversion issues)
+        formattedDate,
+        formattedTime
       } = eventData;
+
+      // Always use EST timezone for consistency
+      const displayTimezone = EST_TIMEZONE;
 
       const calendar = ical({ name: 'Psychology Portal - Session Booking' });
 
@@ -74,7 +81,7 @@ class EmailCalendarService {
         summary: eventTitle,
         description: eventDescription,
         location: location || '',
-        timezone: timezone || 'America/New_York',
+        timezone: displayTimezone,
         url: location, 
         organizer: {
           name: 'Psychology Portal',
@@ -88,6 +95,12 @@ class EmailCalendarService {
 
       const recipients = Array.isArray(to) ? to.join(', ') : to;
 
+      // Use pre-formatted date/time strings if provided, otherwise calculate duration
+      const displayDateTime = (formattedDate && formattedTime) 
+        ? `${formattedDate} at ${formattedTime}`
+        : formatDateEST(startTime);
+      const durationMinutes = Math.round((new Date(endTime) - new Date(startTime)) / 60000);
+
       // Email HTML body
       const htmlBody = `
         <!DOCTYPE html>
@@ -100,6 +113,7 @@ class EmailCalendarService {
             .content { background-color: #f9f9f9; padding: 30px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 5px 5px; }
             .button { display: inline-block; padding: 12px 30px; background-color: #2196F3; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
             .details { background-color: white; padding: 15px; border-left: 4px solid #4CAF50; margin: 20px 0; }
+            .timezone-note { font-size: 12px; color: #666; font-style: italic; }
             .footer { text-align: center; margin-top: 20px; color: #777; font-size: 12px; }
           </style>
         </head>
@@ -113,8 +127,8 @@ class EmailCalendarService {
               <p>Your therapy session has been scheduled. Please find the details below:</p>
 
               <div class="details">
-                <p><strong>📅 Date & Time:</strong><br>${new Date(startTime).toLocaleString('en-US', { timeZone: timezone, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-                <p><strong>⏱️ Duration:</strong><br>${Math.round((new Date(endTime) - new Date(startTime)) / 60000)} minutes</p>
+                <p><strong>📅 Date & Time:</strong><br>${displayDateTime}<br><span class="timezone-note">(Eastern Time - EST/EDT)</span></p>
+                <p><strong>⏱️ Duration:</strong><br>${durationMinutes} minutes</p>
                 ${eventDescription ? `<p><strong>📝 Notes:</strong><br>${eventDescription}</p>` : ''}
               </div>
 
@@ -130,6 +144,7 @@ class EmailCalendarService {
             </div>
             <div class="footer">
               <p>Psychology Portal - Your Mental Wellness Partner</p>
+              <p class="timezone-note">All times are in Eastern Time (EST/EDT)</p>
             </div>
           </div>
         </body>
@@ -181,10 +196,18 @@ class EmailCalendarService {
         subject,
         eventTitle,
         startTime,
-        reason
+        reason,
+        // Pre-formatted strings for display
+        formattedDate,
+        formattedTime
       } = eventData;
 
       const recipients = Array.isArray(to) ? to.join(', ') : to;
+
+      // Use pre-formatted date/time if provided
+      const displayDateTime = (formattedDate && formattedTime) 
+        ? `${formattedDate} at ${formattedTime}`
+        : formatDateEST(startTime);
 
       const htmlBody = `
         <!DOCTYPE html>
@@ -195,6 +218,7 @@ class EmailCalendarService {
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
             .header { background-color: #f44336; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
             .content { background-color: #f9f9f9; padding: 30px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 5px 5px; }
+            .timezone-note { font-size: 12px; color: #666; font-style: italic; }
             .footer { text-align: center; margin-top: 20px; color: #777; font-size: 12px; }
           </style>
         </head>
@@ -205,7 +229,7 @@ class EmailCalendarService {
             </div>
             <div class="content">
               <h2>${eventTitle}</h2>
-              <p>The therapy session scheduled for <strong>${new Date(startTime).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</strong> has been cancelled.</p>
+              <p>The therapy session scheduled for <strong>${displayDateTime}</strong> <span class="timezone-note">(Eastern Time)</span> has been cancelled.</p>
 
               ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ''}
 
@@ -213,6 +237,7 @@ class EmailCalendarService {
             </div>
             <div class="footer">
               <p>Psychology Portal - Your Mental Wellness Partner</p>
+              <p class="timezone-note">All times are in Eastern Time (EST/EDT)</p>
             </div>
           </div>
         </body>

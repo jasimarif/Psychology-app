@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Calendar } from "@/components/ui/calendar"
 import { bookingService } from "@/services/bookingService"
+import { formatDateOnlyEST, formatTime24to12 } from "@/lib/timezone"
 import {
   LocationIcon,
   AwardIcon,
@@ -383,13 +384,7 @@ const PsychologistProfile = () => {
                         >
                           <option value="">Choose a date</option>
                           {getAvailableDates().map(date => {
-                            const dateObj = new Date(date)
-                            const formatted = dateObj.toLocaleDateString('en-US', {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric'
-                            })
+                            const formatted = formatDateOnlyEST(date, 'medium')
                             return (
                               <option key={date} value={date}>
                                 {formatted}
@@ -402,7 +397,7 @@ const PsychologistProfile = () => {
                       {/* Time Slots */}
                       {selectedDate && (
                         <div className="space-y-2">
-                          <label className="block text-sm font-medium text-gray-900">Available Time Slots</label>
+                          <label className="block text-sm font-medium text-gray-900">Available Time Slots (EST)</label>
                           {loadingSlots ? (
                             <div className="flex items-center justify-center py-8">
                               <Loader2 className="w-8 h-8 animate-spin text-customGreen" />
@@ -426,7 +421,7 @@ const PsychologistProfile = () => {
                                 >
                                   <div className="flex items-center justify-center gap-1">
                                     <TimeIcon className="w-4 h-4" />
-                                    <span>{slot.startTime}</span>
+                                    <span>{formatTime24to12(slot.startTime)}</span>
                                   </div>
                                 </button>
                               ))}
@@ -472,17 +467,12 @@ const PsychologistProfile = () => {
                             <div className="flex justify-between">
                               <span className="text-gray-600">Date:</span>
                               <span className="font-medium">
-                                {new Date(selectedDate).toLocaleDateString('en-US', {
-                                  weekday: 'short',
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric'
-                                })}
+                                {formatDateOnlyEST(selectedDate, 'medium')}
                               </span>
                             </div>
                             <div className="flex justify-between">
-                              <span className="text-gray-600">Time:</span>
-                              <span className="font-medium">{selectedSlot.startTime} - {selectedSlot.endTime}</span>
+                              <span className="text-gray-600">Time (EST):</span>
+                              <span className="font-medium">{formatTime24to12(selectedSlot.startTime)} - {formatTime24to12(selectedSlot.endTime)}</span>
                             </div>
                             <div className="flex justify-between border-t border-gray-300 pt-2 mt-2">
                               <span className="text-gray-900 font-semibold">Total:</span>
@@ -638,17 +628,12 @@ const PsychologistProfile = () => {
                       <div className="flex justify-between">
                         <span className="text-gray-600">Date:</span>
                         <span className="font-medium">
-                          {new Date(selectedDate).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
+                          {formatDateOnlyEST(selectedDate, 'medium')}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Time:</span>
-                        <span className="font-medium">{selectedSlot.startTime} - {selectedSlot.endTime}</span>
+                        <span className="text-gray-600">Time (EST):</span>
+                        <span className="font-medium">{formatTime24to12(selectedSlot.startTime)} - {formatTime24to12(selectedSlot.endTime)}</span>
                       </div>
                       <div className="flex justify-between border-t border-gray-300 pt-2 mt-2">
                         <span className="text-gray-900 font-semibold">Total:</span>
