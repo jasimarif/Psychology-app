@@ -1,0 +1,25 @@
+.grainy {
+  background-color: #3d5347;
+  position: relative;
+  overflow: hidden;
+}
+
+.grainy::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(#00000022 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: 0.25;
+}
+
+/* noise.css */
+.noise-bg {
+  background-color: #3d5347;   /* your green base */
+  background-image: url('/noise.png');
+  background-size: 300px;      /* adjust density */
+  background-repeat: repeat;
+}
+
