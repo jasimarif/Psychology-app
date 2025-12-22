@@ -209,6 +209,8 @@ export const createBooking = async (req, res) => {
 
     const booking = await Booking.create({
       userId: req.user.uid,
+      userEmail: req.user.email || '',
+      userName: req.user.displayName || req.user.email || '',
       psychologistId,
       appointmentDate: new Date(appointmentDate),
       startTime,
@@ -487,12 +489,17 @@ export const cancelBooking = async (req, res) => {
           const [cancelHours, cancelMinutes] = booking.startTime.split(':').map(Number);
           appointmentDateTimeForEmail.setHours(cancelHours, cancelMinutes, 0, 0);
 
+          const canceledBy = isUser ? 'user' : 'psychologist';
+          const canceledByName = isUser ? (req.user.displayName || req.user.email || 'User') : psychologist.name;
+
           await emailCalendarService.sendCancellationEmail({
             to: recipients,
             subject: `Therapy Session Cancelled - ${shortDate} at ${formattedStartTime} EST`,
             eventTitle: `Psychology Session with ${psychologist.name}`,
             startTime: appointmentDateTimeForEmail,
             reason: reason,
+            canceledBy: canceledBy,
+            canceledByName: canceledByName,
             formattedDate: formattedDate,
             formattedTime: formattedStartTime
           });

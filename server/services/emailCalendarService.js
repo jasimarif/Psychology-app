@@ -197,14 +197,14 @@ class EmailCalendarService {
         eventTitle,
         startTime,
         reason,
-        // Pre-formatted strings for display
+        canceledBy,
+        canceledByName,
         formattedDate,
         formattedTime
       } = eventData;
 
       const recipients = Array.isArray(to) ? to.join(', ') : to;
 
-      // Use pre-formatted date/time if provided
       const displayDateTime = (formattedDate && formattedTime) 
         ? `${formattedDate} at ${formattedTime}`
         : formatDateEST(startTime);
@@ -231,6 +231,7 @@ class EmailCalendarService {
               <h2>${eventTitle}</h2>
               <p>The therapy session scheduled for <strong>${displayDateTime}</strong> <span class="timezone-note">(Eastern Time)</span> has been cancelled.</p>
 
+              ${canceledByName ? `<p><strong>Cancelled by:</strong> ${canceledByName} ${canceledBy ? `(${canceledBy === 'psychologist' ? 'Psychologist' : 'Client'})` : ''}</p>` : ''}
               ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ''}
 
               <p style="margin-top: 30px;">If you'd like to reschedule, please contact us or book a new session through the portal.</p>

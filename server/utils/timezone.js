@@ -20,9 +20,19 @@ export const formatDateEST = (date, options = {}) => {
 
 
 export const formatDateOnlyEST = (date) => {
-  const dateObj = typeof date === 'string' && date.includes('-') 
-    ? new Date(date + 'T12:00:00') 
-    : new Date(date);
+  let dateObj;
+  
+  if (typeof date === 'string' && date.includes('-')) {
+    const [year, month, day] = date.split('T')[0].split('-');
+    dateObj = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), 12, 0, 0));
+  } else if (date instanceof Date) {
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth();
+    const day = date.getUTCDate();
+    dateObj = new Date(Date.UTC(year, month, day, 12, 0, 0));
+  } else {
+    dateObj = new Date(date);
+  }
   
   return dateObj.toLocaleDateString('en-US', {
     timeZone: EST_TIMEZONE,
@@ -45,9 +55,19 @@ export const formatTimeOnlyEST = (date) => {
 
 
 export const formatShortDateEST = (date) => {
-  const dateObj = typeof date === 'string' && date.includes('-') 
-    ? new Date(date + 'T12:00:00') 
-    : new Date(date);
+  let dateObj;
+  
+  if (typeof date === 'string' && date.includes('-')) {
+    const [year, month, day] = date.split('T')[0].split('-');
+    dateObj = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day), 12, 0, 0));
+  } else if (date instanceof Date) {
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth();
+    const day = date.getUTCDate();
+    dateObj = new Date(Date.UTC(year, month, day, 12, 0, 0));
+  } else {
+    dateObj = new Date(date);
+  }
   
   return dateObj.toLocaleDateString('en-US', {
     timeZone: EST_TIMEZONE,
