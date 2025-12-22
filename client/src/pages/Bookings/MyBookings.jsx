@@ -78,7 +78,7 @@ const MyBookings = () => {
       case "upcoming":
         return bookings.filter(b =>
           new Date(b.appointmentDate) >= now &&
-          (b.status === 'pending' || b.status === 'confirmed')
+          b.status === 'confirmed'
         )
       case "past":
         return bookings.filter(b =>
@@ -94,11 +94,6 @@ const MyBookings = () => {
 
   const getStatusBadge = (status) => {
     const variants = {
-      pending: { 
-        className: "bg-amber-100 text-amber-700  hover:bg-amber-100", 
-        label: "Pending",
-        icon: <TimeIcon className="w-3 h-3" />
-      },
       confirmed: { 
         className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100", 
         label: "Confirmed",
@@ -116,7 +111,7 @@ const MyBookings = () => {
       }
     }
 
-    const variant = variants[status] || variants.pending
+    const variant = variants[status] || variants.confirmed
     return (
       <Badge className={`${variant.className} border font-medium gap-1.5 px-3 py-1`}>
         {variant.icon}
@@ -128,7 +123,7 @@ const MyBookings = () => {
   const getBookingStats = () => {
     const upcoming = bookings.filter(b =>
       new Date(b.appointmentDate) >= new Date() &&
-      (b.status === 'pending' || b.status === 'confirmed')
+      b.status === 'confirmed'
     ).length
 
     const completed = bookings.filter(b => b.status === 'completed').length

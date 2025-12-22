@@ -87,7 +87,7 @@ bookingSchema.index(
   {
     unique: true,
     partialFilterExpression: {
-      status: { $in: ['pending', 'confirmed'] }
+      status: 'confirmed'
     }
   }
 );

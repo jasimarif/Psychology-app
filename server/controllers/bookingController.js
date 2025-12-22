@@ -100,7 +100,7 @@ export const getAvailableSlots = async (req, res) => {
         $gte: startOfDay,
         $lte: endOfDay
       },
-      status: { $in: ['pending', 'confirmed'] }
+      status: 'confirmed'
     });
 
     const bookedTimes = new Set(existingBookings.map(b => b.startTime));
@@ -164,7 +164,7 @@ export const createBooking = async (req, res) => {
         $lte: endOfDay
       },
       startTime,
-      status: { $in: ['pending', 'confirmed'] }
+      status: 'confirmed'
     });
 
     if (existingBooking) {
@@ -216,7 +216,7 @@ export const createBooking = async (req, res) => {
       timezone: psychologist.availability.timezone,
       price,
       notes: notes || '',
-      status: 'pending'
+      status: 'confirmed'
     });
 
     await booking.populate('psychologistId', 'name title email profileImage');
@@ -520,51 +520,6 @@ export const cancelBooking = async (req, res) => {
   }
 };
 
-export const confirmBooking = async (req, res) => {
-  try {
-    const { bookingId } = req.params;
-
-    const booking = await Booking.findById(bookingId);
-    if (!booking) {
-      return res.status(404).json({
-        success: false,
-        message: 'Booking not found'
-      });
-    }
-
-    const psychologist = await Psychologist.findById(booking.psychologistId);
-    if (!psychologist || psychologist.userId !== req.user.uid) {
-      return res.status(403).json({
-        success: false,
-        message: 'Unauthorized to confirm this booking'
-      });
-    }
-
-    if (booking.status !== 'pending') {
-      return res.status(400).json({
-        success: false,
-        message: 'Only pending bookings can be confirmed'
-      });
-    }
-
-    booking.status = 'confirmed';
-    await booking.save();
-
-    res.json({
-      success: true,
-      message: 'Booking confirmed successfully',
-      data: booking
-    });
-  } catch (error) {
-    console.error('Error in confirmBooking:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to confirm booking',
-      error: error.message
-    });
-  }
-};
-
 // Reschedule a booking
 export const rescheduleBooking = async (req, res) => {
   try {
@@ -651,7 +606,7 @@ export const rescheduleBooking = async (req, res) => {
         $lte: endOfDay
       },
       startTime,
-      status: { $in: ['pending', 'confirmed'] }
+      status: 'confirmed'
     });
 
     if (existingBooking) {
