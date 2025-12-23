@@ -557,12 +557,11 @@ export const rescheduleBooking = async (req, res) => {
 
     const psychologist = booking.psychologistId;
     const isUser = booking.userId === req.user.uid;
-    const isPsychologist = psychologist && psychologist.userId === req.user.uid;
 
-    if (!isUser && !isPsychologist) {
+    if (!isUser) {
       return res.status(403).json({
         success: false,
-        message: 'Unauthorized to reschedule this booking'
+        message: 'Only the user who booked the session can reschedule it'
       });
     }
 
@@ -570,6 +569,20 @@ export const rescheduleBooking = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: `Cannot reschedule a ${booking.status} booking`
+      });
+    }
+
+    const currentAppointmentDate = new Date(booking.appointmentDate);
+    const [hours, minutes] = booking.startTime.split(':').map(Number);
+    currentAppointmentDate.setHours(hours, minutes, 0, 0);
+
+    const now = new Date();
+    const hoursUntilAppointment = (currentAppointmentDate - now) / (1000 * 60 * 60);
+
+    if (hoursUntilAppointment < 24) {
+      return res.status(400).json({
+        success: false,
+        message: 'Rescheduling is only allowed at least 24 hours before the session'
       });
     }
 

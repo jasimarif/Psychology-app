@@ -103,5 +103,31 @@ export const bookingService = {
       console.error('Error cancelling booking:', error);
       throw error;
     }
+  },
+
+  async rescheduleBooking(bookingId, rescheduleData) {
+    try {
+      const token = await getAuthToken();
+
+      const response = await fetch(`${API_URL}/api/bookings/${bookingId}/reschedule`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(rescheduleData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to reschedule booking');
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (error) {
+      console.error('Error rescheduling booking:', error);
+      throw error;
+    }
   }
 };

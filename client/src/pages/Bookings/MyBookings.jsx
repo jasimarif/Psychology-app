@@ -13,6 +13,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Calendar } from "@/components/ui/calendar"
 import { bookingService } from "@/services/bookingService"
 import { Loader2 } from "lucide-react"
 import {
@@ -37,11 +39,82 @@ const MyBookings = () => {
   const [cancellingId, setCancellingId] = useState(null)
   const [filter, setFilter] = useState("all") 
 
+  // Reschedule state
+  const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false)
+  const [reschedulingBooking, setReschedulingBooking] = useState(null)
+  const [selectedDate, setSelectedDate] = useState(null)
+  const [availableSlots, setAvailableSlots] = useState([])
+  const [loadingSlots, setLoadingSlots] = useState(false)
+  const [selectedSlot, setSelectedSlot] = useState(null)
+  const [rescheduleLoading, setRescheduleLoading] = useState(false)
+  const [rescheduleError, setRescheduleError] = useState("")
+
   useEffect(() => {
     if (currentUser) {
       loadBookings()
     }
   }, [currentUser])
+
+  useEffect(() => {
+    if (selectedDate && reschedulingBooking) {
+      loadAvailableSlots()
+    }
+  }, [selectedDate])
+
+  const loadAvailableSlots = async () => {
+    if (!reschedulingBooking?.psychologistId?._id) return
+
+    setLoadingSlots(true)
+    setSelectedSlot(null)
+    setRescheduleError("")
+    try {
+      const offset = selectedDate.getTimezoneOffset()
+      const date = new Date(selectedDate.getTime() - (offset*60*1000))
+      const dateStr = date.toISOString().split('T')[0]
+      
+      const data = await bookingService.getAvailableSlots(reschedulingBooking.psychologistId._id, dateStr)
+      setAvailableSlots(data.availableSlots || [])
+    } catch (error) {
+      setRescheduleError(error.message)
+      setAvailableSlots([])
+    } finally {
+      setLoadingSlots(false)
+    }
+  }
+
+  const handleRescheduleClick = (booking) => {
+    setReschedulingBooking(booking)
+    setRescheduleModalOpen(true)
+    setSelectedDate(null)
+    setAvailableSlots([])
+    setSelectedSlot(null)
+    setRescheduleError("")
+  }
+
+  const handleConfirmReschedule = async () => {
+    if (!selectedSlot || !selectedDate || !reschedulingBooking) return
+
+    setRescheduleLoading(true)
+    setRescheduleError("")
+    try {
+      const offset = selectedDate.getTimezoneOffset()
+      const date = new Date(selectedDate.getTime() - (offset*60*1000))
+      const dateStr = date.toISOString().split('T')[0]
+
+      await bookingService.rescheduleBooking(reschedulingBooking._id, {
+        appointmentDate: dateStr,
+        startTime: selectedSlot.startTime,
+        endTime: selectedSlot.endTime
+      })
+      
+      setRescheduleModalOpen(false)
+      loadBookings()
+    } catch (error) {
+      setRescheduleError(error.message)
+    } finally {
+      setRescheduleLoading(false)
+    }
+  }
 
   const loadBookings = async () => {
     try {
@@ -134,6 +207,25 @@ const MyBookings = () => {
   }
 
   const canCancelBooking = (booking) => {
+    if (!booking || booking.status === 'cancelled' || booking.status === 'completed') {
+      return false
+    }
+
+    if (!booking.startTime || !booking.appointmentDate) {
+      return false
+    }
+
+    const appointmentDateTime = new Date(booking.appointmentDate)
+    const [hours, minutes] = booking.startTime.split(':').map(Number)
+    appointmentDateTime.setHours(hours, minutes, 0, 0)
+
+    const now = new Date()
+    const hoursUntilAppointment = (appointmentDateTime - now) / (1000 * 60 * 60)
+
+    return hoursUntilAppointment >= 24
+  }
+
+  const canRescheduleBooking = (booking) => {
     if (!booking || booking.status === 'cancelled' || booking.status === 'completed') {
       return false
     }
@@ -509,6 +601,17 @@ const MyBookings = () => {
                             View Profile
                           </Button>
 
+                          {canRescheduleBooking(booking) && (
+                            <Button
+                              variant="outline"
+                              className="w-full justify-start rounded-xl border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-all cursor-pointer"
+                              onClick={() => handleRescheduleClick(booking)}
+                            >
+                              <TimeIcon className="w-4 h-4 mr-2" />
+                              Reschedule
+                            </Button>
+                          )}
+
                           {canCancelBooking(booking) && (
                             <>
                               <Separator className="my-2" />
@@ -566,6 +669,96 @@ const MyBookings = () => {
             Book New Session
           </Button>
         </div>
+
+        {/* Reschedule Dialog */}
+        <Dialog open={rescheduleModalOpen} onOpenChange={setRescheduleModalOpen}>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Reschedule Session</DialogTitle>
+              <DialogDescription>
+                Select a new date and time for your session with {reschedulingBooking?.psychologistId?.name}.
+                Rescheduling is allowed up to 24 hours before the session.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-6 py-4">
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex-1">
+                  <Calendar
+                    selectedDate={selectedDate}
+                    onSelectDate={(dateStr) => {
+                      const [year, month, day] = dateStr.split('-').map(Number)
+                      const date = new Date(year, month - 1, day)
+                      setSelectedDate(date)
+                    }}
+                    className="rounded-md border"
+                    minDate={new Date()}
+                  />
+                </div>
+                
+                <div className="flex-1">
+                  <h4 className="font-medium mb-3">Available Slots</h4>
+                  {loadingSlots ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-customGreen" />
+                    </div>
+                  ) : !selectedDate ? (
+                    <p className="text-sm text-gray-500 text-center py-8">
+                      Select a date to view available time slots
+                    </p>
+                  ) : availableSlots.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-8">
+                      No available slots for this date
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2">
+                      {availableSlots.map((slot, index) => (
+                        <Button
+                          key={index}
+                          variant={selectedSlot === slot ? "default" : "outline"}
+                          className={`w-full ${
+                            selectedSlot === slot 
+                              ? "bg-customGreen hover:bg-customGreenHover text-white" 
+                              : "hover:border-customGreen hover:text-customGreen"
+                          }`}
+                          onClick={() => setSelectedSlot(slot)}
+                        >
+                          {formatTime24to12(slot.startTime)}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {rescheduleError && (
+                <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
+                  {rescheduleError}
+                </div>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setRescheduleModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleConfirmReschedule}
+                disabled={!selectedSlot || rescheduleLoading}
+                className="bg-customGreen hover:bg-customGreenHover text-white"
+              >
+                {rescheduleLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Rescheduling...
+                  </>
+                ) : (
+                  "Confirm Reschedule"
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )
