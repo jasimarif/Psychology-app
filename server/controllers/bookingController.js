@@ -2,6 +2,7 @@ import Booking from '../models/Booking.js';
 import Psychologist from '../models/Psychologist.js';
 import zoomService from '../services/zoomService.js';
 import emailCalendarService from '../services/emailCalendarService.js';
+import { updateCompletedSessions } from '../utils/sessionCompletionService.js';
 import {
   formatDate,
   formatShortDate,
@@ -337,6 +338,8 @@ export const getUserBookings = async (req, res) => {
       });
     }
 
+    await updateCompletedSessions();
+
     const bookings = await Booking.find({ userId })
       .populate('psychologistId', 'name title email phone profileImage location')
       .sort({ appointmentDate: -1, startTime: -1 });
@@ -375,6 +378,8 @@ export const getPsychologistBookings = async (req, res) => {
         message: 'Unauthorized access'
       });
     }
+
+    await updateCompletedSessions();
 
     // Build query
     const query = { psychologistId };
