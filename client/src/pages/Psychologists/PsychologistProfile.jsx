@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Calendar } from "@/components/ui/calendar"
 import { bookingService } from "@/services/bookingService"
-import { formatDateOnlyEST, formatTime24to12 } from "@/lib/timezone"
+import { formatDateOnly, formatTime24to12 } from "@/lib/timezone"
 import {
   LocationIcon,
   AwardIcon,
@@ -384,7 +384,7 @@ const PsychologistProfile = () => {
                         >
                           <option value="">Choose a date</option>
                           {getAvailableDates().map(date => {
-                            const formatted = formatDateOnlyEST(date, 'medium')
+                            const formatted = formatDateOnly(date, 'medium')
                             return (
                               <option key={date} value={date}>
                                 {formatted}
@@ -467,7 +467,7 @@ const PsychologistProfile = () => {
                             <div className="flex justify-between">
                               <span className="text-gray-600">Date:</span>
                               <span className="font-medium">
-                                {formatDateOnlyEST(selectedDate, 'medium')}
+                                {formatDateOnly(selectedDate, 'medium')}
                               </span>
                             </div>
                             <div className="flex justify-between">
@@ -628,11 +628,11 @@ const PsychologistProfile = () => {
                       <div className="flex justify-between">
                         <span className="text-gray-600">Date:</span>
                         <span className="font-medium">
-                          {formatDateOnlyEST(selectedDate, 'medium')}
+                          {formatDateOnly(selectedDate, 'medium')}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Time (EST):</span>
+                        <span className="text-gray-600">Time:</span>
                         <span className="font-medium">{formatTime24to12(selectedSlot.startTime)} - {formatTime24to12(selectedSlot.endTime)}</span>
                       </div>
                       <div className="flex justify-between border-t border-gray-300 pt-2 mt-2">

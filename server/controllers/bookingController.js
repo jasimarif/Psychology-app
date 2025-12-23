@@ -2,13 +2,12 @@ import Booking from '../models/Booking.js';
 import Psychologist from '../models/Psychologist.js';
 import zoomService from '../services/zoomService.js';
 import emailCalendarService from '../services/emailCalendarService.js';
-import { 
-  formatDateEST, 
-  formatShortDateEST, 
-  formatTime24to12, 
-  formatDateOnlyEST,
-  getISOStringForEST,
-  APP_TIMEZONE 
+import {
+  formatDate,
+  formatShortDate,
+  formatTime24to12,
+  formatDateOnly,
+  getISOString
 } from '../utils/timezone.js';
 
 const timeToMinutes = (timeStr) => {
@@ -240,12 +239,11 @@ export const createBooking = async (req, res) => {
         // Calculate duration in minutes
         const durationMinutes = Math.round((endDateTime - startDateTime) / 60000);
 
-        // Create Zoom meeting - always use EST timezone
+        // Create Zoom meeting
         const meetingData = {
           topic: `Psychology Session with ${psychologist.name}`,
-          startTime: getISOStringForEST(bookingDate, startTime),
-          duration: durationMinutes,
-          timezone: APP_TIMEZONE
+          startTime: getISOString(bookingDate, startTime),
+          duration: durationMinutes
         };
 
         const zoomMeeting = await zoomService.createMeeting(meetingData);
@@ -264,12 +262,12 @@ export const createBooking = async (req, res) => {
           try {
             const userEmail = req.user.email || '';
 
-            const formattedDate = formatDateOnlyEST(appointmentDate);
+            const formattedDate = formatDateOnly(appointmentDate);
             const formattedStartTime = formatTime24to12(startTime);
             const formattedEndTime = formatTime24to12(endTime);
-            const shortDate = formatShortDateEST(appointmentDate);
+            const shortDate = formatShortDate(appointmentDate);
 
-            const inviteDescription = `Session Details:\n\nPsychologist: ${psychologist.name}\nDate: ${formattedDate}\nTime: ${formattedStartTime} - ${formattedEndTime} (Eastern Time)\n\n${notes ? 'Notes: ' + notes : ''}\n\nZoom Meeting ID: ${zoomMeeting.meetingId}\nPassword: ${zoomMeeting.password}`;
+            const inviteDescription = `Session Details:\n\nPsychologist: ${psychologist.name}\nDate: ${formattedDate}\nTime: ${formattedStartTime} - ${formattedEndTime}\n\n${notes ? 'Notes: ' + notes : ''}\n\nZoom Meeting ID: ${zoomMeeting.meetingId}\nPassword: ${zoomMeeting.password}`;
 
             // Send to both psychologist and client
             const recipients = [psychologist.email, userEmail].filter(Boolean);
@@ -277,13 +275,12 @@ export const createBooking = async (req, res) => {
             if (recipients.length > 0) {
               await emailCalendarService.sendCalendarInvite({
                 to: recipients,
-                subject: `Therapy Session Scheduled - ${shortDate} at ${formattedStartTime} EST`,
+                subject: `Therapy Session Scheduled - ${shortDate} at ${formattedStartTime}`,
                 eventTitle: `Psychology Session with ${psychologist.name}`,
                 eventDescription: inviteDescription,
                 startTime: startDateTime,
                 endTime: endDateTime,
                 location: zoomMeeting.joinUrl,
-                timezone: APP_TIMEZONE,
                 formattedDate: formattedDate,
                 formattedTime: formattedStartTime
               });
@@ -481,8 +478,8 @@ export const cancelBooking = async (req, res) => {
         const recipients = [psychologist.email, userEmail].filter(Boolean);
 
         if (recipients.length > 0) {
-          const formattedDate = formatDateOnlyEST(booking.appointmentDate);
-          const shortDate = formatShortDateEST(booking.appointmentDate);
+          const formattedDate = formatDateOnly(booking.appointmentDate);
+          const shortDate = formatShortDate(booking.appointmentDate);
           const formattedStartTime = formatTime24to12(booking.startTime);
           
           const appointmentDateTimeForEmail = new Date(booking.appointmentDate);
@@ -647,8 +644,7 @@ export const rescheduleBooking = async (req, res) => {
         const updateData = {
           topic: `Psychology Session with ${psychologist.name}`,
           startTime: startDateTime,
-          duration: durationMinutes,
-          timezone: booking.timezone || 'America/New_York'
+          duration: durationMinutes
         };
 
         await zoomService.updateMeeting(booking.zoomMeetingId, updateData);
@@ -671,8 +667,7 @@ export const rescheduleBooking = async (req, res) => {
                 eventDescription: inviteDescription,
                 startTime: startDateTime,
                 endTime: endDateTime,
-                location: booking.zoomJoinUrl,
-                timezone: booking.timezone || 'America/New_York'
+                location: booking.zoomJoinUrl
               });
 
               console.log(`Updated calendar invites sent to: ${recipients.join(', ')}`);
