@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import connectDB from './config/database.js';
 import psychologistRoutes from './routes/psychologistRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.use('/api/psychologists', psychologistRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/profiles', profileRoutes);
 
 // Serve index.html for all non-API routes (SPA fallback)
 app.get('*', (req, res) => {

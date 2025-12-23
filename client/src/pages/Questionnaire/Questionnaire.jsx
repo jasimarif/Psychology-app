@@ -1,18 +1,22 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { RadioQuestion, DropdownQuestionSelect, CheckboxQuestion } from "@/components"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Info, MessageCircle, Users, ArrowLeft } from 'lucide-react'
-import { QuestionnaireIcon } from "@/components/icons/DuoTuneIcons"
+import { QuestionnaireIcon, CheckIcon } from "@/components/icons/DuoTuneIcons"
 import { Footer } from "../../components"
+import { useAuth } from "@/context/AuthContext"
 
 function Questionnaire() {
   const navigate = useNavigate()
+  const { currentUser } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
   const totalSteps = 6
   const [currentQuestion, setCurrentQuestion] = useState(1)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [profileExists, setProfileExists] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const [formData, setFormData] = useState({
     // Step 1: Therapy Type & Basic Info
@@ -64,6 +68,43 @@ function Questionnaire() {
     preferredTherapist: ""
   })
 
+  useEffect(() => {
+    const checkProfileExists = async () => {
+      if (!currentUser) {
+        setLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/profiles/${currentUser.uid}`
+        )
+
+        if (response.status === 404) {
+          console.log("Profile not found - user can fill questionnaire")
+          setProfileExists(false)
+        } else if (response.ok) {
+          const data = await response.json()
+          console.log("Profile data:", data)
+          if (data.success && data.data) {
+            setProfileExists(true)
+          } else {
+            setProfileExists(false)
+          }
+        } else {
+          setProfileExists(false)
+        }
+      } catch (error) {
+        console.error("Error checking profile:", error)
+        setProfileExists(false)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    checkProfileExists()
+  }, [currentUser])
+
   const handleCheckboxChange = (field, value) => {
     setFormData(prev => {
       const currentValues = prev[field] || []
@@ -100,7 +141,7 @@ function Questionnaire() {
           setCurrentQuestion(currentQuestion + 1)
         } else if (currentStep === 5 && currentQuestion < 5) {
           setCurrentQuestion(currentQuestion + 1)
-        } else if (currentStep === 6 && currentQuestion < 4) {
+        } else if (currentStep === 6 && currentQuestion < 1) {
           setCurrentQuestion(currentQuestion + 1)
         } else {
           setCurrentStep(currentStep + 1)
@@ -123,17 +164,43 @@ function Questionnaire() {
         else if (currentStep === 3) setCurrentQuestion(9)
         else if (currentStep === 4) setCurrentQuestion(3)
         else if (currentStep === 5) setCurrentQuestion(10)
-        else if (currentStep === 6) setCurrentQuestion(5)
+        else if (currentStep === 6) setCurrentQuestion(1)
         else setCurrentQuestion(1)
       }
       setIsAnimating(false)
     }, 150)
   }
 
-  const handleSubmit = () => {
-    console.log("Questionnaire submitted:", formData)
-    // TODO: Save to database
-    navigate("/dashboard")
+  const handleSubmit = async () => {
+    try {
+      const profileData = {
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
+        userName: currentUser.displayName || '',
+        ...formData
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profiles`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData)
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        console.log("Questionnaire submitted successfully:", data)
+        navigate("/dashboard")
+      } else {
+        console.error("Failed to save questionnaire:", data.message)
+        alert("Failed to save your questionnaire. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error submitting questionnaire:", error)
+      alert("An error occurred while saving your questionnaire. Please try again.")
+    }
   }
 
   const renderProgressBar = () => (
@@ -610,53 +677,83 @@ function Questionnaire() {
             { id: 'unstable', label: 'Unstable' }
           ]}
           selectedValue={formData.financialStatus}
-          onSelect={(value) => handleAutoNext("financialStatus", value)}
-        />
-      )
-    } else if (currentQuestion === 2) {
-      return (
-        <CheckboxQuestion
-          title="What resources would be useful for you?"
-          options={[
-            "Support Groups",
-            "Therapy journals",
-            "Worksheets",
-            "Goal/habit tracking",
-            "Others",
-            "I don't know"
-          ]}
-          selectedValues={formData.usefulResources}
-          onToggle={(option) => handleCheckboxChange("usefulResources", option)}
-          onNext={handleNext}
-        />
-      )
-    } else if (currentQuestion === 3) {
-      return (
-        <RadioQuestion
-          title="How do you prefer to communicate with your therapist?"
-          options={[
-            { id: 'mostly-text', label: 'Mostly text-based (chat, email)' },
-            { id: 'video-calls', label: 'Video calls' },
-            { id: 'in-person', label: 'In-person sessions' }
-          ]}
-          selectedValue={formData.communicateTherapist}
-          onSelect={(value) => handleAutoNext("communicateTherapist", value)}
-        />
-      )
-    } else if (currentQuestion === 4) {
-      return (
-        <RadioQuestion
-          title="Are there any specific preferences for your therapist?"
-          options={[
-            { id: 'male-therapist', label: 'Male therapist' },
-            { id: 'female-therapist', label: 'Female therapist' },
-            { id: 'no-preference', label: 'No preference' }
-          ]}
-          selectedValue={formData.preferredTherapist}
-          onSelect={(value) => handleAutoNext("preferredTherapist", value)}
+          onSelect={(value) => handleRadioChange("financialStatus", value)}
         />
       )
     }
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-white rounded-lg font-nunito">
+        <div className="container mx-auto px-4 py-8 max-w-4xl text-center">
+          <div className="animate-pulse">
+            <QuestionnaireIcon className="w-12 h-12 text-customGreenHover mx-auto mb-4" />
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show message if profile already exists
+  if (profileExists) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-white rounded-lg font-nunito">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <Card className="border-2 border-dashed border-gray-300 shadow-none">
+            <CardHeader className="text-center pb-4">
+              <div className="flex justify-center mb-4">
+                <div className="rounded-full bg-teal-50 p-5">
+                  <CheckIcon className="w-20 h-20 text-teal-700" />
+                </div>
+              </div>
+              <CardTitle className="text-3xl font-bold text-customGreenHover mb-2">
+                Questionnaire Already Completed
+              </CardTitle>
+              <CardDescription className="text-lg text-gray-600">
+                You have already filled out the questionnaire
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 text-center">
+              <p className="text-gray-700">
+                Your profile has been successfully saved and we've matched you with psychologists based on your preferences.
+              </p>
+              
+              <div className="bg-customGreen/10 rounded-lg p-4">
+                <p className="text-customGreen font-medium">
+                  You can view and edit your responses in the Profile section
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <Button
+                  onClick={() => navigate("/profile")}
+                  className="px-8 bg-teal-800 hover:bg-teal-900"
+                >
+                  View Profile
+                </Button>
+                <Button
+                  onClick={() => navigate("/psychologists")}
+                  variant="outline"
+                  className="px-8 border-teal-800 text-teal-800 hover:bg-teal-50"
+                >
+                  Browse Psychologists
+                </Button>
+                <Button
+                  onClick={() => navigate("/dashboard")}
+                  variant="outline"
+                  className="px-8"
+                >
+                  Go to Dashboard
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -705,7 +802,7 @@ function Questionnaire() {
 
         {/* Navigation Buttons */}
         <div className="mt-8 mb-14 flex justify-end ">
-          {currentStep === totalSteps && currentQuestion === 4 ? (
+          {currentStep === totalSteps && currentQuestion === 1 ? (
             <Button
               onClick={handleSubmit}
               className="px-8 bg-teal-800 hover:bg-teal-900"

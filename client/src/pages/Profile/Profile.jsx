@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { RadioQuestion, DropdownQuestionSelect, CheckboxQuestion, Card, CardHeader, CardTitle, CardContent } from "@/components"
 import { Button } from "@/components/ui/button"
@@ -31,70 +31,121 @@ function Profile() {
   const { currentUser } = useAuth()
   const [activeSection, setActiveSection] = useState('basic')
   const [editingSection, setEditingSection] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  // Initialize with sample data - in real app, fetch from database
   const [profileData, setProfileData] = useState({
-    // Step 1: Therapy Type & Basic Info
-    therapyType: "therapy",
-    country: "Pakistan",
-    relationshipStatus: "single",
-    age: "25-34",
-    gender: "male",
-
-    // Step 2: Religion & Therapy Preferences
-    religion: "islam",
-    religionImportance: "important",
-    spiritual: "yes",
-    therapyHistory: "no",
-    therapyReasons: ["I've been feeling depressed", "I feel anxious or overwhelmed"],
-    therapistExpectations: ["Listens", "Guides me to set goals"],
-    therapistStyle: "casual",
-    therapistApproach: "somewhat-flexible",
-    therapistManner: "gentle",
-
-    // Step 3: Current State
-    depression: "no",
-    eatingHabits: "good",
-    physicalHealth: "good",
-
-    // Step 4: Past 2 Weeks Assessment
-    littleInterest: "several-days",
-    motorActivity: "not-at-all",
-    feelingDown: "several-days",
-    troubleSleeping: "more-than-half",
-    feelingTired: "several-days",
-    poorAppetite: "not-at-all",
-    feelingBad: "several-days",
-    troubleConcentrating: "not-at-all",
-    thoughtsHurting: "not-at-all",
-    difficultyForWork: "somewhat-difficult",
-
-    // Step 5: Additional Health Info
-    employmentStatus: "employed",
-    drinkingHabits: "never",
-    suicidalThoughts: "never",
-    panicAttacks: "no",
-    medication: "no",
-
-    // Step 6: Preferences & Resources
-    financialStatus: "stable",
-    usefulResources: ["Support Groups", "Worksheets"],
-    communicateTherapist: "video-calls",
-    preferredTherapist: "no-preference"
+    therapyType: "",
+    country: "",
+    relationshipStatus: "",
+    age: "",
+    gender: "",
+    religion: "",
+    religionImportance: "",
+    spiritual: "",
+    therapyHistory: "",
+    therapyReasons: [],
+    therapistExpectations: [],
+    therapistStyle: "",
+    therapistApproach: "",
+    therapistManner: "",
+    depression: "",
+    eatingHabits: "",
+    physicalHealth: "",
+    littleInterest: "",
+    motorActivity: "",
+    feelingDown: "",
+    troubleSleeping: "",
+    feelingTired: "",
+    poorAppetite: "",
+    feelingBad: "",
+    troubleConcentrating: "",
+    thoughtsHurting: "",
+    difficultyForWork: "",
+    employmentStatus: "",
+    drinkingHabits: "",
+    suicidalThoughts: "",
+    panicAttacks: "",
+    medication: "",
+    financialStatus: "",
+    usefulResources: [],
+    communicateTherapist: "",
+    preferredTherapist: ""
   })
 
   const [tempData, setTempData] = useState({})
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!currentUser) {
+        setLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/profiles/${currentUser.uid}`
+        )
+
+        if (response.status === 404) {
+          setLoading(false)
+          return
+        }
+
+        const data = await response.json()
+
+        if (data.success) {
+          setProfileData(data.data)
+        } else {
+          setError(data.message)
+        }
+      } catch (err) {
+        console.error("Error fetching profile:", err)
+        setError("Failed to load profile data")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchProfile()
+  }, [currentUser])
 
   const handleEdit = (section) => {
     setEditingSection(section)
     setTempData({ ...profileData })
   }
 
-  const handleSave = () => {
-    setProfileData({ ...tempData })
-    setEditingSection(null)
-    // TODO: Save to database
-    console.log("Saved data:", tempData)
+  const handleSave = async () => {
+    if (!currentUser) {
+      alert("You must be logged in to save your profile")
+      return
+    }
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/profiles/${currentUser.uid}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(tempData)
+        }
+      )
+
+      const data = await response.json()
+
+      if (data.success) {
+        setProfileData({ ...tempData })
+        setEditingSection(null)
+        console.log("Profile saved successfully")
+      } else {
+        alert("Failed to save profile: " + data.message)
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error)
+      alert("An error occurred while saving your profile")
+    }
   }
 
   const handleCancel = () => {
@@ -553,8 +604,6 @@ function Profile() {
   ]
 
   const renderFieldValue = (field, value) => {
-     if (!value) return <span className="text-gray-400">Not set</span>
-
     if (field.type === 'checkbox') {
       if (Array.isArray(value) && value.length > 0) {
         return (
@@ -567,7 +616,11 @@ function Profile() {
           </div>
         )
       }
-      return <span className="text-gray-400">None selected</span>
+      return <span className="text-gray-400 italic">N/A</span>
+    }
+
+    if (!value || value === '') {
+      return <span className="text-gray-400 italic">N/A</span>
     }
 
     const label = getLabelForValue(value, field.options)
@@ -606,6 +659,28 @@ function Profile() {
         />
       )
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-teal-800 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    )
   }
 
   return (
