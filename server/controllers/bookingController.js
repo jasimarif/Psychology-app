@@ -1,5 +1,6 @@
 import Booking from '../models/Booking.js';
 import Psychologist from '../models/Psychologist.js';
+import admin from 'firebase-admin';
 import zoomService from '../services/zoomService.js';
 import emailCalendarService from '../services/emailCalendarService.js';
 import { updateCompletedSessions } from '../utils/sessionCompletionService.js';
@@ -207,10 +208,23 @@ export const createBooking = async (req, res) => {
 
     const price = parseFloat(psychologist.price.replace(/[^0-9.]/g, ''));
 
+    let userName = req.user.displayName;
+    
+    if (!userName) {
+      try {
+        const userRecord = await admin.auth().getUser(req.user.uid);
+        userName = userRecord.displayName;
+      } catch (error) {
+        console.error('Error fetching user from Firebase:', error);
+      }
+    }
+
+    userName = userName || req.user.email || 'User';
+
     const booking = await Booking.create({
       userId: req.user.uid,
       userEmail: req.user.email || '',
-      userName: req.user.displayName || req.user.email || '',
+      userName: userName,
       psychologistId,
       appointmentDate: new Date(appointmentDate),
       startTime,
@@ -226,7 +240,6 @@ export const createBooking = async (req, res) => {
     // Create Zoom meeting and send calendar invites
     try {
       if (zoomService.isAvailable()) {
-        // Construct full datetime for Zoom meeting
         const bookingDate = new Date(appointmentDate);
         const [startHours, startMinutes] = startTime.split(':').map(Number);
         const [endHours, endMinutes] = endTime.split(':').map(Number);
@@ -237,7 +250,6 @@ export const createBooking = async (req, res) => {
         const endDateTime = new Date(bookingDate);
         endDateTime.setHours(endHours, endMinutes, 0, 0);
 
-        // Calculate duration in minutes
         const durationMinutes = Math.round((endDateTime - startDateTime) / 60000);
 
         // Create Zoom meeting
@@ -249,7 +261,6 @@ export const createBooking = async (req, res) => {
 
         const zoomMeeting = await zoomService.createMeeting(meetingData);
 
-        // Update booking with Zoom details
         booking.zoomMeetingId = zoomMeeting.meetingId;
         booking.zoomJoinUrl = zoomMeeting.joinUrl;
         booking.zoomPassword = zoomMeeting.password;
@@ -270,7 +281,6 @@ export const createBooking = async (req, res) => {
 
             const inviteDescription = `Session Details:\n\nPsychologist: ${psychologist.name}\nDate: ${formattedDate}\nTime: ${formattedStartTime} - ${formattedEndTime}\n\n${notes ? 'Notes: ' + notes : ''}\n\nZoom Meeting ID: ${zoomMeeting.meetingId}\nPassword: ${zoomMeeting.password}`;
 
-            // Send to both psychologist and client
             const recipients = [psychologist.email, userEmail].filter(Boolean);
 
             if (recipients.length > 0) {
@@ -381,7 +391,6 @@ export const getPsychologistBookings = async (req, res) => {
 
     await updateCompletedSessions();
 
-    // Build query
     const query = { psychologistId };
 
     if (status) {
@@ -437,7 +446,6 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
-    // Check if booking can be cancelled
     if (booking.status === 'cancelled' || booking.status === 'completed') {
       return res.status(400).json({
         success: false,
@@ -465,14 +473,12 @@ export const cancelBooking = async (req, res) => {
     booking.cancelledAt = new Date();
     await booking.save();
 
-    // Delete Zoom meeting if it exists
     if (booking.zoomMeetingId && zoomService.isAvailable()) {
       try {
         await zoomService.deleteMeeting(booking.zoomMeetingId);
         console.log(`Zoom meeting ${booking.zoomMeetingId} deleted`);
       } catch (zoomError) {
         console.error('Failed to delete Zoom meeting:', zoomError.message);
-        // Continue with cancellation even if Zoom deletion fails
       }
     }
 
@@ -510,7 +516,6 @@ export const cancelBooking = async (req, res) => {
         }
       } catch (emailError) {
         console.error('Failed to send cancellation emails:', emailError.message);
-        // Continue even if email fails
       }
     }
 
@@ -561,7 +566,6 @@ export const rescheduleBooking = async (req, res) => {
       });
     }
 
-    // Check if booking can be rescheduled
     if (booking.status === 'cancelled' || booking.status === 'completed') {
       return res.status(400).json({
         success: false,
@@ -569,7 +573,6 @@ export const rescheduleBooking = async (req, res) => {
       });
     }
 
-    // Validate new time slot
     const requestedDate = new Date(appointmentDate);
     const dayOfWeek = requestedDate.getDay();
 
@@ -601,14 +604,13 @@ export const rescheduleBooking = async (req, res) => {
       });
     }
 
-    // Check if new slot is available
     const startOfDay = new Date(appointmentDate);
     startOfDay.setHours(0, 0, 0, 0);
     const endOfDay = new Date(appointmentDate);
     endOfDay.setHours(23, 59, 59, 999);
 
     const existingBooking = await Booking.findOne({
-      _id: { $ne: bookingId }, // Exclude current booking
+      _id: { $ne: bookingId }, 
       psychologistId: booking.psychologistId._id,
       appointmentDate: {
         $gte: startOfDay,
@@ -625,13 +627,11 @@ export const rescheduleBooking = async (req, res) => {
       });
     }
 
-    // Update booking with new date/time
     booking.appointmentDate = new Date(appointmentDate);
     booking.startTime = startTime;
     booking.endTime = endTime;
     await booking.save();
 
-    // Update Zoom meeting if it exists
     if (booking.zoomMeetingId && zoomService.isAvailable()) {
       try {
         const bookingDate = new Date(appointmentDate);
@@ -679,12 +679,10 @@ export const rescheduleBooking = async (req, res) => {
             }
           } catch (emailError) {
             console.error('Failed to send updated calendar invites:', emailError.message);
-            // Continue even if email fails
           }
         }
       } catch (zoomError) {
         console.error('Failed to update Zoom meeting:', zoomError.message);
-        // Continue with reschedule even if Zoom update fails
       }
     }
 

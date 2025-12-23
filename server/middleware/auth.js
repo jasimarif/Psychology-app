@@ -57,7 +57,9 @@ export const verifyToken = async (req, res, next) => {
     req.user = {
       uid: decodedToken.uid,
       email: decodedToken.email,
-      emailVerified: decodedToken.email_verified
+      emailVerified: decodedToken.email_verified,
+      displayName: decodedToken.name || '',
+      picture: decodedToken.picture || ''
     };
 
     next();
