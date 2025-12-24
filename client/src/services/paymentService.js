@@ -3,7 +3,7 @@ import { auth } from '../lib/firebase';
 const API_URL = import.meta.env.VITE_API_URL;
 
 
-export const createCheckoutSession = async (bookingId) => {
+export const createCheckoutSession = async (bookingData) => {
   try {
     const user = auth.currentUser;
     if (!user) {
@@ -18,7 +18,7 @@ export const createCheckoutSession = async (bookingId) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ bookingId })
+      body: JSON.stringify(bookingData)
     });
 
     if (!response.ok) {

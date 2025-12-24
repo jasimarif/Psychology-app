@@ -102,19 +102,17 @@ const PsychologistProfile = () => {
     setBookingError("")
 
     try {
-      // Step 1: Create booking (status will be 'pending')
-      const booking = await bookingService.createBooking({
+      const { url } = await createCheckoutSession({
         psychologistId: psychologist._id,
         appointmentDate: selectedDate,
         startTime: selectedSlot.startTime,
         endTime: selectedSlot.endTime,
-        notes: bookingNotes
+        notes: bookingNotes,
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
+        userName: currentUser.displayName || currentUser.email
       })
 
-      // Step 2: Create Stripe Checkout Session
-      const { url } = await createCheckoutSession(booking._id)
-
-      // Step 3: Redirect to Stripe Checkout
       window.location.href = url
 
     } catch (error) {

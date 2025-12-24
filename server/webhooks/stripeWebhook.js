@@ -4,6 +4,7 @@ import { sendConfirmationEmail } from '../utils/emailService.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
+
 export const handleStripeWebhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -27,10 +28,6 @@ export const handleStripeWebhook = async (req, res) => {
         await handleCheckoutSessionCompleted(event.data.object);
         break;
 
-      case 'payment_intent.succeeded':
-        await handlePaymentIntentSucceeded(event.data.object);
-        break;
-
       case 'payment_intent.payment_failed':
         await handlePaymentIntentFailed(event.data.object);
         break;
@@ -50,38 +47,48 @@ export const handleStripeWebhook = async (req, res) => {
   }
 };
 
+
 async function handleCheckoutSessionCompleted(session) {
   console.log('✅ Checkout session completed:', session.id);
 
-  const bookingId = session.metadata.bookingId;
+  const metadata = session.metadata;
 
-  if (!bookingId) {
-    console.error('No bookingId found in session metadata');
+  if (!metadata.psychologistId || !metadata.appointmentDate || !metadata.startTime || !metadata.endTime) {
+    console.error('Missing booking data in session metadata');
     return;
   }
 
   try {
-    const booking = await Booking.findById(bookingId).populate('psychologistId');
+    const booking = await Booking.create({
+      userId: metadata.userId,
+      userEmail: metadata.userEmail,
+      userName: metadata.userName,
+      psychologistId: metadata.psychologistId,
+      appointmentDate: new Date(metadata.appointmentDate),
+      startTime: metadata.startTime,
+      endTime: metadata.endTime,
+      timezone: metadata.timezone,
+      price: parseFloat(metadata.price),
+      currency: metadata.currency,
+      notes: metadata.notes || '',
+      status: 'confirmed', 
+      paymentStatus: 'paid',
+      stripeSessionId: session.id,
+      stripePaymentIntentId: session.payment_intent,
+      stripeCustomerId: metadata.stripeCustomerId,
+      paidAt: new Date()
+    });
 
-    if (!booking) {
-      console.error('Booking not found:', bookingId);
-      return;
-    }
+    await booking.populate('psychologistId');
 
-    booking.paymentStatus = 'paid';
-    booking.status = 'confirmed';
-    booking.stripePaymentIntentId = session.payment_intent;
-    booking.paidAt = new Date();
-
-    await booking.save();
-
-    console.log(`✅ Booking ${bookingId} confirmed and marked as paid`);
+    console.log(`✅ Booking created and confirmed: ${booking._id}`);
 
     try {
       await sendConfirmationEmail(booking);
-      console.log(`✅ Confirmation email sent for booking ${bookingId}`);
+      console.log(`✅ Confirmation email sent for booking ${booking._id}`);
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
+      // Don't fail the webhook if email fails
     }
 
   } catch (error) {
@@ -90,63 +97,20 @@ async function handleCheckoutSessionCompleted(session) {
   }
 }
 
-async function handlePaymentIntentSucceeded(paymentIntent) {
-  console.log('✅ Payment intent succeeded:', paymentIntent.id);
-
-  const bookingId = paymentIntent.metadata.bookingId;
-
-  if (!bookingId) {
-    console.log('No bookingId in payment intent metadata');
-    return;
-  }
-
-  try {
-    const booking = await Booking.findById(bookingId);
-
-    if (!booking) {
-      console.error('Booking not found:', bookingId);
-      return;
-    }
-
-    if (!booking.stripePaymentIntentId) {
-      booking.stripePaymentIntentId = paymentIntent.id;
-      await booking.save();
-    }
-
-  } catch (error) {
-    console.error('Error processing payment intent:', error);
-    throw error;
-  }
-}
-
 
 async function handlePaymentIntentFailed(paymentIntent) {
   console.log('❌ Payment intent failed:', paymentIntent.id);
 
-  const bookingId = paymentIntent.metadata.bookingId;
+  // No booking to update since booking is only created after successful payment
+  const userId = paymentIntent.metadata.userId;
+  const psychologistId = paymentIntent.metadata.psychologistId;
 
-  if (!bookingId) {
-    return;
-  }
-
-  try {
-    const booking = await Booking.findById(bookingId);
-
-    if (!booking) {
-      console.error('Booking not found:', bookingId);
-      return;
-    }
-
-    console.log(`Payment failed for booking ${bookingId}`);
-
-
-  } catch (error) {
-    console.error('Error handling failed payment:', error);
-    throw error;
-  }
+  console.log(`Payment failed for user ${userId} trying to book psychologist ${psychologistId}`);
 }
 
-
+/**
+ * Handle refunded charges
+ */
 async function handleChargeRefunded(charge) {
   console.log('💰 Charge refunded:', charge.id);
 

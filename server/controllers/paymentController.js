@@ -5,48 +5,29 @@ import Psychologist from '../models/Psychologist.js';
 
 export const createCheckoutSession = async (req, res) => {
   try {
-    const { bookingId } = req.body;
+    const { psychologistId, appointmentDate, startTime, endTime, notes, userId, userEmail, userName } = req.body;
 
-    if (!bookingId) {
-      return res.status(400).json({ error: 'Booking ID is required' });
+    if (!psychologistId || !appointmentDate || !startTime || !endTime) {
+      return res.status(400).json({ error: 'Missing required booking fields' });
     }
 
-    const booking = await Booking.findById(bookingId).populate('psychologistId');
+    const psychologist = await Psychologist.findById(psychologistId);
 
-    if (!booking) {
-      return res.status(404).json({ error: 'Booking not found' });
+    if (!psychologist) {
+      return res.status(404).json({ error: 'Psychologist not found' });
     }
 
-    if (booking.userId !== req.user.uid) {
-      return res.status(403).json({ error: 'Unauthorized access to this booking' });
-    }
+    // Get or create Stripe customer
+    const customer = await stripe.customers.create({
+      email: userEmail || req.user.email,
+      name: userName || req.user.displayName,
+      metadata: {
+        userId: userId || req.user.uid,
+        firebaseUid: userId || req.user.uid
+      }
+    });
 
-    if (booking.paymentStatus === 'paid') {
-      return res.status(400).json({ error: 'This booking has already been paid' });
-    }
-
-    if (booking.status === 'cancelled') {
-      return res.status(400).json({ error: 'Cannot pay for a cancelled booking' });
-    }
-
-    const psychologist = booking.psychologistId;
-
-    let customerId = booking.stripeCustomerId;
-
-    if (!customerId) {
-      const customer = await stripe.customers.create({
-        email: req.user.email,
-        name: booking.userName || req.user.displayName,
-        metadata: {
-          userId: req.user.uid,
-          firebaseUid: req.user.uid
-        }
-      });
-      customerId = customer.id;
-
-      booking.stripeCustomerId = customerId;
-      await booking.save();
-    }
+    const customerId = customer.id;
 
     // Create Checkout Session
     const session = await stripe.checkout.sessions.create({
@@ -55,39 +36,41 @@ export const createCheckoutSession = async (req, res) => {
       line_items: [
         {
           price_data: {
-            currency: booking.currency.toLowerCase(),
+            currency: (psychologist.currency || 'USD').toLowerCase(),
             product_data: {
               name: `Therapy Session with ${psychologist.name}`,
-              description: `${psychologist.title} - ${new Date(booking.appointmentDate).toLocaleDateString()} at ${booking.startTime}`,
+              description: `${psychologist.title} - ${new Date(appointmentDate).toLocaleDateString()} at ${startTime}`,
               images: psychologist.profileImage ? [psychologist.profileImage] : [],
             },
-            unit_amount: Math.round(booking.price * 100), // Convert to cents
+            unit_amount: Math.round(psychologist.price * 100), // Convert to cents
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
       success_url: `${process.env.CLIENT_URL}/booking-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/booking-cancelled?booking_id=${bookingId}`,
+      cancel_url: `${process.env.CLIENT_URL}/booking-cancelled`,
       metadata: {
-        bookingId: bookingId.toString(),
-        psychologistId: psychologist._id.toString(),
-        userId: req.user.uid,
-        appointmentDate: booking.appointmentDate.toISOString(),
-        startTime: booking.startTime,
-        endTime: booking.endTime
+        psychologistId: psychologistId.toString(),
+        userId: userId || req.user.uid,
+        userEmail: userEmail || req.user.email,
+        userName: userName || req.user.displayName || req.user.email,
+        appointmentDate: new Date(appointmentDate).toISOString(),
+        startTime,
+        endTime,
+        notes: notes || '',
+        timezone: psychologist.availability.timezone || 'America/New_York',
+        price: psychologist.price.toString(),
+        currency: psychologist.currency || 'USD',
+        stripeCustomerId: customerId
       },
       payment_intent_data: {
         metadata: {
-          bookingId: bookingId.toString(),
-          psychologistId: psychologist._id.toString(),
-          userId: req.user.uid
+          psychologistId: psychologistId.toString(),
+          userId: userId || req.user.uid
         }
       }
     });
-
-    booking.stripeSessionId = session.id;
-    await booking.save();
 
     res.json({
       sessionId: session.id,
