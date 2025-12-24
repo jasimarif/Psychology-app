@@ -9,6 +9,7 @@ import bookingRoutes from './routes/bookingRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import { handleStripeWebhook } from './webhooks/stripeWebhook.js';
+import emailCalendarService from './services/emailCalendarService.js';
 
 dotenv.config();
 
@@ -18,6 +19,10 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 connectDB();
+
+// Initialize email service on startup
+console.log('Initializing email service...');
+emailCalendarService.initialize();
 
 app.use(cors({
   origin: process.env.CLIENT_URL,

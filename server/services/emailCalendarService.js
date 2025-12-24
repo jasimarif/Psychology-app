@@ -18,8 +18,21 @@ class EmailCalendarService {
       const emailPassword = process.env.EMAIL_PASSWORD;
       const emailFrom = process.env.EMAIL_FROM || emailUser;
 
+      console.log('Initializing Email Calendar Service with:', {
+        host: emailHost,
+        port: emailPort,
+        user: emailUser,
+        hasPassword: !!emailPassword,
+        from: emailFrom,
+        nodeEnv: process.env.NODE_ENV
+      });
+
       if (!emailHost || !emailUser || !emailPassword) {
-        console.warn('Email Calendar Service: Missing email credentials. Calendar invites will not be sent.');
+        console.error('Email Calendar Service: Missing email credentials!', {
+          hasHost: !!emailHost,
+          hasUser: !!emailUser,
+          hasPassword: !!emailPassword
+        });
         return false;
       }
 
@@ -30,7 +43,13 @@ class EmailCalendarService {
         auth: {
           user: emailUser,
           pass: emailPassword
-        }
+        },
+        // Add these options for better compatibility
+        tls: {
+          rejectUnauthorized: process.env.NODE_ENV === 'production'
+        },
+        debug: process.env.NODE_ENV === 'development',
+        logger: process.env.NODE_ENV === 'development'
       });
 
       this.emailFrom = emailFrom;
@@ -39,7 +58,7 @@ class EmailCalendarService {
       console.log('Email Calendar Service initialized successfully');
       return true;
     } catch (error) {
-      console.error('Failed to initialize Email Calendar Service:', error.message);
+      console.error('Failed to initialize Email Calendar Service:', error);
       return false;
     }
   }
@@ -162,7 +181,9 @@ class EmailCalendarService {
         }]
       };
 
+      console.log('Attempting to send email to:', recipients);
       const info = await this.transporter.sendMail(mailOptions);
+      console.log('Email sent successfully:', info.messageId);
 
       return {
         success: true,
@@ -170,7 +191,7 @@ class EmailCalendarService {
         recipients: recipients
       };
     } catch (error) {
-      console.error('Error sending calendar invite:', error.message);
+      console.error('Error sending calendar invite:', error);
       throw new Error(`Failed to send calendar invite: ${error.message}`);
     }
   }
