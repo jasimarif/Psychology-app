@@ -139,7 +139,9 @@ const PsychologistCard = ({ psychologist, onViewProfile, onBookSession }) => {
           <div className="flex items-center justify-between bg-lightGreen p-4 rounded-xl">
             <div>
               <p className="text-xs text-gray-600 uppercase font-semibold">Session Fee</p>
-              <p className="text-2xl font-bold text-customGreen">${psychologist.price}</p>
+              <p className="text-2xl font-bold text-customGreen">
+                ${typeof psychologist.price === 'number' ? psychologist.price.toFixed(2) : psychologist.price}
+              </p>
             </div>
             <div className="w-12 h-12 bg-customGreen/20 rounded-full flex items-center justify-center shadow-none">
               <CalendarIcon className="w-6 h-6 text-customGreen" />

@@ -206,7 +206,9 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    const price = parseFloat(psychologist.price.replace(/[^0-9.]/g, ''));
+    const price = typeof psychologist.price === 'number'
+      ? psychologist.price
+      : parseFloat(psychologist.price.replace(/[^0-9.]/g, ''));
 
     let userName = req.user.displayName;
     
@@ -231,12 +233,18 @@ export const createBooking = async (req, res) => {
       endTime,
       timezone: psychologist.availability.timezone,
       price,
+      currency: psychologist.currency || 'USD',
       notes: notes || '',
-      status: 'confirmed'
+      status: 'pending',
+      paymentStatus: 'unpaid'
     });
 
     await booking.populate('psychologistId', 'name title email profileImage');
 
+    // NOTE: Zoom meeting and calendar invites will be created AFTER successful payment
+    // See webhooks/stripeWebhook.js for post-payment logic
+
+    /* COMMENTED OUT - Will be handled after payment in webhook
     // Create Zoom meeting and send calendar invites
     try {
       if (zoomService.isAvailable()) {
@@ -312,11 +320,14 @@ export const createBooking = async (req, res) => {
       booking.calendarIntegrationStatus = 'failed';
       await booking.save();
     }
+    */ // END COMMENTED OUT SECTION
 
+    // Return booking - client should redirect to payment
     res.status(201).json({
       success: true,
-      message: 'Booking created successfully',
-      data: booking
+      message: 'Booking created. Please proceed to payment.',
+      data: booking,
+      requiresPayment: true
     });
   } catch (error) {
     console.error('Error in createBooking:', error);

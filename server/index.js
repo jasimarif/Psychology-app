@@ -7,6 +7,8 @@ import connectDB from './config/database.js';
 import psychologistRoutes from './routes/psychologistRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import { handleStripeWebhook } from './webhooks/stripeWebhook.js';
 
 dotenv.config();
 
@@ -21,15 +23,18 @@ app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true
 }));
+
+app.post('/api/payment/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from the client dist folder
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.use('/api/psychologists', psychologistRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/profiles', profileRoutes);
+app.use('/api/payment', paymentRoutes);
 
 // Serve index.html for all non-API routes (SPA fallback)
 app.get('*', (req, res) => {

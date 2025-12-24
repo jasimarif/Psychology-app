@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Calendar } from "@/components/ui/calendar"
 import { bookingService } from "@/services/bookingService"
+import { createCheckoutSession } from "@/services/paymentService"
 import { formatDateOnly, formatTime24to12 } from "@/lib/timezone"
 import {
   LocationIcon,
@@ -101,7 +102,8 @@ const PsychologistProfile = () => {
     setBookingError("")
 
     try {
-      await bookingService.createBooking({
+      // Step 1: Create booking (status will be 'pending')
+      const booking = await bookingService.createBooking({
         psychologistId: psychologist._id,
         appointmentDate: selectedDate,
         startTime: selectedSlot.startTime,
@@ -109,17 +111,14 @@ const PsychologistProfile = () => {
         notes: bookingNotes
       })
 
-      setBookingSuccess(true)
-      // Don't redirect, just show success message
-      setTimeout(() => {
-        setShowBooking(false)
-        setBookingSuccess(false)
-        setSelectedDate("")
-        setSelectedSlot(null)
-        setBookingNotes("")
-      }, 2000)
+      // Step 2: Create Stripe Checkout Session
+      const { url } = await createCheckoutSession(booking._id)
+
+      // Step 3: Redirect to Stripe Checkout
+      window.location.href = url
+
     } catch (error) {
-      setBookingError(error.message)
+      setBookingError(error.message || "Failed to initiate payment. Please try again.")
       setBookingLoading(false)
     }
   }
@@ -230,7 +229,9 @@ const PsychologistProfile = () => {
                     <span>{psychologist.languages.join(", ")}</span>
                   </div>
                   <div className="flex items-center gap-3 text-gray-600">
-                    <div className="font-bold text-gray-900">{psychologist.price}$</div>
+                    <div className="font-bold text-gray-900">
+                      ${typeof psychologist.price === 'number' ? psychologist.price.toFixed(2) : psychologist.price}
+                    </div>
                     <span className="text-sm">per session</span>
                   </div>
                 </div>
@@ -476,7 +477,9 @@ const PsychologistProfile = () => {
                             </div>
                             <div className="flex justify-between border-t border-gray-300 pt-2 mt-2">
                               <span className="text-gray-900 font-semibold">Total:</span>
-                              <span className="text-customGreen font-bold text-lg">{psychologist.price}</span>
+                              <span className="text-customGreen font-bold text-lg">
+                                ${typeof psychologist.price === 'number' ? psychologist.price.toFixed(2) : psychologist.price}
+                              </span>
                             </div>
                           </div>
                           <Button
@@ -637,7 +640,9 @@ const PsychologistProfile = () => {
                       </div>
                       <div className="flex justify-between border-t border-gray-300 pt-2 mt-2">
                         <span className="text-gray-900 font-semibold">Total:</span>
-                        <span className="text-customGreen font-bold text-lg">{psychologist.price}</span>
+                        <span className="text-customGreen font-bold text-lg">
+                          ${typeof psychologist.price === 'number' ? psychologist.price.toFixed(2) : psychologist.price}
+                        </span>
                       </div>
                     </div>
                     <Button
@@ -648,10 +653,10 @@ const PsychologistProfile = () => {
                       {bookingLoading ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Confirming Booking...
+                          Redirecting to Payment...
                         </>
                       ) : (
-                        "Confirm Booking"
+                        "Proceed to Payment"
                       )}
                     </Button>
                   </div>

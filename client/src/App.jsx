@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import {Login, Signup, LandingPage, Dashboard, Questionnaire, Profile, Psychologists, PsychologistProfile, MyBookings} from "./pages";
+import BookingSuccess from "./pages/Bookings/BookingSuccess";
+import BookingCancelled from "./pages/Bookings/BookingCancelled";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Layout } from "./components";
@@ -24,6 +26,8 @@ function App() {
         <Route path="/browse-psychologists" element={<ProtectedRoute><Layout><Psychologists /></Layout></ProtectedRoute>} />
         <Route path="/psychologist/:id" element={<ProtectedRoute><Layout><PsychologistProfile /></Layout></ProtectedRoute>} />
         <Route path="/my-bookings" element={<ProtectedRoute><Layout><MyBookings /></Layout></ProtectedRoute>} />
+        <Route path="/booking-success" element={<ProtectedRoute><Layout><BookingSuccess /></Layout></ProtectedRoute>} />
+        <Route path="/booking-cancelled" element={<ProtectedRoute><Layout><BookingCancelled /></Layout></ProtectedRoute>} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
       </Routes>
