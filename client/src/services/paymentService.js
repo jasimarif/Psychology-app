@@ -12,7 +12,7 @@ export const createCheckoutSession = async (bookingId) => {
 
     const token = await user.getIdToken();
 
-    const response = await fetch(`${API_URL}/payment/create-checkout-session`, {
+    const response = await fetch(`${API_URL}/api/payment/create-checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export const getCheckoutSession = async (sessionId) => {
 
     const token = await user.getIdToken();
 
-    const response = await fetch(`${API_URL}/payment/session/${sessionId}`, {
+    const response = await fetch(`${API_URL}/api/payment/session/${sessionId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -72,7 +72,7 @@ export const refundPayment = async (bookingId) => {
 
     const token = await user.getIdToken();
 
-    const response = await fetch(`${API_URL}/payment/refund`, {
+    const response = await fetch(`${API_URL}/api/payment/refund`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
