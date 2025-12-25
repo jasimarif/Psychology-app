@@ -20,9 +20,6 @@ const app = express();
 
 connectDB();
 
-// Initialize email service on startup
-console.log('Initializing email service...');
-emailCalendarService.initialize();
 
 app.use(cors({
   origin: process.env.CLIENT_URL,

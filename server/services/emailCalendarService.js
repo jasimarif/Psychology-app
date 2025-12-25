@@ -44,12 +44,7 @@ class EmailCalendarService {
           user: emailUser,
           pass: emailPassword
         },
-        // Add these options for better compatibility
-        tls: {
-          rejectUnauthorized: process.env.NODE_ENV === 'production'
-        },
-        debug: process.env.NODE_ENV === 'development',
-        logger: process.env.NODE_ENV === 'development'
+      
       });
 
       this.emailFrom = emailFrom;
