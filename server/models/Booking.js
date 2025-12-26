@@ -88,6 +88,19 @@ const bookingSchema = new mongoose.Schema({
   cancelledAt: {
     type: Date
   },
+  // Refund tracking fields
+  stripeRefundId: {
+    type: String,
+    default: null
+  },
+  refundedAt: {
+    type: Date,
+    default: null
+  },
+  refundAmount: {
+    type: Number,
+    default: null
+  },
   // Zoom integration fields
   zoomMeetingId: {
     type: String,
