@@ -1,56 +1,44 @@
-import pkg from 'nodemailer';
-const { createTransport } = pkg;
+import SibApiV3Sdk from '@sendinblue/client';
 import ical from 'ical-generator';
 import { formatDate, formatTime24to12 } from '../utils/timezone.js';
 
 class EmailCalendarService {
   constructor() {
-    this.transporter = null;
+    this.apiInstance = null;
     this.initialized = false;
   }
 
   
   initialize() {
     try {
-      const emailHost = process.env.EMAIL_HOST;
-      const emailPort = process.env.EMAIL_PORT;
-      const emailUser = process.env.EMAIL_USER;
-      const emailPassword = process.env.EMAIL_PASSWORD;
-      const emailFrom = process.env.EMAIL_FROM || emailUser;
+      const brevoApiKey = process.env.BREVO_API_KEY;
+      const emailFrom = process.env.EMAIL_FROM || process.env.BREVO_SENDER_EMAIL;
+      const senderName = process.env.BREVO_SENDER_NAME || 'Psychology Portal';
 
-      console.log('Initializing Email Calendar Service with:', {
-        host: emailHost,
-        port: emailPort,
-        user: emailUser,
-        hasPassword: !!emailPassword,
+      console.log('Initializing Email Calendar Service with Brevo API:', {
+        hasApiKey: !!brevoApiKey,
         from: emailFrom,
+        senderName: senderName,
         nodeEnv: process.env.NODE_ENV
       });
 
-      if (!emailHost || !emailUser || !emailPassword) {
-        console.error('Email Calendar Service: Missing email credentials!', {
-          hasHost: !!emailHost,
-          hasUser: !!emailUser,
-          hasPassword: !!emailPassword
+      if (!brevoApiKey || !emailFrom) {
+        console.error('Email Calendar Service: Missing Brevo credentials!', {
+          hasApiKey: !!brevoApiKey,
+          hasFrom: !!emailFrom
         });
         return false;
       }
 
-      this.transporter = createTransport({
-        host: emailHost,
-        port: parseInt(emailPort) || 587,
-        secure: parseInt(emailPort) === 465, 
-        auth: {
-          user: emailUser,
-          pass: emailPassword
-        },
-      
-      });
+      // Initialize Brevo API
+      this.apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+      this.apiInstance.setApiKey(SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
 
       this.emailFrom = emailFrom;
+      this.senderName = senderName;
       this.initialized = true;
 
-      console.log('Email Calendar Service initialized successfully');
+      console.log('Email Calendar Service initialized successfully with Brevo API');
       return true;
     } catch (error) {
       console.error('Failed to initialize Email Calendar Service:', error);
@@ -159,31 +147,31 @@ class EmailCalendarService {
         </html>
       `;
 
-      // Send email with .ics attachment
-      const mailOptions = {
-        from: `"Psychology Portal" <${this.emailFrom}>`,
-        to: recipients,
-        subject: subject,
-        html: htmlBody,
-        icalEvent: {
-          filename: 'session-invite.ics',
-          method: 'REQUEST',
-          content: icsContent
-        },
-        alternatives: [{
-          contentType: 'text/calendar; method=REQUEST',
-          content: Buffer.from(icsContent)
-        }]
-      };
+      // Prepare recipients for Brevo API
+      const recipientList = Array.isArray(to) ? to : [to];
+      const toRecipients = recipientList.map(email => ({ email: email.trim() }));
 
-      console.log('Attempting to send email to:', recipients);
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log('Email sent successfully:', info.messageId);
+      // Send email using Brevo API with .ics attachment
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      sendSmtpEmail.sender = { name: this.senderName, email: this.emailFrom };
+      sendSmtpEmail.to = toRecipients;
+      sendSmtpEmail.subject = subject;
+      sendSmtpEmail.htmlContent = htmlBody;
+      sendSmtpEmail.attachment = [
+        {
+          name: 'session-invite.ics',
+          content: Buffer.from(icsContent).toString('base64')
+        }
+      ];
+
+      console.log('Attempting to send email via Brevo API to:', recipientList.join(', '));
+      const response = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      console.log('Email sent successfully via Brevo:', response.body?.messageId || response.messageId);
 
       return {
         success: true,
-        messageId: info.messageId,
-        recipients: recipients
+        messageId: response.body?.messageId || response.messageId,
+        recipients: recipientList.join(', ')
       };
     } catch (error) {
       console.error('Error sending calendar invite:', error);
@@ -212,8 +200,6 @@ class EmailCalendarService {
         formattedDate,
         formattedTime
       } = eventData;
-
-      const recipients = Array.isArray(to) ? to.join(', ') : to;
 
       const displayDateTime = (formattedDate && formattedTime)
         ? `${formattedDate} at ${formattedTime}`
@@ -255,19 +241,25 @@ class EmailCalendarService {
         </html>
       `;
 
-      const mailOptions = {
-        from: `"Psychology Portal" <${this.emailFrom}>`,
-        to: recipients,
-        subject: subject,
-        html: htmlBody
-      };
+      // Prepare recipients for Brevo API
+      const recipientList = Array.isArray(to) ? to : [to];
+      const toRecipients = recipientList.map(email => ({ email: email.trim() }));
 
-      const info = await this.transporter.sendMail(mailOptions);
+      // Send email using Brevo API
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+      sendSmtpEmail.sender = { name: this.senderName, email: this.emailFrom };
+      sendSmtpEmail.to = toRecipients;
+      sendSmtpEmail.subject = subject;
+      sendSmtpEmail.htmlContent = htmlBody;
+
+      console.log('Attempting to send cancellation email via Brevo API to:', recipientList.join(', '));
+      const response = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
+      console.log('Cancellation email sent successfully via Brevo:', response.body?.messageId || response.messageId);
 
       return {
         success: true,
-        messageId: info.messageId,
-        recipients: recipients
+        messageId: response.body?.messageId || response.messageId,
+        recipients: recipientList.join(', ')
       };
     } catch (error) {
       console.error('Error sending cancellation email:', error.message);

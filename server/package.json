@@ -11,6 +11,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@sendinblue/client": "^3.3.1",
     "@zoom/meetingsdk": "^5.0.0",
     "axios": "^1.13.2",
     "cors": "^2.8.5",
