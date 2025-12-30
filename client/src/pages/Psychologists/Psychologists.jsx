@@ -67,7 +67,7 @@ function Psychologists() {
           languages: p.languages || [],
           price: p.price,
           availability: p.availability,
-          typicalHours: p.typicalHours,
+          // typicalHours: p.typicalHours,
           profileImage: p.profileImage,
           education: p.education || [],
           workExperience: p.workExperience || [],

@@ -529,7 +529,7 @@ const MyBookings = () => {
                       {booking.zoomJoinUrl && booking.status !== 'cancelled' && (
                         <div className="p-4 bg-blue-50 rounded-xl border border-blue-200 mb-4">
                           <div className="flex items-start gap-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-0">
                               <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M15.75 2.25H8.25C7.00736 2.25 6 3.25736 6 4.5V19.5C6 20.7426 7.00736 21.75 8.25 21.75H15.75C16.9926 21.75 18 20.7426 18 19.5V4.5C18 3.25736 16.9926 2.25 15.75 2.25Z" />
                                 <path d="M9 6.75H15M9 9.75H15M9 12.75H15" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>

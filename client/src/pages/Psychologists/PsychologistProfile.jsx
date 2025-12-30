@@ -342,7 +342,7 @@ const PsychologistProfile = () => {
                       <CalendarIcon className="w-8 h-8 text-yellow-600 bg-yellow-100 p-2 rounded" />
                       <span className="font-semibold text-gray-900">Typical Hours</span>
                     </div>
-                    <p className="text-gray-600">{psychologist.typicalHours || "Mon - Fri: 9:00 AM - 5:00 PM"}</p>
+                    {/* <p className="text-gray-600">{psychologist.typicalHours || "Mon - Fri: 9:00 AM - 5:00 PM"}</p> */}
                   </div>
                   <div className="p-4 bg-yellow-100/80 rounded-lg  ">
                     <div className="flex items-center gap-2 mb-2">
