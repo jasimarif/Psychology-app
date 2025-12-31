@@ -729,57 +729,93 @@ function Questionnaire() {
   // Show message if profile already exists
   if (profileExists) {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-white rounded-lg font-nunito">
+      <div className="min-h-screen flex flex-col bg-white font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500 select-none">
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <Card className="border-2 border-dashed border-gray-300 shadow-none">
-            <CardHeader className="text-center pb-4">
-              <div className="flex justify-center mb-4">
-                <div className="rounded-full bg-teal-50 p-5">
-                  <CheckIcon className="w-20 h-20 text-teal-700" />
+          {/* Header - consistent with questionnaire page */}
+          <div className="mb-8 text-center">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-customGreen/20 rounded-full flex items-center justify-center">
+                <CheckIcon className="w-6 h-6 text-customGreenHover" />
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-customGreenHover">
+                You're All Set!
+              </h1>
+            </div>
+            <p className="text-gray-600 text-lg">
+              Your questionnaire has already been completed
+            </p>
+          </div>
+
+          {/* Progress bar showing 100% */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-customGreenHover">
+                Questionnaire Complete
+              </span>
+              <span className="text-sm text-gray-600">
+                100% Complete
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="bg-customGreen h-2 rounded-full w-full" />
+            </div>
+          </div>
+
+          {/* Main content area */}
+          <div className="space-y-6">
+            {/* Success message card */}
+            <div className="bg-customGreen/20 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-12 h-12 bg-customGreen rounded-xl flex items-center justify-center">
+                  <CheckIcon className="w-7 h-7 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xl font-semibold text-teal-900 mb-2">
+                    Profile Successfully Created
+                  </h2>
+                  <p className="text-teal-700 leading-relaxed">
+                    Your profile is ready and we've matched you with psychologists tailored to your needs and preferences. You can now browse through our recommended professionals.
+                  </p>
                 </div>
               </div>
-              <CardTitle className="text-3xl font-bold text-customGreenHover mb-2">
-                Questionnaire Already Completed
-              </CardTitle>
-              <CardDescription className="text-lg text-gray-600">
-                You have already filled out the questionnaire
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6 text-center">
-              <p className="text-gray-700">
-                Your profile has been successfully saved and we've matched you with psychologists based on your preferences.
-              </p>
-              
-              <div className="bg-customGreen/10 rounded-lg p-4">
-                <p className="text-customGreen font-medium">
-                  You can view and edit your responses in the Profile section
-                </p>
-              </div>
+            </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            {/* Info tip */}
+            <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <Info className="w-5 h-5 text-gray-500 flex-shrink-0" />
+              <p className="text-gray-600 text-sm">
+                Want to update your responses? Visit your <button onClick={() => navigate("/profile")} className="text-teal-700 font-medium hover:underline">profile</button> to view and edit your questionnaire answers anytime.
+              </p>
+            </div>
+
+            {/* Action buttons */}
+            <div className="pt-4 space-y-4">
+              <Button
+                onClick={() => navigate("/psychologists")}
+                className="w-full h-12 bg-customGreen hover:bg-customGreenHover text-white font-semibold rounded-xl transition-all duration-300 select-none cursor-pointer"
+              >
+                <Users className="w-5 h-5 mr-2" />
+                Browse Matched Psychologists
+              </Button>
+              
+              <div className="grid grid-cols-2 gap-4">
                 <Button
                   onClick={() => navigate("/profile")}
-                  className="px-8 bg-teal-800 hover:bg-teal-900"
+                  variant="outline"
+                  className="h-11  font-medium rounded-xl text-gray-700 select-none cursor-pointer transition-all duration-300"
                 >
                   View Profile
                 </Button>
                 <Button
-                  onClick={() => navigate("/psychologists")}
-                  variant="outline"
-                  className="px-8 border-teal-800 text-teal-800 hover:bg-teal-50"
-                >
-                  Browse Psychologists
-                </Button>
-                <Button
                   onClick={() => navigate("/dashboard")}
                   variant="outline"
-                  className="px-8"
+                  className="h-11 cursor-pointer select-none text-gray-700  font-medium rounded-xl transition-all duration-300"
                 >
                   Go to Dashboard
                 </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     )
