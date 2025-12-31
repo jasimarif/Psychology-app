@@ -96,9 +96,9 @@ function Login() {
                   <Field>
                     <div className="flex items-center">
                       <FieldLabel htmlFor="password" className="text-gray-800 text-base">Password</FieldLabel>
-                      <a href="#" className="ml-auto text-base underline-offset-2 hover:underline text-teal-900">
+                      <Link to="/forgot-password" className="ml-auto text-base underline-offset-2 hover:underline text-teal-900">
                         Forgot your password?
-                      </a>
+                      </Link>
                     </div>
                     <Input
                       id="password"
