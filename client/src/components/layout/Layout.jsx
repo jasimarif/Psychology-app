@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import AppSidebar from '../sidebar/AppSidebar';
 import {
   Breadcrumb,
@@ -21,26 +21,43 @@ const Layout = ({ children }) => {
 
   const generateBreadcrumbs = () => {
     const pathnames = location.pathname.split('/').filter((x) => x);
-    
-    const getLabel = (path) => {
+    const psychologist = location.state?.psychologist;
+
+    const getLabel = (path, index) => {
       const labels = {
         'dashboard': 'Dashboard',
-        'psychologist': 'Psychologist Profile',
+        'psychologist': 'Psychologists',
         'my-bookings': 'My Bookings',
         'questionnaire': 'Questionnaire',
         'profile': 'Profile',
         'browse-psychologists': 'Psychologists',
       };
+
+      // If this is a psychologist ID (after /psychologist/), show psychologist name
+      if (pathnames[index - 1] === 'psychologist' && psychologist?.name) {
+        return psychologist.name;
+      }
+
       return labels[path] || path.charAt(0).toUpperCase() + path.slice(1);
+    };
+
+    const getLink = (value, index) => {
+      // For psychologist route, link to browse-psychologists instead
+      if (value === 'psychologist') {
+        return '/browse-psychologists';
+      }
+      return `/${pathnames.slice(0, index + 1).join('/')}`;
     };
 
     return (
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/dashboard" className="flex items-center gap-2">
-              <DashboardIcon className="h-4 w-4 text-gray-400" />
-              Dashboard
+            <BreadcrumbLink asChild className="flex items-center gap-2">
+              <Link to="/dashboard">
+                <DashboardIcon className="h-4 w-4 text-gray-400" />
+                Dashboard
+              </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -52,17 +69,19 @@ const Layout = ({ children }) => {
             pathnames.map((value, index) => {
               if (value === 'dashboard' && index === 0) return null;
 
-              const to = `/${pathnames.slice(0, index + 1).join('/')}`;
+              const to = getLink(value, index);
               const isLast = index === pathnames.length - 1;
-              const label = getLabel(value);
+              const label = getLabel(value, index);
 
               return (
-                <React.Fragment key={to}>
+                <React.Fragment key={to + index}>
                   <BreadcrumbItem>
                     {isLast ? (
                       <BreadcrumbPage>{label}</BreadcrumbPage>
                     ) : (
-                      <BreadcrumbLink href={to}>{label}</BreadcrumbLink>
+                      <BreadcrumbLink asChild>
+                        <Link to={to}>{label}</Link>
+                      </BreadcrumbLink>
                     )}
                   </BreadcrumbItem>
                   {!isLast && <BreadcrumbSeparator />}
@@ -115,7 +134,7 @@ const Layout = ({ children }) => {
           </div>
 
           {/* Center: Search (Optional, based on image) */}
-          <div className="flex-1 max-w-md mx-4 lg:mx-8 hidden md:block">
+          {/* <div className="flex-1 max-w-md mx-4 lg:mx-8 hidden md:block">
             <div className="relative">
               <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
@@ -124,7 +143,7 @@ const Layout = ({ children }) => {
                 className="w-full pl-10 pr-4 py-2 rounded-lg border-none bg-white focus:ring-1 focus:ring-customGreen outline-none text-sm"
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Right: Actions & Profile */}
           <div className="flex items-center gap-2 sm:gap-4">
