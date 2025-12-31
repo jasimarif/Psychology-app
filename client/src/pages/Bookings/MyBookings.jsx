@@ -14,6 +14,16 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Calendar } from "@/components/ui/calendar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { bookingService } from "@/services/bookingService"
@@ -38,7 +48,7 @@ const MyBookings = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [cancellingId, setCancellingId] = useState(null)
-  const [filter, setFilter] = useState("all") 
+  const [filter, setFilter] = useState("all")
 
   // Reschedule state
   const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false)
@@ -49,6 +59,11 @@ const MyBookings = () => {
   const [selectedSlot, setSelectedSlot] = useState(null)
   const [rescheduleLoading, setRescheduleLoading] = useState(false)
   const [rescheduleError, setRescheduleError] = useState("")
+
+  // Cancel dialog state
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false)
+  const [bookingToCancel, setBookingToCancel] = useState(null)
+  const [cancelError, setCancelError] = useState("")
 
   useEffect(() => {
     if (currentUser) {
@@ -70,9 +85,9 @@ const MyBookings = () => {
     setRescheduleError("")
     try {
       const offset = selectedDate.getTimezoneOffset()
-      const date = new Date(selectedDate.getTime() - (offset*60*1000))
+      const date = new Date(selectedDate.getTime() - (offset * 60 * 1000))
       const dateStr = date.toISOString().split('T')[0]
-      
+
       const data = await bookingService.getAvailableSlots(reschedulingBooking.psychologistId._id, dateStr)
       setAvailableSlots(data.availableSlots || [])
     } catch (error) {
@@ -99,7 +114,7 @@ const MyBookings = () => {
     setRescheduleError("")
     try {
       const offset = selectedDate.getTimezoneOffset()
-      const date = new Date(selectedDate.getTime() - (offset*60*1000))
+      const date = new Date(selectedDate.getTime() - (offset * 60 * 1000))
       const dateStr = date.toISOString().split('T')[0]
 
       await bookingService.rescheduleBooking(reschedulingBooking._id, {
@@ -107,7 +122,7 @@ const MyBookings = () => {
         startTime: selectedSlot.startTime,
         endTime: selectedSlot.endTime
       })
-      
+
       setRescheduleModalOpen(false)
       loadBookings()
     } catch (error) {
@@ -129,17 +144,23 @@ const MyBookings = () => {
     }
   }
 
-  const handleCancelBooking = async (bookingId) => {
-    if (!confirm("Are you sure you want to cancel this booking?")) {
-      return
-    }
+  const openCancelDialog = (booking) => {
+    setBookingToCancel(booking)
+    setCancelError("")
+    setCancelDialogOpen(true)
+  }
+
+  const handleCancelBooking = async () => {
+    if (!bookingToCancel) return
 
     try {
-      setCancellingId(bookingId)
-      await bookingService.cancelBooking(bookingId, "Cancelled by user")
-      await loadBookings() 
+      setCancellingId(bookingToCancel._id)
+      await bookingService.cancelBooking(bookingToCancel._id, "Cancelled by user")
+      setCancelDialogOpen(false)
+      setBookingToCancel(null)
+      await loadBookings()
     } catch (err) {
-      alert(err.message)
+      setCancelError(err.message)
     } finally {
       setCancellingId(null)
     }
@@ -168,18 +189,18 @@ const MyBookings = () => {
 
   const getStatusBadge = (status) => {
     const variants = {
-      confirmed: { 
-        className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100", 
+      confirmed: {
+        className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100",
         label: "Confirmed",
         icon: <CheckIcon className="w-3 h-3" />
       },
-      completed: { 
-        className: "bg-blue-100 text-blue-700 hover:bg-blue-100", 
+      completed: {
+        className: "bg-blue-100 text-blue-700 hover:bg-blue-100",
         label: "Completed",
         icon: <CheckIcon className="w-3 h-3" />
       },
-      cancelled: { 
-        className: "bg-red-100 text-red-700 hover:bg-red-100", 
+      cancelled: {
+        className: "bg-red-100 text-red-700 hover:bg-red-100",
         label: "Cancelled",
         icon: <CloseIcon className="w-3 h-3" />
       }
@@ -255,7 +276,7 @@ const MyBookings = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Authentication Required</h2>
             <p className="text-gray-600 mb-6">Please log in to view and manage your therapy session bookings</p>
-            <Button 
+            <Button
               onClick={() => navigate("/login")}
               className="w-full bg-customGreen hover:bg-customGreenHover text-white h-11 rounded-xl font-medium"
             >
@@ -356,7 +377,7 @@ const MyBookings = () => {
       <div className="container mx-auto px-4 lg:px-8 py-8">
         {/* Header Section */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-6 select-none">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <CalendarIcon className="w-8 h-8 text-customGreenHover" />
@@ -364,13 +385,13 @@ const MyBookings = () => {
                   My Bookings
                 </h1>
               </div>
-                       <p className="text-gray-600 text-lg">
+              <p className="text-gray-600 text-lg">
                 Track and manage your therapy sessions
               </p>
             </div>
             <Button
               onClick={() => navigate("/browse-psychologists")}
-              className="bg-customGreen hover:bg-customGreenHover text-white rounded-xl shadow-none transition-all hidden md:flex"
+              className="bg-customGreen hover:bg-customGreenHover text-white rounded-xl shadow-none transition-all hidden md:flex cursor-pointer"
             >
               <CalendarIcon className="w-4 h-4 mr-2" />
               Book New Session
@@ -379,7 +400,7 @@ const MyBookings = () => {
 
           {/* Statistics Cards */}
           {bookings.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 select-none">
               <Card className="rounded-2xl border-0 shadow-none bg-lightGreen/50 ">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
@@ -440,19 +461,19 @@ const MyBookings = () => {
         </div>
 
         {/* Filter Dropdown */}
-        <div className="mb-6 flex items-center gap-3">
+        <div className="mb-6 flex items-center gap-3 select-none">
           <label htmlFor="booking-filter" className="text-sm font-medium text-gray-700">
             Filter by:
           </label>
           <Select value={filter} onValueChange={setFilter}>
-            <SelectTrigger className="w-[200px] rounded-xl border-gray-300 bg-white h-11">
+            <SelectTrigger className="w-[200px] rounded-xl border-gray-300 bg-white h-11 cursor-pointer">
               <SelectValue placeholder="Select filter" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Bookings</SelectItem>
-              <SelectItem value="upcoming">Upcoming</SelectItem>
-              <SelectItem value="past">Past</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="all" className="cursor-pointer">All Bookings</SelectItem>
+              <SelectItem value="upcoming" className="cursor-pointer">Upcoming</SelectItem>
+              <SelectItem value="past" className="cursor-pointer">Past</SelectItem>
+              <SelectItem value="cancelled" className="cursor-pointer">Cancelled</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -464,11 +485,11 @@ const MyBookings = () => {
                 <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CloseIcon className="w-10 h-10 text-red-600" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Oops! Something went wrong</h3>
+                <h3 className="text-2xl font-bold text-red-600 mb-3">Oops! Something went wrong!</h3>
                 <p className="text-gray-600 mb-6 max-w-md mx-auto">{error}</p>
-                <Button 
-                  onClick={loadBookings} 
-                  className="bg-customGreen hover:bg-customGreenHover text-white rounded-xl px-6 h-11"
+                <Button
+                  onClick={loadBookings}
+                  className="bg-customGreen hover:bg-customGreenHover text-white rounded-xl px-6 h-11 cursor-pointer select-none"
                 >
                   <StatsIcon className="w-4 h-4 mr-2" />
                   Try Again
@@ -515,8 +536,8 @@ const MyBookings = () => {
         ) : (
           <div className="space-y-4">
             {getFilteredBookings().map((booking) => (
-              <Card 
-                key={booking._id} 
+              <Card
+                key={booking._id}
                 className="rounded-3xl border-0 shadow-none bg-customGreen/5 transition-all duration-300 overflow-hidden group py-0"
               >
                 <CardContent className="p-0">
@@ -524,8 +545,8 @@ const MyBookings = () => {
                     {/* Left Section - Psychologist Info */}
                     <div className="flex-1 p-6 lg:p-8">
                       <div className="flex items-start gap-4 mb-6">
-                        <Avatar className="w-16 h-16 ring-4 ring-customGreen/10 group-hover:ring-customGreen/20 transition-all">
-                          <AvatarImage src={booking.psychologistId?.avatar} />
+                        <Avatar className="w-16 h-16 ring-4 ring-customGreen/10 group-hover:ring-customGreen/20 transition-all select-none">
+                          <AvatarImage src={booking.psychologistId?.profileImage} />
                           <AvatarFallback className="bg-customGreen/10 text-customGreen text-lg font-bold">
                             {booking.psychologistId?.name?.charAt(0) || "P"}
                           </AvatarFallback>
@@ -598,13 +619,13 @@ const MyBookings = () => {
                       </div>
 
                       {/* Zoom Link */}
-                      {booking.zoomJoinUrl && booking.status !== 'cancelled' && (
-                        <div className="p-4 bg-blue-50 rounded-xl border border-blue-200 mb-4">
+                      {booking.zoomJoinUrl && booking.status !== 'cancelled' && booking.status !== 'completed' && (
+                        <div className="p-4 bg-blue-100 rounded-xl  mb-4">
                           <div className="flex items-start gap-3">
                             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-0">
                               <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M15.75 2.25H8.25C7.00736 2.25 6 3.25736 6 4.5V19.5C6 20.7426 7.00736 21.75 8.25 21.75H15.75C16.9926 21.75 18 20.7426 18 19.5V4.5C18 3.25736 16.9926 2.25 15.75 2.25Z" />
-                                <path d="M9 6.75H15M9 9.75H15M9 12.75H15" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                                <path d="M9 6.75H15M9 9.75H15M9 12.75H15" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
                               </svg>
                             </div>
                             <div className="flex-1">
@@ -623,7 +644,7 @@ const MyBookings = () => {
                                 href={booking.zoomJoinUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors select-none cursor-pointer"
                               >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -657,14 +678,14 @@ const MyBookings = () => {
                     </div>
 
                     {/* Right Section - Actions */}
-                    <div className="lg:w-64 bg-lightGreen/50 ">
+                    <div className="lg:w-64 bg-lightGreen/50 select-none">
                       <div className="flex flex-col py-6 lg:py-8 px-6 lg:px-8 h-full">
                         <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-2">Actions</p>
 
                         <div className="space-y-3">
                           <Button
                             variant="outline"
-                            className="w-full justify-start rounded-xl border-gray-300 hover:bg-white hover:border-customGreen hover:text-customGreen transition-all cursor-pointer"
+                            className="w-full justify-start rounded-xl border-gray-300 hover:bg-white hover:border-gray-300  hover:text-customGreen transition-all cursor-pointer"
                             onClick={() => navigate(`/psychologist/${booking.psychologistId?._id}`, {
                               state: { psychologist: booking.psychologistId }
                             })}
@@ -676,7 +697,7 @@ const MyBookings = () => {
                           {canRescheduleBooking(booking) && (
                             <Button
                               variant="outline"
-                              className="w-full justify-start rounded-xl border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-all cursor-pointer"
+                              className="w-full justify-start rounded-xl border-blue-200 text-blue-600 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-all cursor-pointer"
                               onClick={() => handleRescheduleClick(booking)}
                             >
                               <TimeIcon className="w-4 h-4 mr-2" />
@@ -693,21 +714,11 @@ const MyBookings = () => {
                                 </p>
                                 <Button
                                   variant="outline"
-                                  className="w-full justify-start rounded-xl border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all cursor-pointer"
-                                  onClick={() => handleCancelBooking(booking._id)}
-                                  disabled={cancellingId === booking._id}
+                                  className="w-full justify-start rounded-xl border-red-200 text-red-600 hover:text-red-600 hover:bg-red-50 hover:border-red-300 transition-all cursor-pointer"
+                                  onClick={() => openCancelDialog(booking)}
                                 >
-                                  {cancellingId === booking._id ? (
-                                    <>
-                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                      Cancelling...
-                                    </>
-                                  ) : (
-                                    <>
-                                      <CloseIcon className="w-4 h-4 mr-2" />
-                                      Cancel Booking
-                                    </>
-                                  )}
+                                  <CloseIcon className="w-4 h-4 mr-2" />
+                                  Cancel Booking
                                 </Button>
                               </div>
                             </>
@@ -735,7 +746,7 @@ const MyBookings = () => {
         <div className="md:hidden fixed bottom-4 left-4 right-4 z-50">
           <Button
             onClick={() => navigate("/browse-psychologists")}
-            className="w-full bg-customGreen hover:bg-customGreenHover text-white rounded-xl shadow-none transition-all h-12"
+            className="w-full bg-customGreen hover:bg-customGreenHover text-white rounded-xl shadow-none transition-all h-12 cursor-pointer"
           >
             <CalendarIcon className="w-4 h-4 mr-2" />
             Book New Session
@@ -767,7 +778,7 @@ const MyBookings = () => {
                     minDate={new Date()}
                   />
                 </div>
-                
+
                 <div className="flex-1">
                   <h4 className="font-medium mb-3">Available Slots</h4>
                   {loadingSlots ? (
@@ -788,11 +799,10 @@ const MyBookings = () => {
                         <Button
                           key={index}
                           variant={selectedSlot === slot ? "default" : "outline"}
-                          className={`w-full ${
-                            selectedSlot === slot 
-                              ? "bg-customGreen hover:bg-customGreenHover text-white" 
+                          className={`w-full ${selectedSlot === slot
+                              ? "bg-customGreen hover:bg-customGreenHover text-white"
                               : "hover:border-customGreen hover:text-customGreen"
-                          }`}
+                            }`}
                           onClick={() => setSelectedSlot(slot)}
                         >
                           {formatTime24to12(slot.startTime)}
@@ -814,7 +824,7 @@ const MyBookings = () => {
               <Button variant="outline" onClick={() => setRescheduleModalOpen(false)}>
                 Cancel
               </Button>
-              <Button 
+              <Button
                 onClick={handleConfirmReschedule}
                 disabled={!selectedSlot || rescheduleLoading}
                 className="bg-customGreen hover:bg-customGreenHover text-white"
@@ -831,6 +841,61 @@ const MyBookings = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Cancel Booking Dialog */}
+        <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+          <AlertDialogContent className="rounded-3xl select-none font-nunito">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-2xl font-bold text-gray-700 font-nunito">
+                Cancel Booking
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-500 font-nunito">
+                Are you sure you want to cancel your session with{" "}
+                <span className="font-semibold text-gray-700">
+                  {bookingToCancel?.psychologistId?.name}
+                </span>{" "}
+                on{" "}
+                <span className="font-semibold text-gray-700">
+                  {bookingToCancel && formatDateOnly(bookingToCancel.appointmentDate, 'medium')}
+                </span>
+                ? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+
+            {cancelError && (
+              <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
+                {cancelError}
+              </div>
+            )}
+
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => {
+                  setCancelDialogOpen(false)
+                  setBookingToCancel(null)
+                  setCancelError("")
+                }}
+                className="rounded-xl select-none cursor-pointer"
+              >
+                Keep Booking
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleCancelBooking}
+                disabled={cancellingId === bookingToCancel?._id}
+                className="bg-red-600 hover:bg-red-700 rounded-xl select-none cursor-pointer"
+              >
+                {cancellingId === bookingToCancel?._id ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Cancelling...
+                  </>
+                ) : (
+                  "Cancel Booking"
+                )}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   )

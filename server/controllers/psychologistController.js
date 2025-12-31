@@ -16,6 +16,32 @@ const getPsychologists = async (req, res) => {
   }
 };
 
+const getPsychologistById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const psychologist = await Psychologist.findById(id);
+
+    if (!psychologist) {
+      return res.status(404).json({
+        success: false,
+        message: 'Psychologist not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: psychologist
+    });
+  } catch (error) {
+    console.error('Error fetching psychologist:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch psychologist'
+    });
+  }
+};
+
 export {
-  getPsychologists
+  getPsychologists,
+  getPsychologistById
 };

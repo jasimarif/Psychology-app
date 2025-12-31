@@ -167,7 +167,7 @@ const BookingSuccess = () => {
           <div className="grid gap-3">
             {/* Email notification */}
             <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl ">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-0">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <MailIcon className="w-5 h-5 text-blue-600" />
               </div>
               <div>
@@ -180,7 +180,7 @@ const BookingSuccess = () => {
 
             {/* Calendar reminder */}
             <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-xl ">
-              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-0">
+              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <CalendarIcon className="w-5 h-5 text-amber-600" />
               </div>
               <div>
