@@ -6,6 +6,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { Layout } from "./components";
 import { useAuth } from "./context/AuthContext";
+import { Toaster } from "@/components/ui/sonner";
 
 // Component to redirect logged-in users from public pages
 function PublicRoute({ children }) {
@@ -17,6 +18,7 @@ function App() {
 
   return (
    <AuthProvider>
+     <Toaster position="top-right" />
      <Router>
       <Routes>
         <Route path="/" element={<PublicRoute><LandingPage /></PublicRoute>} />

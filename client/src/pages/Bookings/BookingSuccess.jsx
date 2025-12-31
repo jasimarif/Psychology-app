@@ -10,6 +10,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { CheckIcon, CalendarIcon, MailIcon, Loader2, Sparkles, Clock, ArrowRight } from "lucide-react"
+import { toast } from "sonner"
 
 const BookingSuccess = () => {
   const [searchParams] = useSearchParams()
@@ -36,8 +37,14 @@ const BookingSuccess = () => {
       const data = await getCheckoutSession(sessionId)
       setSession(data.session)
       setBooking(data.booking)
+      toast.success("Session booked successfully!", {
+        description: "You'll receive a confirmation email with the details."
+      })
     } catch (err) {
       setError(err.message || "Failed to retrieve payment details")
+      toast.error("Payment verification failed", {
+        description: err.message || "Please contact support if you were charged."
+      })
     } finally {
       setLoading(false)
     }

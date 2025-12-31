@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
+import { toast } from "sonner"
 import {
   Select,
   SelectContent,
@@ -124,9 +125,15 @@ const MyBookings = () => {
       })
 
       setRescheduleModalOpen(false)
+      toast.success("Session rescheduled!", {
+        description: "Your session has been moved to the new date and time."
+      })
       loadBookings()
     } catch (error) {
       setRescheduleError(error.message)
+      toast.error("Failed to reschedule", {
+        description: error.message || "Please try again."
+      })
     } finally {
       setRescheduleLoading(false)
     }
@@ -158,9 +165,15 @@ const MyBookings = () => {
       await bookingService.cancelBooking(bookingToCancel._id, "Cancelled by user")
       setCancelDialogOpen(false)
       setBookingToCancel(null)
+      toast.success("Booking cancelled", {
+        description: "Your session has been cancelled and a refund will be processed."
+      })
       await loadBookings()
     } catch (err) {
       setCancelError(err.message)
+      toast.error("Failed to cancel booking", {
+        description: err.message || "Please try again."
+      })
     } finally {
       setCancellingId(null)
     }

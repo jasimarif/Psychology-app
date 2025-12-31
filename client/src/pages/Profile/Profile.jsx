@@ -4,6 +4,7 @@ import { RadioQuestion, DropdownQuestionSelect, CheckboxQuestion, Card, CardHead
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/context/AuthContext"
+import { toast } from "sonner"
 import {
   Edit2,
   Save,
@@ -139,13 +140,19 @@ function Profile() {
       if (data.success) {
         setProfileData({ ...tempData })
         setEditingSection(null)
-        console.log("Profile saved successfully")
+        toast.success("Profile updated!", {
+          description: "Your changes have been saved successfully."
+        })
       } else {
-        alert("Failed to save profile: " + data.message)
+        toast.error("Failed to save profile", {
+          description: data.message || "Please try again."
+        })
       }
     } catch (error) {
       console.error("Error saving profile:", error)
-      alert("An error occurred while saving your profile")
+      toast.error("Something went wrong", {
+        description: "An error occurred while saving your profile."
+      })
     }
   }
 

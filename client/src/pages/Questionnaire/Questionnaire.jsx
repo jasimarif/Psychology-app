@@ -8,6 +8,7 @@ import { Info, MessageCircle, Users, ArrowLeft } from 'lucide-react'
 import { QuestionnaireIcon, CheckIcon } from "@/components/icons/DuoTuneIcons"
 import { Footer } from "../../components"
 import { useAuth } from "@/context/AuthContext"
+import { toast } from "sonner"
 
 function Questionnaire() {
   const navigate = useNavigate()
@@ -193,14 +194,21 @@ function Questionnaire() {
 
       if (data.success) {
         console.log("Questionnaire submitted successfully:", data)
+        toast.success("Questionnaire completed!", {
+          description: "Your profile has been created and we're matching you with psychologists."
+        })
         navigate("/dashboard")
       } else {
         console.error("Failed to save questionnaire:", data.message)
-        alert("Failed to save your questionnaire. Please try again.")
+        toast.error("Failed to save questionnaire", {
+          description: data.message || "Please try again."
+        })
       }
     } catch (error) {
       console.error("Error submitting questionnaire:", error)
-      alert("An error occurred while saving your questionnaire. Please try again.")
+      toast.error("Something went wrong", {
+        description: "An error occurred while saving your questionnaire. Please try again."
+      })
     }
   }
 
