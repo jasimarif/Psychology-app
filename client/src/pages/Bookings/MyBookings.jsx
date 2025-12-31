@@ -768,18 +768,23 @@ const MyBookings = () => {
 
         {/* Reschedule Dialog */}
         <Dialog open={rescheduleModalOpen} onOpenChange={setRescheduleModalOpen}>
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-none font-nunito select-none">
             <DialogHeader>
-              <DialogTitle>Reschedule Session</DialogTitle>
-              <DialogDescription>
-                Select a new date and time for your session with {reschedulingBooking?.psychologistId?.name}.
-                Rescheduling is allowed up to 24 hours before the session.
+              <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <CalendarIcon className="w-6 h-6 text-customGreen" />
+                Reschedule Session with {reschedulingBooking?.psychologistId?.name}
+              </DialogTitle>
+              <DialogDescription className="text-gray-600">
+                Select a new date and time for your therapy session. Rescheduling is allowed up to 24 hours before the session.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid gap-6 py-4">
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="flex-1">
+            <div className="space-y-6">
+              {/* Calendar and Time Slots Section - Side by Side */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Calendar Section */}
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">Select New Date</h3>
                   <Calendar
                     selectedDate={selectedDate}
                     onSelectDate={(dateStr) => {
@@ -787,71 +792,101 @@ const MyBookings = () => {
                       const date = new Date(year, month - 1, day)
                       setSelectedDate(date)
                     }}
-                    className="rounded-md border"
+                    className="border rounded-lg"
                     minDate={new Date()}
+                    maxDays={30}
                   />
                 </div>
 
-                <div className="flex-1">
-                  <h4 className="font-medium mb-3">Available Slots</h4>
-                  {loadingSlots ? (
-                    <div className="flex justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin text-customGreen" />
+                {/* Time Slots Section */}
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 mb-3">Available Time Slots</h3>
+                  {!selectedDate ? (
+                    <div className="flex items-center justify-center py-20 bg-gray-50 rounded-lg border border-gray-200 border-dashed">
+                      <div className="text-center">
+                        <CalendarIcon className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                        <p className="text-gray-500 text-sm">Select a date to view available time slots</p>
+                      </div>
                     </div>
-                  ) : !selectedDate ? (
-                    <p className="text-sm text-gray-500 text-center py-8">
-                      Select a date to view available time slots
-                    </p>
+                  ) : loadingSlots ? (
+                    <div className="flex items-center justify-center py-20">
+                      <Loader2 className="w-8 h-8 animate-spin text-customGreen" />
+                    </div>
                   ) : availableSlots.length === 0 ? (
-                    <p className="text-sm text-gray-500 text-center py-8">
-                      No available slots for this date
-                    </p>
+                    <div className="text-center py-20 bg-gray-50 rounded-lg border border-gray-200">
+                      <CloseIcon className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-gray-600">No available slots on this date</p>
+                    </div>
                   ) : (
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
                       {availableSlots.map((slot, index) => (
-                        <Button
+                        <button
                           key={index}
-                          variant={selectedSlot === slot ? "default" : "outline"}
-                          className={`w-full ${selectedSlot === slot
-                              ? "bg-customGreen hover:bg-customGreenHover text-white"
-                              : "hover:border-customGreen hover:text-customGreen"
-                            }`}
                           onClick={() => setSelectedSlot(slot)}
+                          className={`p-3 rounded-lg border transition-all cursor-pointer ${
+                            selectedSlot?.startTime === slot.startTime
+                              ? 'bg-customGreen/30 border-none font-semibold'
+                              : 'border-gray-200 hover:bg-gray-50'
+                          }`}
                         >
-                          {formatTime24to12(slot.startTime)}
-                        </Button>
+                          <div className="flex items-center justify-center gap-1">
+                            <TimeIcon className="w-4 h-4" />
+                            <span className="text-sm">{formatTime24to12(slot.startTime)}</span>
+                          </div>
+                        </button>
                       ))}
                     </div>
                   )}
                 </div>
               </div>
 
+              {/* Error Message */}
               {rescheduleError && (
-                <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
-                  {rescheduleError}
+                <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+                  <div className="flex items-start gap-2">
+                    <CloseIcon className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                    <p className="text-red-600 text-sm">{rescheduleError}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Reschedule Summary & Confirm */}
+              {selectedSlot && (
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+                  <h4 className="font-semibold text-gray-900">Reschedule Summary</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Psychologist:</span>
+                      <span className="font-medium">{reschedulingBooking?.psychologistId?.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">New Date:</span>
+                      <span className="font-medium">
+                        {selectedDate && formatDateOnly(selectedDate, 'medium')}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">New Time:</span>
+                      <span className="font-medium">{formatTime24to12(selectedSlot.startTime)} - {formatTime24to12(selectedSlot.endTime)}</span>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={handleConfirmReschedule}
+                    disabled={!selectedSlot || rescheduleLoading}
+                    className="w-full bg-customGreen hover:bg-customGreenHover text-white cursor-pointer"
+                  >
+                    {rescheduleLoading ? (
+                      <>
+                        Rescheduling...
+                        <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                      </>
+                    ) : (
+                      "Confirm Reschedule"
+                    )}
+                  </Button>
                 </div>
               )}
             </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setRescheduleModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button
-                onClick={handleConfirmReschedule}
-                disabled={!selectedSlot || rescheduleLoading}
-                className="bg-customGreen hover:bg-customGreenHover text-white"
-              >
-                {rescheduleLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Rescheduling...
-                  </>
-                ) : (
-                  "Confirm Reschedule"
-                )}
-              </Button>
-            </DialogFooter>
           </DialogContent>
         </Dialog>
 
