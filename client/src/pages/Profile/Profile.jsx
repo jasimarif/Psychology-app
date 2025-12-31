@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { RadioQuestion, DropdownQuestionSelect, CheckboxQuestion, Card, CardHeader, CardTitle, CardContent } from "@/components"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useAuth } from "@/context/AuthContext"
 import {
   Edit2,
@@ -663,10 +664,60 @@ function Profile() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-teal-800 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading profile...</p>
+      <div className="min-h-screen bg-white rounded-lg font-nunito">
+        <div className="container mx-auto px-4 lg:px-12 py-8 mb-8">
+          {/* Header skeleton */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="h-10 w-64" />
+            </div>
+            <Skeleton className="h-5 w-80" />
+          </div>
+
+          {/* User Info Card skeleton */}
+          <div className="mb-8 bg-white rounded-lg overflow-hidden border border-gray-100">
+            <div className="bg-gray-50 p-6">
+              <div className="flex items-center gap-4">
+                <Skeleton className="w-16 h-16 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-40" />
+                  <Skeleton className="h-4 w-56" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Sidebar skeleton */}
+            <div className="md:col-span-1 space-y-2">
+              {[...Array(5)].map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full rounded-xl" />
+              ))}
+            </div>
+
+            {/* Main Content skeleton */}
+            <div className="md:col-span-3">
+              <Card className="border-none shadow-none bg-gray-50">
+                <CardHeader className="pb-6 border-b border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-8 w-48" />
+                    <Skeleton className="h-10 w-24 rounded-lg" />
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="p-4 rounded-xl bg-white/80 border border-gray-100">
+                        <Skeleton className="h-3 w-24 mb-2" />
+                        <Skeleton className="h-5 w-32" />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     )

@@ -26,6 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Calendar } from "@/components/ui/calendar"
+import { Skeleton } from "@/components/ui/skeleton"
 import { PsychologistsIcon, CalendarIcon, TimeIcon, CheckIcon, AlertIcon } from "@/components/icons/DuoTuneIcons"
 import { bookingService } from "@/services/bookingService"
 import { createCheckoutSession } from "@/services/paymentService"
@@ -199,13 +200,49 @@ function Psychologists() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-linear-to-br from-teal-50/30 via-white to-emerald-50/30 font-nunito">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <div className="relative w-20 h-20 mx-auto mb-6">
-              <div className="absolute inset-0 border-4 border-customGreen/20 border-t-customGreen rounded-full animate-spin"></div>
-              <Users className="w-8 h-8 text-customGreen absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-            </div>
-            <p className="text-gray-600 font-medium">Finding the best professionals for you...</p>
+        <div className="container mx-auto px-4 lg:px-8 py-8">
+          {/* Header skeleton */}
+          <div className="mb-8">
+            <Skeleton className="h-10 w-72 mb-2" />
+            <Skeleton className="h-5 w-96" />
+          </div>
+
+          {/* Search and filters skeleton */}
+          <div className="flex flex-col md:flex-row gap-4 mb-8">
+            <Skeleton className="h-12 flex-1 rounded-xl" />
+            <Skeleton className="h-12 w-40 rounded-xl" />
+            <Skeleton className="h-12 w-32 rounded-xl" />
+          </div>
+
+          {/* Cards grid skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <Card key={i} className="rounded-2xl border-0 shadow-sm overflow-hidden">
+                <CardContent className="p-0">
+                  <Skeleton className="h-48 w-full" />
+                  <div className="p-5 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-24" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-3 w-full" />
+                    <Skeleton className="h-3 w-3/4" />
+                    <div className="flex gap-2 pt-2">
+                      <Skeleton className="h-6 w-16 rounded-full" />
+                      <Skeleton className="h-6 w-20 rounded-full" />
+                      <Skeleton className="h-6 w-14 rounded-full" />
+                    </div>
+                    <div className="flex gap-2 pt-3">
+                      <Skeleton className="h-10 flex-1 rounded-xl" />
+                      <Skeleton className="h-10 flex-1 rounded-xl" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { RadioQuestion, DropdownQuestionSelect, CheckboxQuestion } from "@/components"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Info, MessageCircle, Users, ArrowLeft } from 'lucide-react'
 import { QuestionnaireIcon, CheckIcon } from "@/components/icons/DuoTuneIcons"
 import { Footer } from "../../components"
@@ -687,10 +688,38 @@ function Questionnaire() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col justify-center items-center bg-white rounded-lg font-nunito">
-        <div className="container mx-auto px-4 py-8 max-w-4xl text-center">
-          <div className="animate-pulse">
-            <QuestionnaireIcon className="w-12 h-12 text-customGreenHover mx-auto mb-4" />
-            <p className="text-gray-600">Loading...</p>
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          {/* Header skeleton */}
+          <div className="mb-8 text-center">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <Skeleton className="w-8 h-8 rounded" />
+              <Skeleton className="h-10 w-72" />
+            </div>
+            <Skeleton className="h-5 w-96 mx-auto" />
+          </div>
+
+          {/* Progress bar skeleton */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+            <Skeleton className="h-2 w-full rounded-full" />
+          </div>
+
+          {/* Question cards skeleton */}
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="rounded-2xl p-6 bg-gray-50">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-6 w-48" />
+                    <Skeleton className="h-4 w-72" />
+                  </div>
+                  <Skeleton className="w-12 h-12 rounded-full" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

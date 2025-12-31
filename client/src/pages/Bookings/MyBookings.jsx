@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Calendar } from "@/components/ui/calendar"
+import { Skeleton } from "@/components/ui/skeleton"
 import { bookingService } from "@/services/bookingService"
 import { Loader2 } from "lucide-react"
 import {
@@ -269,6 +270,87 @@ const MyBookings = () => {
 
   const stats = getBookingStats()
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white font-nunito rounded-lg px-4">
+        <div className="container mx-auto px-4 lg:px-8 py-8">
+          {/* Header skeleton */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <Skeleton className="w-8 h-8 rounded" />
+                  <Skeleton className="h-10 w-48" />
+                </div>
+                <Skeleton className="h-5 w-72" />
+              </div>
+              <Skeleton className="h-10 w-40 rounded-xl hidden md:block" />
+            </div>
+
+            {/* Stats skeleton */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              {[...Array(4)].map((_, i) => (
+                <Card key={i} className="rounded-2xl border-0 shadow-none">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-12 h-12 rounded-xl" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-6 w-8" />
+                        <Skeleton className="h-3 w-16" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Filter skeleton */}
+          <div className="mb-6 flex items-center gap-3">
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-11 w-[200px] rounded-xl" />
+          </div>
+
+          {/* Booking cards skeleton */}
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <Card key={i} className="rounded-3xl border-0 shadow-none bg-customGreen/5">
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex items-start gap-4 flex-1">
+                      <Skeleton className="w-16 h-16 rounded-full" />
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-5 w-40" />
+                        <Skeleton className="h-4 w-32" />
+                        <div className="flex gap-2 pt-2">
+                          <Skeleton className="h-6 w-20 rounded-full" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-3 md:w-48">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-4" />
+                        <Skeleton className="h-4 w-28" />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-4" />
+                        <Skeleton className="h-4 w-24" />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 md:flex-col">
+                      <Skeleton className="h-10 w-24 rounded-xl" />
+                      <Skeleton className="h-10 w-24 rounded-xl" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-white font-nunito rounded-lg px-4">
       <div className="container mx-auto px-4 lg:px-8 py-8">
@@ -296,7 +378,7 @@ const MyBookings = () => {
           </div>
 
           {/* Statistics Cards */}
-          {!loading && bookings.length > 0 && (
+          {bookings.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <Card className="rounded-2xl border-0 shadow-none bg-lightGreen/50 ">
                 <CardContent className="p-4">
@@ -375,17 +457,7 @@ const MyBookings = () => {
           </Select>
         </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-center">
-              <div className="relative">
-                <div className="w-20 h-20 border-4 border-customGreen/20 border-t-customGreen rounded-full animate-spin mx-auto mb-6"></div>
-                <CalendarIcon className="w-8 h-8 text-customGreen absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
-              </div>
-              <p className="text-gray-600 font-medium">Loading your bookings...</p>
-            </div>
-          </div>
-        ) : error ? (
+        {error ? (
           <Card className="rounded-3xl  shadow-none bg-red-100">
             <CardContent className="pt-8 pb-8">
               <div className="text-center py-8">
