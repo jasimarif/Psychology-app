@@ -95,7 +95,7 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen bg-[#F7F0EA] font-nunito">
+    <div className="flex h-screen bg-[#F7F0EA] font-nunito ">
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div

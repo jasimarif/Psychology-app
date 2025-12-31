@@ -12,7 +12,7 @@ const PsychologistCard = ({ psychologist, onViewProfile, onBookSession }) => {
       <CardHeader className="">
         <div className="flex items-start gap-4">
           {/* Avatar */}
-          <div className="relative">
+          <div className="relative seletct-none">
             <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300 shadow-none overflow-hidden">
               {psychologist.profileImage ? (
                 <img
@@ -153,14 +153,14 @@ const PsychologistCard = ({ psychologist, onViewProfile, onBookSession }) => {
             <Button
               onClick={() => onViewProfile(psychologist)}
               variant="outline"
-              className="flex-1 border-2 border-gray-200  hover:bg-gray-50  font-semibold transition-all duration-200 rounded-xl shadow-none cursor-pointer"
+              className="flex-1 border-2 border-gray-200  hover:bg-gray-50  font-semibold transition-all duration-200 rounded-xl shadow-none cursor-pointer select-none" 
             >
               View Profile
               <ArrowRightIcon className="w-4 h-4 ml-2" />
             </Button>
             <Button
               onClick={() => onBookSession(psychologist)}
-              className="flex-1 bg-customGreen hover:bg-customGreenHover cursor-pointer text-white font-semibold shadow-none transition-all duration-200 rounded-xl"
+              className="flex-1 bg-customGreen hover:bg-customGreenHover cursor-pointer text-white font-semibold shadow-none transition-all duration-200 rounded-xl select-none"
             >
               <CalendarIcon className="w-4 h-4 mr-2" />
               Book Now
