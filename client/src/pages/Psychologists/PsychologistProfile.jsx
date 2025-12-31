@@ -157,7 +157,7 @@ const PsychologistProfile = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col rounded-lg bg-white font-nunito">
+    <div className="min-h-screen flex flex-col rounded-lg bg-white font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500">
 
 
       <div className="flex-1 container mx-auto px-4 py-8">

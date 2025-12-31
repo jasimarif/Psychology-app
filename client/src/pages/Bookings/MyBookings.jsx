@@ -352,7 +352,7 @@ const MyBookings = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white font-nunito rounded-lg px-4">
+    <div className="min-h-screen bg-white font-nunito rounded-lg px-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="container mx-auto px-4 lg:px-8 py-8">
         {/* Header Section */}
         <div className="mb-8">

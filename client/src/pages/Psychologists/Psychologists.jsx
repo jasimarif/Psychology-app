@@ -312,7 +312,7 @@ function Psychologists() {
   }
 
   return (
-    <div className="min-h-screen bg-white rounded-lg font-nunito">
+    <div className="min-h-screen bg-white rounded-lg font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="container  px-4 lg:px-12 py-8">
 
         {/* Hero Header Section */}
