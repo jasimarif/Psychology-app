@@ -155,8 +155,20 @@ const Layout = ({ children }) => {
         </header>
 
         {/* Main Content */}
-        <div className="px-4 sm:px-6 lg:px-8 pb-8">
-          {children}
+        <div className="px-4 sm:px-6 lg:px-8 pb-8 relative">
+          {/* Sticky corners that stay visible on scroll */}
+          <div className="sticky top-[72px] z-5 h-0 pointer-events-none">
+            <div className="absolute left-0 w-6 h-6 bg-[#F7F0EA]">
+              <div className="w-full h-full bg-white rounded-tl-3xl"></div>
+            </div>
+            <div className="absolute right-0 w-6 h-6 bg-[#F7F0EA]">
+              <div className="w-full h-full bg-white rounded-tr-3xl"></div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-t-3xl min-h-[calc(100vh-100px)]">
+            {children}
+          </div>
         </div>
       </main>
     </div>
