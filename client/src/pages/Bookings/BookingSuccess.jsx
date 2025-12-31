@@ -117,7 +117,7 @@ const BookingSuccess = () => {
     <Dialog open={modalOpen} onOpenChange={handleModalClose}>
       <DialogContent className="sm:max-w-xl p-0 overflow-hidden">
         {/* Success Header with gradient background */}
-        <div className="relative bg-gradient-to-br from-customGreen via-emerald-500 to-teal-500 px-6 py-8 text-center">
+        <div className="relative bg-customGreen px-6 py-8 text-center">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMyIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
 
           {/* Animated success icon */}
@@ -126,7 +126,6 @@ const BookingSuccess = () => {
             <div className="relative w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg">
               <CheckIcon className="w-10 h-10 text-customGreen animate-[bounce_1s_ease-in-out]" />
             </div>
-            <Sparkles className="absolute -top-2 -right-2 w-6 h-6 text-yellow-300 animate-pulse" />
           </div>
 
           <h2 className="text-2xl font-bold text-white mt-4">Payment Successful!</h2>
@@ -167,8 +166,8 @@ const BookingSuccess = () => {
           {/* Info Cards */}
           <div className="grid gap-3">
             {/* Email notification */}
-            <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl ">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-0">
                 <MailIcon className="w-5 h-5 text-blue-600" />
               </div>
               <div>
@@ -180,8 +179,8 @@ const BookingSuccess = () => {
             </div>
 
             {/* Calendar reminder */}
-            <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-100">
-              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-xl ">
+              <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center flex-0">
                 <CalendarIcon className="w-5 h-5 text-amber-600" />
               </div>
               <div>
@@ -197,7 +196,7 @@ const BookingSuccess = () => {
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <Button
               onClick={handleViewBookings}
-              className="flex-1 bg-customGreen hover:bg-customGreenHover h-12 text-base font-semibold shadow-lg shadow-customGreen/25 transition-all hover:shadow-xl hover:shadow-customGreen/30 hover:-translate-y-0.5"
+              className="flex-1 bg-customGreen hover:bg-customGreenHover h-12 text-base font-semibold shadow-none select-none cursor-pointer"
             >
               <CalendarIcon className="w-5 h-5 mr-2" />
               View My Bookings
@@ -205,7 +204,7 @@ const BookingSuccess = () => {
             <Button
               onClick={handleBookAnother}
               variant="outline"
-              className="flex-1 h-12 text-base font-semibold border-2 hover:bg-gray-50 transition-all hover:-translate-y-0.5 group"
+              className="flex-1 h-12 text-base font-semibold border-2 hover:bg-gray-50 select-none cursor-pointer shadow-none group"
             >
               Book Another Session
               <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
