@@ -1,19 +1,32 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { AwardIcon, UsersIcon, CalendarIcon, StarIcon, LocationIcon, ArrowRightIcon, BriefcaseIcon, GlobeIcon, DocumentIcon } from "../icons/DuoTuneIcons";
+import { StarIcon, LocationIcon } from "../icons/DuoTuneIcons";
 
-const PsychologistCard = ({ psychologist, onViewProfile, onBookSession }) => {
+const PsychologistCard = ({ psychologist, onViewProfile }) => {
   return (
-    <Card className="group relative border shadow-none transition-all duration-300 overflow-hidden bg-white py-6">
-      {/* Decorative gradient top border */}
-      {/* <div className="absolute top-0 left-0 right-0 h-1 bg-customGreen"></div> */}
+    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+      {/* Cover Image Area */}
+      <div className="relative h-28 bg-linear-to-br from-gray-50 to-gray-100">
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        />
+        {/* Settings/Options button positioned top right */}
+        <button className="absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-lg flex items-center justify-center hover:bg-white transition-colors">
+          <svg className="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="5" r="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <circle cx="12" cy="19" r="2"/>
+          </svg>
+        </button>
+      </div>
 
-      <CardHeader className="">
-        <div className="flex items-start gap-4">
-          {/* Avatar */}
-          <div className="relative seletct-none">
-            <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-300 shadow-none overflow-hidden">
+      {/* Profile Section */}
+      <div className="relative px-5 pb-5">
+        {/* Profile Image - Overlapping cover */}
+        <div className="relative -mt-12 mb-4 flex justify-center">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full border-4 border-white bg-amber-400 overflow-hidden">
               {psychologist.profileImage ? (
                 <img
                   src={psychologist.profileImage}
@@ -21,154 +34,76 @@ const PsychologistCard = ({ psychologist, onViewProfile, onBookSession }) => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <UsersIcon className="w-10 h-10 text-blue-600" />
+                <div className="w-full h-full bg-customGreen/20 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-customGreen">
+                    {psychologist.name?.charAt(0) || 'P'}
+                  </span>
+                </div>
               )}
             </div>
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-              <div className="w-2 h-2 bg-white rounded-full"></div>
-            </div>
-          </div>
-
-          {/* Header Info */}
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-xl text-customGreen truncate font-bold group-hover:text-customGreenHover transition-colors">
-              {psychologist.name}
-            </CardTitle>
-            <CardDescription className="text-sm text-gray-600 font-medium mt-1">
-              {psychologist.title}
-            </CardDescription>
-            
-            {/* Rating */}
-            <div className="flex items-center gap-2 mt-2">
-              <div className="flex">
-                {[...Array(5)].map((_, i) => (
-                  <StarIcon
-                    key={i}
-                    className={`w-4 h-4 ${
-                      i < Math.floor(psychologist.rating)
-                        ? 'text-yellow-400 fill-yellow-400'
-                        : 'text-gray-300 fill-gray-300'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-sm font-bold text-gray-900">{psychologist.rating}</span>
-              <span className="text-sm text-gray-500">({psychologist.reviews} reviews)</span>
-            </div>
+            {/* Online Status Indicator */}
+            <div className="absolute bottom-1 right-1 w-5 h-5 bg-green-500 rounded-full border-3 border-white"></div>
           </div>
         </div>
-      </CardHeader>
 
-      <CardContent className="pt-0">
-        <div className="space-y-4">
-          {/* Specialties */}
-          <div>
-            <p className="text-xs font-bold text-gray-500 uppercase mb-2 flex items-center gap-1">
-              <BriefcaseIcon className="w-3 h-3" />
-              Specialties
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {psychologist.specialties.slice(0, 3).map((specialty, index) => (
-                <Badge 
-                  key={index} 
-                  variant="secondary" 
-                  className="text-xs bg-customGreen/10 text-customGreenHover transition-colors"
-                >
-                  {specialty}
-                </Badge>
-              ))}
-              {psychologist.specialties.length > 3 && (
-                <Badge 
-                  variant="outline" 
-                  className="text-xs bg-gray-50 text-gray-600 border-gray-300"
-                >
-                  +{psychologist.specialties.length - 3} more
-                </Badge>
-              )}
-            </div>
+        {/* Name and Title */}
+        <div className="text-center mb-4">
+          <div className="flex items-center justify-center gap-1.5 mb-1">
+            <h3 className="text-lg font-bold text-gray-900">{psychologist.name}</h3>
+            {psychologist.verified && (
+              <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+              </svg>
+            )}
           </div>
+          <p className="text-sm text-gray-500">{psychologist.title}</p>
+        </div>
 
-          {/* Location and Experience */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-xs font-bold text-gray-500 uppercase mb-2 flex items-center gap-1">
-                <LocationIcon className="w-3 h-3" />
-                Location
-              </p>
-              <div className="flex items-center gap-2 text-sm bg-green-100/90 p-3 rounded-xl">
-                <LocationIcon className="w-4 h-4 text-green-600 shrink-0" />
-                <span className="font-medium text-gray-700 truncate">{psychologist.location}</span>
-              </div>
-            </div>
-            <div>
-              <p className="text-xs font-bold text-gray-500 uppercase mb-2 flex items-center gap-1">
-                <AwardIcon className="w-3 h-3" />
-                Experience
-              </p>
-              <div className="flex items-center gap-2 text-sm bg-orange-100/90 p-3 rounded-xl">
-                <AwardIcon className="w-4 h-4 text-orange-600 shrink-0" />
-                <span className="font-medium text-gray-700 truncate">{psychologist.experience}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Bio */}
-          <div>
-            <p className="text-xs font-bold text-gray-500 uppercase mb-2 flex items-center gap-1">
-              <DocumentIcon className="w-3 h-3" />
-              About
-            </p>
-            <p className="text-sm text-gray-700 line-clamp-2 leading-relaxed">
-              {psychologist.bio}
-            </p>
-          </div>
-
-          {/* Languages */}
-          {psychologist.languages && psychologist.languages.length > 0 && (
-            <div className="flex items-center gap-2 text-sm bg-red-100/80 p-3 rounded-lg">
-              <GlobeIcon className="w-3 h-3 shrink-0" />
-              <span className="font-medium">Languages:</span>
-              <span className="truncate">{psychologist.languages.join(', ')}</span>
-            </div>
+        {/* Specialties as inline text */}
+        <div className="flex items-center justify-center gap-1.5 text-sm text-customGreen mb-5">
+          <span className="font-medium">{psychologist.specialties?.slice(0, 2).join(' • ')}</span>
+          {psychologist.specialties?.length > 2 && (
+            <span className="text-gray-400">+{psychologist.specialties.length - 2}</span>
           )}
+        </div>
 
-          {/* Divider */}
-          <div className="border-t border-gray-100 my-4"></div>
-
-          {/* Price */}
-          <div className="flex items-center justify-between bg-lightGreen p-4 rounded-xl">
-            <div>
-              <p className="text-xs text-gray-600 uppercase font-semibold">Session Fee</p>
-              <p className="text-2xl font-bold text-customGreen">
-                ${typeof psychologist.price === 'number' ? psychologist.price.toFixed(2) : psychologist.price}
-              </p>
-            </div>
-            <div className="w-12 h-12 bg-customGreen/20 rounded-full flex items-center justify-center shadow-none">
-              <CalendarIcon className="w-6 h-6 text-customGreen" />
-            </div>
+        {/* Stats Section */}
+        <div className="flex items-center justify-center divide-x divide-gray-200 border border-gray-100 rounded-xl py-3 mb-5">
+          <div className="flex-1 text-center px-3">
+            <p className="text-lg font-bold text-gray-900">${psychologist.price}</p>
+            <p className="text-xs text-gray-500">Per Session</p>
           </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 mt-4">
-            <Button
-              onClick={() => onViewProfile(psychologist)}
-              variant="outline"
-              className="flex-1 border-2 border-gray-200  hover:bg-gray-50  font-semibold transition-all duration-200 rounded-xl shadow-none cursor-pointer select-none" 
-            >
-              View Profile
-              <ArrowRightIcon className="w-4 h-4 ml-2" />
-            </Button>
-            <Button
-              onClick={() => onBookSession(psychologist)}
-              className="flex-1 bg-customGreen hover:bg-customGreenHover cursor-pointer text-white font-semibold shadow-none transition-all duration-200 rounded-xl select-none"
-            >
-              <CalendarIcon className="w-4 h-4 mr-2" />
-              Book Now
-            </Button>
+          <div className="flex-1 text-center px-3">
+            <p className="text-lg font-bold text-gray-900">{psychologist.experience}</p>
+            <p className="text-xs text-gray-500">Experience</p>
+          </div>
+          <div className="flex-1 text-center px-3">
+            <div className="flex items-center justify-center gap-1">
+              <StarIcon className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              <p className="text-lg font-bold text-gray-900">{psychologist.rating}</p>
+            </div>
+            <p className="text-xs text-gray-500">{psychologist.reviews} reviews</p>
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Location */}
+        <div className="flex items-center justify-center gap-1.5 text-sm text-gray-500 mb-5">
+          <LocationIcon className="w-4 h-4" />
+          <span>{psychologist.location}</span>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-100 mb-4"></div>
+
+        {/* Action Button */}
+        <button
+          onClick={() => onViewProfile(psychologist)}
+          className="w-full text-center text-customGreen font-semibold text-sm hover:text-customGreenHover transition-colors py-2 border-b-2 border-dashed border-customGreen/30 hover:border-customGreen cursor-pointer"
+        >
+          View Profile
+        </button>
+      </div>
+    </div>
   )
 }
 
