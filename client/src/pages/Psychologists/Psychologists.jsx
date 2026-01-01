@@ -228,21 +228,19 @@ function Psychologists() {
 
         {/* Hero Header Section */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4 select-none">
-            <div className="flex items-center gap-3">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <PsychologistsIcon className="w-8 h-8 text-customGreenHover" />
-                  <h1 className="text-3xl md:text-4xl font-bold text-customGreenHover">
-                    Find Your Perfect Match
-                  </h1>
-                </div>
-                                       <p className="text-gray-600 text-lg">
-                  Connect with qualified mental health professionals
-                </p>
-              </div>
-            </div>
-          </div>
+          <header className="">
+        <div className="">
+          <p className="text-xs font-medium tracking-[0.2em] uppercase text-customGreen mb-4">
+            Find a Therapist
+          </p>
+          <h1 className="text-5xl md:text-6xl font-light text-gray-900 tracking-tight mb-4">
+            Our Specialists<br />
+          </h1>
+          <p className="text-lg text-gray-500 font-light max-w-xl">
+            Connect with licensed mental health professionals who understand your unique journey.
+          </p>
+        </div>
+      </header>
 
 
         </div>        {/* Search and Filter Section */}
@@ -290,8 +288,8 @@ function Psychologists() {
               onClick={() => setShowFilters(!showFilters)}
               variant="outline"
               className={`flex items-center gap-2 h-10 px-4 rounded-xl transition-all ${showFilters
-                  ? 'bg-customGreen text-white border-customGreen hover:text-white cursor-pointer hover:bg-customGreenHover'
-                  : 'bg-white border-gray-200 hover:bg-gray-50 cursor-pointer'
+                ? 'bg-customGreen text-white border-customGreen hover:text-white cursor-pointer hover:bg-customGreenHover'
+                : 'bg-white border-gray-200 hover:bg-gray-50 cursor-pointer'
                 }`}
             >
               <Filter className="w-4 h-4" />
@@ -308,8 +306,8 @@ function Psychologists() {
               <button
                 onClick={() => setViewMode("grid")}
                 className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === "grid"
-                    ? 'bg-white text-customGreen'
-                    : 'text-gray-400 hover:text-gray-600'
+                  ? 'bg-white text-customGreen'
+                  : 'text-gray-400 hover:text-gray-600'
                   }`}
               >
                 <Grid3x3 className="w-4 h-4" />
@@ -317,8 +315,8 @@ function Psychologists() {
               <button
                 onClick={() => setViewMode("list")}
                 className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === "list"
-                    ? 'bg-white text-customGreen'
-                    : 'text-gray-400 hover:text-gray-600'
+                  ? 'bg-white text-customGreen'
+                  : 'text-gray-400 hover:text-gray-600'
                   }`}
               >
                 <LayoutList className="w-4 h-4" />
@@ -445,8 +443,8 @@ function Psychologists() {
         {/* Psychologists Grid/List */}
         {filteredPsychologists.length > 0 ? (
           <div className={`grid gap-6 ${viewMode === "grid"
-              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-              : 'grid-cols-1'
+            ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+            : 'grid-cols-1'
             }`}>
             {filteredPsychologists.map((psychologist) => (
               <PsychologistCard
