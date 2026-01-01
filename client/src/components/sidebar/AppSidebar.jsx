@@ -43,7 +43,7 @@ const AppSidebar = ({ onClose }) => {
   return (
     <div className="w-[250px] h-screen flex flex-col py-6 px-4 bg-[#F7F0EA] font-nunito">
       {/* Logo */}
-      <div className="mb-10 px-2">
+      <div className="mb-10 px-2 select-none">
         <Link to="/" className="flex items-center gap-2" onClick={() => onClose && onClose()}>
           <BriefcaseIcon className="w-8 h-8 text-customGreen" />
           <span className="text-2xl font-extrabold text-customGreen font-averia">PsychApp</span>
@@ -51,7 +51,7 @@ const AppSidebar = ({ onClose }) => {
       </div>
 
       {/* Menu */}
-      <div className="flex-1 flex flex-col gap-1">
+      <div className="flex-1 flex flex-col gap-1 select-none">
         {menuItems.map((item) => {
           const isActive = location.pathname === item.path;
           return (
@@ -61,10 +61,10 @@ const AppSidebar = ({ onClose }) => {
               className={`flex items-center gap-3 px-4 py-3 font-medium cursor-pointer rounded-lg transition-colors ${
                 isActive
                   ? 'bg-[#EEE7DE] text-customGreen font-semibold'
-                  : 'text-gray-500  hover:bg-[#EEE7DE]'
+                  : 'text-customGray  hover:bg-[#EEE7DE]'
               }`}
             >
-              <item.icon className={`w-5 h-5 ${isActive ? 'text-customGreen' : 'text-gray-400 group-hover:text-gray-600'}`} />
+              <item.icon className={`w-5 h-5 ${isActive ? 'text-customGreen' : 'text-customGray group-hover:text-gray-600'}`} />
               <span>{item.label}</span>
             </button>
           );
@@ -72,12 +72,12 @@ const AppSidebar = ({ onClose }) => {
       </div>
 
       {/* Logout */}
-      <div className="mt-auto">
+      <div className="mt-auto select-none">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-red-600 hover:bg-red-100 cursor-pointer rounded-lg w-full transition-colors group"
+          className="flex items-center gap-3 px-4 py-3 text-customGray hover:text-red-600 hover:bg-red-100 cursor-pointer rounded-lg w-full transition-colors group"
         >
-          <LogoutIcon className="w-5 h-5 text-gray-400 group-hover:text-red-600" />
+          <LogoutIcon className="w-5 h-5 text-customGray font-medium group-hover:text-red-600" />
           <span>Logout</span>
         </button>
       </div>

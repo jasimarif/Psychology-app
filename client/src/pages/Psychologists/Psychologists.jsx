@@ -23,6 +23,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
 import BookingModal from "@/components/BookingModal"
 import { PsychologistsIcon } from "@/components/icons/DuoTuneIcons"
@@ -44,7 +51,6 @@ function Psychologists() {
     rating: "any",
     availability: ""
   })
-  const [showFilters, setShowFilters] = useState(false)
   const [activeFilterCount, setActiveFilterCount] = useState(0)
 
   // Booking modal state
@@ -160,7 +166,7 @@ function Psychologists() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-linear-to-br from-teal-50/30 via-white to-emerald-50/30 font-nunito">
-        <div className="container mx-auto px-4 lg:px-8 py-8">
+        <div className="py-8">
           {/* Header skeleton */}
           <div className="mb-8">
             <Skeleton className="h-10 w-72 mb-2" />
@@ -224,11 +230,11 @@ function Psychologists() {
 
   return (
     <div className="min-h-screen bg-white rounded-lg font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="container  px-4 lg:px-12 py-8">
+      <div className="container mx-auto px-4 lg:px-8 py-8">
 
         {/* Hero Header Section */}
         <div className="mb-8">
-          <header className="">
+          <header className="select-none">
             <div className="">
               <p className="text-xs font-medium tracking-[0.2em] uppercase text-customGreen mb-4">
                 Find a Therapist
@@ -245,36 +251,36 @@ function Psychologists() {
 
         </div>        
         {/* Search and Filter Section */}
-        <div className="mb-8">
-          {/* Search Bar - Full Width */}
-          <div className="relative mb-4">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              type="text"
-              placeholder="Search by name, specialty, or keywords..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-12 shadow-none border-none bg-lightGray focus:bg-white focus:border-customGreen focus:ring-2 focus:ring-customGreen rounded-xl text-base transition-all"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm("")}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
-          </div>
+        <div className="mb-8 space-y-3 text-gray-700">
+          {/* Search Bar, Sort, and Filter - Single Line */}
+          <div className="flex items-center gap-3 select-none">
+            {/* Search Bar */}
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Input
+                type="text"
+                placeholder="Search by name, specialty, or keywords..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 h-12 shadow-none border-none bg-lightGray focus:bg-white focus:border-customGreen focus:ring-2 focus:ring-customGreen rounded-xl text-base transition-all"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </div>
 
-          {/* Filter Controls Row */}
-          <div className="flex flex-wrap items-center gap-3 select-none">
             {/* Sort By */}
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-auto min-w-40 h-10 bg-lightGray border-none cursor-pointer focus:ring-customGreen rounded-xl">
+              <SelectTrigger className="w-auto min-w-40 h-12 bg-lightGray border-none cursor-pointer focus:ring-customGreen rounded-xl py-0">
                 <ArrowUpDown className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
-              <SelectContent >
+              <SelectContent>
                 <SelectItem value="recommended" className='cursor-pointer'>Recommended</SelectItem>
                 <SelectItem value="rating" className='cursor-pointer'>Highest Rated</SelectItem>
                 <SelectItem value="experience" className='cursor-pointer'>Most Experienced</SelectItem>
@@ -284,26 +290,129 @@ function Psychologists() {
               </SelectContent>
             </Select>
 
-            {/* Filter Button */}
-            <Button
-              onClick={() => setShowFilters(!showFilters)}
-              variant="outline"
-              className={`flex items-center gap-2 h-10 px-4 rounded-xl transition-all ${showFilters
-                ? 'bg-customGreen text-white border-customGreen hover:text-white cursor-pointer hover:bg-customGreenHover'
-                : 'bg-white border-gray-200 hover:bg-gray-50 cursor-pointer'
-                }`}
-            >
-              <Filter className="w-4 h-4" />
-              <span className="font-medium">Filters</span>
-              {activeFilterCount > 0 && (
-                <Badge className="ml-1 bg-white text-customGreen hover:bg-white text-xs px-1.5 py-0.5">
-                  {activeFilterCount}
-                </Badge>
-              )}
-            </Button>
+            {/* Filter Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={`flex items-center gap-2 h-12 px-4 shadow-none rounded-xl transition-all ${activeFilterCount > 0
+                    ? 'bg-customGreen text-white border-customGreen hover:text-white cursor-pointer hover:bg-customGreenHover'
+                    : 'bg-white border-dotted hover:bg-gray-50 cursor-pointer'
+                    }`}
+                >
+                  <Filter className="w-4 h-4 text-gray-700" />
+                  <span className="font-medium text-gray-700">Filters</span>
+                  {activeFilterCount > 0 && (
+                    <Badge className="ml-1 bg-white text-customGreen hover:bg-white text-xs px-1.5 py-0.5">
+                      {activeFilterCount}
+                    </Badge>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-72 p-4" align="end">
+                {/* Specialty Filter */}
+                <div className="space-y-1.5 mb-4">
+                  <DropdownMenuLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5 p-0">
+                    <Briefcase className="w-3.5 h-3.5 text-customGreen" />
+                    Specialty
+                  </DropdownMenuLabel>
+                  <Select value={filters.specialty} onValueChange={(value) => handleFilterChange("specialty", value)}>
+                    <SelectTrigger className="w-full h-10 bg-white border-gray-200 focus:ring-customGreen rounded-lg cursor-pointer">
+                      <SelectValue placeholder="All Specialties" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Specialties</SelectItem>
+                      {specialties.map(specialty => (
+                        <SelectItem key={specialty} value={specialty} className="cursor-pointer">{specialty}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            {/* View Mode Toggle */}
-            <div className="hidden lg:flex items-center gap-1 bg-gray-100 p-1 rounded-xl h-10 ml-auto">
+                {/* Location Filter */}
+                <div className="space-y-1.5 mb-4">
+                  <DropdownMenuLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5 p-0">
+                    <MapPin className="w-3.5 h-3.5 text-customGreen" />
+                    Location
+                  </DropdownMenuLabel>
+                  <Select value={filters.location} onValueChange={(value) => handleFilterChange("location", value)}>
+                    <SelectTrigger className="w-full h-10 bg-white border-gray-200 focus:ring-customGreen rounded-lg cursor-pointer">
+                      <SelectValue placeholder="All Locations" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Locations</SelectItem>
+                      {locations.map(location => (
+                        <SelectItem key={location} value={location} className="cursor-pointer">{location}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Rating Filter */}
+                <div className="space-y-1.5 mb-4">
+                  <DropdownMenuLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5 p-0">
+                    <Star className="w-3.5 h-3.5 text-customGreen" />
+                    Min Rating
+                  </DropdownMenuLabel>
+                  <Select value={filters.rating} onValueChange={(value) => handleFilterChange("rating", value)}>
+                    <SelectTrigger className="w-full h-10 bg-white border-gray-200 focus:ring-customGreen rounded-lg cursor-pointer">
+                      <SelectValue placeholder="Any Rating" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any" className="cursor-pointer">Any Rating</SelectItem>
+                      <SelectItem value="4.5" className="cursor-pointer">4.5+ Stars</SelectItem>
+                      <SelectItem value="4.0" className="cursor-pointer">4.0+ Stars</SelectItem>
+                      <SelectItem value="3.5" className="cursor-pointer">3.5+ Stars</SelectItem>
+                      <SelectItem value="3.0" className="cursor-pointer">3.0+ Stars</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Experience Filter */}
+                <div className="space-y-1.5">
+                  <DropdownMenuLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5 p-0">
+                    <Award className="w-3.5 h-3.5 text-customGreen" />
+                    Experience
+                  </DropdownMenuLabel>
+                  <Select value={filters.experience} onValueChange={(value) => handleFilterChange("experience", value)}>
+                    <SelectTrigger className="w-full h-10 bg-white border-gray-200 focus:ring-customGreen rounded-lg cursor-pointer">
+                      <SelectValue placeholder="Any Experience" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any" className="cursor-pointer">Any Experience</SelectItem>
+                      <SelectItem value="10" className="cursor-pointer">10+ Years</SelectItem>
+                      <SelectItem value="5" className="cursor-pointer">5+ Years</SelectItem>
+                      <SelectItem value="3" className="cursor-pointer">3+ Years</SelectItem>
+                      <SelectItem value="1" className="cursor-pointer">1+ Years</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Clear Filters */}
+                {activeFilterCount > 0 && (
+                  <>
+                    <DropdownMenuSeparator className="my-3" />
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">
+                        <span className="font-medium text-customGreen">{activeFilterCount}</span> filter{activeFilterCount > 1 ? 's' : ''} active
+                      </span>
+                      <button
+                        onClick={clearFilters}
+                        className="text-sm text-gray-500 hover:text-red-600 flex items-center gap-1 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                        Clear all
+                      </button>
+                    </div>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* View Mode Toggle - Second Line */}
+          <div className="flex justify-end select-none">
+            <div className="hidden lg:flex items-center gap-1 bg-lightGray p-1 rounded-xl h-10">
               <button
                 onClick={() => setViewMode("grid")}
                 className={`p-2 rounded-lg transition-all cursor-pointer ${viewMode === "grid"
@@ -324,107 +433,6 @@ function Psychologists() {
               </button>
             </div>
           </div>
-
-          {/* Expandable Filters Panel */}
-          {showFilters && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-xl animate-in fade-in slide-in-from-top-2 duration-200 select-none">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Specialty Filter */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5">
-                    <Briefcase className="w-3.5 h-3.5 text-customGreen" />
-                    Specialty
-                  </label>
-                  <Select value={filters.specialty} onValueChange={(value) => handleFilterChange("specialty", value)}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 focus:ring-customGreen rounded-lg cursor-pointer">
-                      <SelectValue placeholder="All Specialties" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Specialties</SelectItem>
-                      {specialties.map(specialty => (
-                        <SelectItem key={specialty} value={specialty} className="cursor-pointer">{specialty}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Location Filter */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-customGreen" />
-                    Location
-                  </label>
-                  <Select value={filters.location} onValueChange={(value) => handleFilterChange("location", value)}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 focus:ring-customGreen rounded-lg cursor-pointer">
-                      <SelectValue placeholder="All Locations" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Locations</SelectItem>
-                      {locations.map(location => (
-                        <SelectItem key={location} value={location} className="cursor-pointer">{location}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Rating Filter */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5">
-                    <Star className="w-3.5 h-3.5 text-customGreen" />
-                    Min Rating
-                  </label>
-                  <Select value={filters.rating} onValueChange={(value) => handleFilterChange("rating", value)}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 focus:ring-customGreen rounded-lg cursor-pointer">
-                      <SelectValue placeholder="Any Rating" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="any" className="cursor-pointer">Any Rating</SelectItem>
-                      <SelectItem value="4.5" className="cursor-pointer">4.5+ Stars</SelectItem>
-                      <SelectItem value="4.0" className="cursor-pointer">4.0+ Stars</SelectItem>
-                      <SelectItem value="3.5" className="cursor-pointer">3.5+ Stars</SelectItem>
-                      <SelectItem value="3.0" className="cursor-pointer">3.0+ Stars</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Experience Filter */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5">
-                    <Award className="w-3.5 h-3.5 text-customGreen" />
-                    Experience
-                  </label>
-                  <Select value={filters.experience} onValueChange={(value) => handleFilterChange("experience", value)}>
-                    <SelectTrigger className="h-10 bg-white border-gray-200 focus:ring-customGreen rounded-lg cursor-pointer">
-                      <SelectValue placeholder="Any Experience" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="any" className="cursor-pointer">Any Experience</SelectItem>
-                      <SelectItem value="10" className="cursor-pointer">10+ Years</SelectItem>
-                      <SelectItem value="5" className="cursor-pointer">5+ Years</SelectItem>
-                      <SelectItem value="3" className="cursor-pointer">3+ Years</SelectItem>
-                      <SelectItem value="1" className="cursor-pointer">1+ Years</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Clear Filters */}
-              {activeFilterCount > 0 && (
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200">
-                  <span className="text-sm text-gray-600">
-                    <span className="font-medium text-customGreen">{activeFilterCount}</span> filter{activeFilterCount > 1 ? 's' : ''} active
-                  </span>
-                  <button
-                    onClick={clearFilters}
-                    className="text-sm text-gray-500 hover:text-red-600 flex items-center gap-1 transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                    Clear all
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
         {/* Results Header */}

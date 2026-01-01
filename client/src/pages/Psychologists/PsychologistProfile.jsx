@@ -14,6 +14,7 @@ import {
   GlobeIcon,
   BriefcaseIcon,
 } from "@/components/icons/DuoTuneIcons"
+import { Heart } from "lucide-react"
 
 const PsychologistProfile = () => {
   const location = useLocation()
@@ -27,6 +28,16 @@ const PsychologistProfile = () => {
   const [error, setError] = useState("")
   const [activeTab, setActiveTab] = useState("about")
   const [showBooking, setShowBooking] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(false)
+
+  const handleToggleFavorite = () => {
+    if (!currentUser) {
+      navigate("/login")
+      return
+    }
+    setIsFavorite(!isFavorite)
+    // TODO: Add API call to save favorite status
+  }
 
   useEffect(() => {
     if (location.state?.psychologist?.specialties) {
@@ -65,7 +76,7 @@ const PsychologistProfile = () => {
       <div className="min-h-screen bg-white font-nunito">
         {/* Header Skeleton */}
         <div className="relative">
-          <div className="h-32 bg-gray-100" />
+          <div className="h-32 bg-lightGrayHover" />
           <div className="max-w-5xl mx-auto px-4">
             <div className="flex flex-col items-center -mt-16">
               <Skeleton className="w-32 h-32 rounded-full border-4 border-white" />
@@ -85,7 +96,7 @@ const PsychologistProfile = () => {
     return (
       <div className="min-h-screen flex flex-col bg-white font-nunito">
         <div className="flex-1 container mx-auto px-4 py-12 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl font-bold text-gray-700 mb-4">
             {error || "Psychologist not found"}
           </h2>
           <Button onClick={() => navigate("/browse-psychologists")}>
@@ -136,7 +147,7 @@ const PsychologistProfile = () => {
 
             {/* Name & Verification */}
             <div className="flex items-center gap-2 mt-4">
-              <h1 className="text-2xl font-bold text-gray-900">{psychologist.name}</h1>
+              <h1 className="text-4xl font-semibold text-customGreen font-averia tracking-tighter">{psychologist.name}</h1>
               {psychologist.verified && (
                 <svg className="w-6 h-6 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
@@ -145,18 +156,18 @@ const PsychologistProfile = () => {
             </div>
 
             {/* Info Row */}
-            <div className="flex items-center flex-wrap justify-center gap-4 mt-3 text-sm text-gray-600">
+            <div className="flex items-center flex-wrap justify-center gap-4 mt-3 text-sm text-customGray">
               <div className="flex items-center gap-1.5">
-                <BriefcaseIcon className="w-4 h-4 text-gray-400" />
+                <BriefcaseIcon className="w-4 h-4 text-customGray" />
                 <span>{psychologist.title}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <LocationIcon className="w-4 h-4 text-gray-400" />
+                <LocationIcon className="w-4 h-4 text-customGray" />
                 <span>{psychologist.location}</span>
               </div>
               {psychologist.languages && psychologist.languages.length > 0 && (
                 <div className="flex items-center gap-1.5">
-                  <GlobeIcon className="w-4 h-4 text-gray-400" />
+                  <GlobeIcon className="w-4 h-4 text-customGray" />
                   <span>{psychologist.languages.join(", ")}</span>
                 </div>
               )}
@@ -168,8 +179,8 @@ const PsychologistProfile = () => {
       {/* Tabs Navigation */}
       <div className="mt-8">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="flex items-center justify-between border-b border-gray-200">
-            <nav className="flex gap-1">
+          <div className="flex items-center justify-between">
+            <nav className="flex gap-1 border-b border-gray-200">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -177,7 +188,7 @@ const PsychologistProfile = () => {
                   className={`px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 cursor-pointer ${
                     activeTab === tab.id
                       ? "border-customGreen text-customGreen"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                      : "border-transparent text-customGray hover:text-gray-700 hover:border-gray-300"
                   }`}
                 >
                   {tab.label}
@@ -185,22 +196,18 @@ const PsychologistProfile = () => {
               ))}
             </nav>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={() => {
-                  if (!currentUser) {
-                    navigate("/login")
-                  } else {
-                    setShowBooking(true)
-                  }
-                }}
-                className="bg-customGreen hover:bg-customGreenHover text-white cursor-pointer"
-              >
-                <CalendarIcon className="w-4 h-4 mr-2" />
-                Book Session
-              </Button>
-             
+            {/* Action Button */}
+            <div
+              onClick={handleToggleFavorite}
+              variant="outline"
+              className={`flex items-center gap-2 cursor-pointer transition-all px-2 py-1.5 border border-customGray rounded-md ${
+                isFavorite
+                  ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
+                  : 'border-gray-200 hover:bg-lightGray text-gray-700'
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500' : ''}`} />
+              {isFavorite ? 'Added to Favorites' : 'Add to Favorites'}
             </div>
           </div>
         </div>
@@ -214,7 +221,7 @@ const PsychologistProfile = () => {
             <div className="bg-lightGray rounded-2xl p-6 sticky top-6">
               {/* Header - Session Type & Availability */}
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-gray-500 tracking-wide uppercase">Standard Session</span>
+                <span className="text-sm font-semibold text-customGray tracking-wide uppercase">Standard Session</span>
                 <Badge className="bg-customGreen/10 text-customGreen border-0 font-medium">
                   Available Today
                 </Badge>
@@ -222,10 +229,10 @@ const PsychologistProfile = () => {
 
               {/* Price */}
               <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900">
+                <span className="text-4xl font-bold text-customGreen font-averia">
                   ${typeof psychologist.price === 'number' ? psychologist.price.toFixed(0) : psychologist.price}
                 </span>
-                <span className="text-gray-500 ml-1">/ hour</span>
+                <span className="text-customGray ml-1">/ hour</span>
               </div>
 
               <hr className="border-gray-200 mb-6" />
@@ -234,23 +241,23 @@ const PsychologistProfile = () => {
               <div className="space-y-4 mb-6">
                 {/* Duration */}
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-lightGrayHover rounded-full flex items-center justify-center">
                     <TimeIcon className="w-5 h-5 text-customGreen" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{psychologist.availability?.sessionDuration || 60} Minutes</p>
-                    <p className="text-sm text-gray-500">Session Duration</p>
+                    <p className="font-semibold text-gray-700">{psychologist.availability?.sessionDuration || 60} Minutes</p>
+                    <p className="text-sm text-customGray">Session Duration</p>
                   </div>
                 </div>
 
                 {/* Next Available */}
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-lightGrayHover rounded-full flex items-center justify-center">
                     <CalendarIcon className="w-5 h-5 text-customGreen" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">Next Available</p>
-                    <p className="text-sm text-gray-500">Today, 10:00 AM</p>
+                    <p className="font-semibold text-gray-700">Next Available</p>
+                    <p className="text-sm text-customGray">Today, 10:00 AM</p>
                   </div>
                 </div>
               </div>
@@ -267,20 +274,21 @@ const PsychologistProfile = () => {
                       setShowBooking(true)
                     }
                   }}
-                  className="w-full bg-customGreen hover:bg-customGreenHover text-white py-6 text-base font-semibold rounded-xl cursor-pointer"
+                  className="w-full bg-customGreen hover:bg-customGreenHover text-white py-6 text-base font-semibold rounded-xl cursor-pointer flex items-center"
                 >
+                  <CalendarIcon className="w-4 h-4 mr-2" />
                   Book Session
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full py-6 text-base font-semibold rounded-xl border-gray-200 hover:bg-gray-50 cursor-pointer"
+                  className="w-full py-6 text-base font-semibold rounded-xl border-gray-200 hover:bg-lightGray cursor-pointer"
                 >
                   Send Message
                 </Button>
               </div>
 
               {/* Security Note */}
-              <div className="flex items-center justify-center gap-2 mt-6 text-sm text-gray-500">
+              <div className="flex items-center justify-center gap-2 mt-6 text-sm text-customGray">
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                 </svg>
@@ -293,14 +301,14 @@ const PsychologistProfile = () => {
           <div className="lg:col-span-2">
             {/* About Tab */}
             {activeTab === "about" && (
-              <div className="bg-gray-50 rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="bg-lightGray rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">About Me</h3>
-                  <p className="text-gray-600 leading-relaxed">{psychologist.bio}</p>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-3">About Me</h3>
+                  <p className="text-customGray leading-relaxed">{psychologist.bio}</p>
                 </div>
 
                 <div className="border-t border-gray-200 pt-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Approach</h3>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-3">Approach</h3>
                   <p className="text-gray-600 leading-relaxed">
                     {psychologist.approach || "I believe in creating a safe, supportive environment where clients can explore their thoughts and feelings openly. My approach is collaborative and tailored to each individual's unique needs and goals."}
                   </p>
@@ -308,10 +316,10 @@ const PsychologistProfile = () => {
 
                 {psychologist.languages && psychologist.languages.length > 0 && (
                   <div className="border-t border-gray-200 pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Languages</h3>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-3">Languages</h3>
                     <div className="flex flex-wrap gap-2">
                       {psychologist.languages.map((lang, index) => (
-                        <span key={index} className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">
+                        <span key={index} className="px-3 py-1 bg-lightGrayHover rounded-full text-sm text-gray-700">
                           {lang}
                         </span>
                       ))}
@@ -323,41 +331,41 @@ const PsychologistProfile = () => {
 
             {/* Education Tab */}
             {activeTab === "education" && (
-              <div className="bg-gray-50 rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Education & Credentials</h3>
+              <div className="bg-lightGray rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4">Education & Credentials</h3>
 
                 {psychologist.education && psychologist.education.length > 0 ? (
                   <div className="space-y-4">
                     {psychologist.education.map((edu, index) => (
-                      <div key={index} className="flex gap-4 p-4 bg-gray-50 rounded-xl">
+                      <div key={index} className="flex gap-4 p-4 bg-lightGray rounded-xl">
                         <div className="w-10 h-10 bg-customGreen/10 rounded-lg flex items-center justify-center shrink-0">
                           <svg className="w-5 h-5 text-customGreen" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
                           </svg>
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-900">{edu.degree}</h4>
+                          <h4 className="font-semibold text-gray-700">{edu.degree}</h4>
                           <p className="text-gray-600">{edu.institution}</p>
-                          <p className="text-sm text-gray-500">{edu.year}</p>
+                          <p className="text-sm text-customGray">{edu.year}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No education information available.</p>
+                  <p className="text-customGray">No education information available.</p>
                 )}
 
                 {psychologist.licenseNumber && (
                   <div className="border-t border-gray-200 pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">License</h3>
-                    <div className="flex gap-4 p-4 bg-green-50 rounded-xl">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-4">License</h3>
+                    <div className="flex gap-4 p-4 bg-lightGrayHover rounded-xl">
                       <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
                         <svg className="w-5 h-5 text-green-600" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
                         </svg>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-gray-900">Licensed Clinical Psychologist</h4>
+                        <h4 className="font-semibold text-gray-700">Licensed Clinical Psychologist</h4>
                         <p className="text-gray-600">License #{psychologist.licenseNumber}</p>
                       </div>
                     </div>
@@ -368,20 +376,20 @@ const PsychologistProfile = () => {
 
             {/* Experience Tab */}
             {activeTab === "experience" && (
-              <div className="bg-gray-50 rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Work Experience</h3>
+              <div className="bg-lightGray rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4">Work Experience</h3>
 
                 {psychologist.workExperience && psychologist.workExperience.length > 0 ? (
                   <div className="space-y-4">
                     {psychologist.workExperience.map((exp, index) => (
-                      <div key={index} className="flex gap-4 p-4 bg-gray-100 rounded-xl">
-                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center shrink-0">
-                          <BriefcaseIcon className="w-5 h-5 text-purple-600" />
+                      <div key={index} className="flex gap-4 p-4 bg-lightGrayHover rounded-xl">
+                        <div className="w-10 h-10 bg-customGray/5 rounded-lg flex items-center justify-center shrink-0">
+                          <BriefcaseIcon className="w-5 h-5 text-customGray" />
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-900">{exp.position}</h4>
+                          <h4 className="font-semibold text-gray-700">{exp.position}</h4>
                           <p className="text-gray-600">{exp.organization}</p>
-                          <p className="text-sm text-gray-500">{exp.duration}</p>
+                          <p className="text-sm text-customGray">{exp.duration}</p>
                           {exp.description && (
                             <p className="text-sm text-gray-600 mt-2">{exp.description}</p>
                           )}
@@ -390,33 +398,33 @@ const PsychologistProfile = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No work experience information available.</p>
+                  <p className="text-customGray">No work experience information available.</p>
                 )}
               </div>
             )}
 
             {/* Availability Tab */}
             {activeTab === "availability" && (
-              <div className="bg-gray-50 rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Availability</h3>
+              <div className="bg-lightGray rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <h3 className="text-lg font-semibold text-gray-700 mb-4">Availability</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 bg-gray-100 rounded-xl">
+                  <div className="p-4 bg-lightGrayHover rounded-xl">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <TimeIcon className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-customGray/5 rounded-lg flex items-center justify-center">
+                        <TimeIcon className="w-5 h-5 text-customGray" />
                       </div>
-                      <span className="font-semibold text-gray-900">Session Duration</span>
+                      <span className="font-semibold text-gray-700">Session Duration</span>
                     </div>
                     <p className="text-gray-600 ml-13">{psychologist.availability?.sessionDuration || 60} minutes</p>
                   </div>
 
-                  <div className="p-4 bg-gray-100 rounded-xl">
+                  <div className="p-4 bg-lightGrayHover rounded-xl">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <CalendarIcon className="w-5 h-5 text-green-600" />
+                      <div className="w-10 h-10 bg-customGray/5 rounded-lg flex items-center justify-center">
+                        <CalendarIcon className="w-5 h-5 text-customGray" />
                       </div>
-                      <span className="font-semibold text-gray-900">Booking</span>
+                      <span className="font-semibold text-gray-700">Booking</span>
                     </div>
                     <p className="text-gray-600 ml-13">Available for online sessions</p>
                   </div>
@@ -426,8 +434,8 @@ const PsychologistProfile = () => {
                 <div className="border border-gray-200 rounded-xl p-6 mt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-1">Ready to book a session?</h4>
-                      <p className="text-sm text-gray-500">Schedule your appointment today</p>
+                      <h4 className="font-semibold text-gray-700 mb-1">Ready to book a session?</h4>
+                      <p className="text-sm text-customGray">Schedule your appointment today</p>
                     </div>
                     <Button
                       onClick={() => {
@@ -437,8 +445,9 @@ const PsychologistProfile = () => {
                           setShowBooking(true)
                         }
                       }}
-                      className="bg-customGreen hover:bg-customGreenHover text-white cursor-pointer"
+                      className="bg-customGreen hover:bg-customGreenHover text-white cursor-pointer flex items-center"
                     >
+                      <CalendarIcon className="w-4 h-4 mr-2" />
                       Book Now
                     </Button>
                   </div>

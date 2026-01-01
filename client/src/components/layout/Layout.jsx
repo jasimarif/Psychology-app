@@ -53,7 +53,7 @@ const Layout = ({ children }) => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink asChild className="flex items-center gap-2">
+            <BreadcrumbLink asChild className="flex items-center gap-2 select-none">
               <Link to="/dashboard">
                 <DashboardIcon className="h-4 w-4 text-gray-400" />
                 Dashboard
@@ -62,7 +62,7 @@ const Layout = ({ children }) => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           {pathnames.length === 0 || (pathnames.length === 1 && pathnames[0] === 'dashboard') ? (
-             <BreadcrumbItem>
+             <BreadcrumbItem className="select-none">
                <BreadcrumbPage>Default</BreadcrumbPage>
              </BreadcrumbItem>
           ) : (
@@ -146,7 +146,7 @@ const Layout = ({ children }) => {
           </div> */}
 
           {/* Right: Actions & Profile */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 select-none">
             <button className="p-2 text-gray-500 hover:bg-white rounded-lg transition-colors hidden sm:block">
               <BellIcon className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>

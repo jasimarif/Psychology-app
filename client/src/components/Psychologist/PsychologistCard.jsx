@@ -1,5 +1,5 @@
 import { Star } from "lucide-react";
-import { PsychologistsIcon } from "../icons/DuoTuneIcons";
+import { PsychologistsIcon, CalendarIcon } from "../icons/DuoTuneIcons";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -48,7 +48,7 @@ const PsychologistCard = ({ psychologist, onViewProfile, onBookSession }) => {
             <Badge
               key={index}
               variant="outline"
-              className="text-xs font-medium text-customGreen bg-[#F8F7F3] border-none rounded-full px-3 py-1"
+              className="text-xs font-medium text-customGreen bg-lightGray border-none rounded-full px-3 py-1"
             >
               {specialty}
             </Badge>
@@ -73,8 +73,9 @@ const PsychologistCard = ({ psychologist, onViewProfile, onBookSession }) => {
               e.stopPropagation();
               onBookSession(psychologist);
             }}
-            className="bg-customGreen hover:bg-customGreenHover text-white rounded-lg px-6 py-3 select-none cursor-pointer font-medium"
+            className="bg-customGreen hover:bg-customGreenHover text-white rounded-lg px-6 py-3 select-none cursor-pointer font-medium flex items-center"
           >
+                <CalendarIcon className="w-4 h-4 mr-2" />
             Book Session
           </div>
         </div>
