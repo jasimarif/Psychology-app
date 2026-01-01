@@ -7,7 +7,7 @@ import {
   PsychologistsIcon,
   BookingsIcon,
   LogoutIcon,
-  HeartPulseIcon
+  BriefcaseIcon
 } from '../icons/DuoTuneIcons';
 import { useAuth } from '@/context/AuthContext';
 import { logout } from '@/lib/firebase';
@@ -45,9 +45,7 @@ const AppSidebar = ({ onClose }) => {
       {/* Logo */}
       <div className="mb-10 px-2">
         <Link to="/" className="flex items-center gap-2" onClick={() => onClose && onClose()}>
-          <div className="w-8 h-8 bg-customGreen rounded-lg flex items-center justify-center">
-            <HeartPulseIcon className="w-5 h-5 text-white" />
-          </div>
+          <BriefcaseIcon className="w-8 h-8 text-customGreen" />
           <span className="text-2xl font-extrabold text-customGreenHover font-averia">PsychApp</span>
         </Link>
       </div>
