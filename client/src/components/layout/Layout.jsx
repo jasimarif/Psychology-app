@@ -112,7 +112,7 @@ const Layout = ({ children }) => {
         <AppSidebar onClose={() => setSidebarOpen(false)} />
       </div>
 
-      <main className="flex-1 overflow-y-auto w-full">
+      <main className="flex-1 overflow-y-auto w-full flex flex-col">
         {/* Top Header */}
         <header className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 bg-[#F7F0EA] sticky top-0 z-10">
           {/* Left: Mobile Menu + Breadcrumbs */}
@@ -174,7 +174,7 @@ const Layout = ({ children }) => {
         </header>
 
         {/* Main Content */}
-        <div className="px-4 sm:px-6 lg:px-8 pb-8 relative">
+        <div className="px-4 sm:px-6 lg:px-8 flex-1 flex flex-col relative">
           {/* Sticky corners that stay visible on scroll */}
           <div className="sticky top-[72px] z-5 h-0 pointer-events-none">
             <div className="absolute left-0 w-6 h-6 bg-[#F7F0EA]">
@@ -185,7 +185,7 @@ const Layout = ({ children }) => {
             </div>
           </div>
 
-          <div className="bg-white rounded-t-3xl min-h-[calc(100vh-100px)]">
+          <div className="bg-white rounded-t-3xl flex-1 pb-8">
             {children}
           </div>
         </div>
