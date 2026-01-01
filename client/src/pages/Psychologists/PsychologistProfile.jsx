@@ -102,9 +102,9 @@ const PsychologistProfile = () => {
       {/* Cover & Profile Header */}
       <div className="relative isolate">
         {/* Cover Image with Pattern */}
-        <div className="h-36 bg-customGreen relative overflow-hidden">
+        <div className="h-36 relative overflow-hidden">
           <div
-            className="absolute inset-0 opacity-40"
+            className="absolute inset-0 opacity-40 "
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23a0aec0' fill-opacity='0.15'%3E%3Cpath d='M40 40L20 20h40L40 40zm0 0L20 60h40L40 40z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             }}
@@ -116,7 +116,7 @@ const PsychologistProfile = () => {
           <div className="flex flex-col items-center -mt-16 relative z-10">
             {/* Profile Image */}
             <div className="relative">
-              <div className="w-32 h-32 rounded-full border-4 border-customGreen bg-white overflow-hidden">
+              <div className="w-32 h-32 rounded-full border-4 border-customGreen/40 bg-white overflow-hidden">
                 {psychologist.profileImage ? (
                   <img
                     src={psychologist.profileImage}
@@ -124,7 +124,7 @@ const PsychologistProfile = () => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full bg-customGreen/10 flex items-center justify-center">
+                  <div className="w-full h-full bg-customGreen/20 flex items-center justify-center">
                     <span className="text-4xl font-bold text-customGreen">
                       {psychologist.name?.charAt(0) || 'P'}
                     </span>
@@ -175,7 +175,7 @@ const PsychologistProfile = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+                  className={`px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 cursor-pointer ${
                     activeTab === tab.id
                       ? "border-customGreen text-customGreen"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -201,13 +201,7 @@ const PsychologistProfile = () => {
                 <CalendarIcon className="w-4 h-4 mr-2" />
                 Book Session
               </Button>
-              <button className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-                <svg className="w-5 h-5 text-gray-500" viewBox="0 0 24 24" fill="currentColor">
-                  <circle cx="12" cy="5" r="2"/>
-                  <circle cx="12" cy="12" r="2"/>
-                  <circle cx="12" cy="19" r="2"/>
-                </svg>
-              </button>
+             
             </div>
           </div>
         </div>
@@ -273,7 +267,7 @@ const PsychologistProfile = () => {
           <div className="lg:col-span-2">
             {/* About Tab */}
             {activeTab === "about" && (
-              <div className="bg-gray-50 rounded-xl p-6 space-y-6">
+              <div className="bg-gray-50 rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">About Me</h3>
                   <p className="text-gray-600 leading-relaxed">{psychologist.bio}</p>
@@ -303,7 +297,7 @@ const PsychologistProfile = () => {
 
             {/* Education Tab */}
             {activeTab === "education" && (
-              <div className="bg-gray-50 rounded-xl p-6 space-y-6">
+              <div className="bg-gray-50 rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Education & Credentials</h3>
 
                 {psychologist.education && psychologist.education.length > 0 ? (
@@ -348,7 +342,7 @@ const PsychologistProfile = () => {
 
             {/* Experience Tab */}
             {activeTab === "experience" && (
-              <div className="bg-gray-50 rounded-xl p-6 space-y-6">
+              <div className="bg-gray-50 rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Work Experience</h3>
 
                 {psychologist.workExperience && psychologist.workExperience.length > 0 ? (
@@ -377,7 +371,7 @@ const PsychologistProfile = () => {
 
             {/* Availability Tab */}
             {activeTab === "availability" && (
-              <div className="bg-gray-50 rounded-xl p-6 space-y-6">
+              <div className="bg-gray-50 rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Availability</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
