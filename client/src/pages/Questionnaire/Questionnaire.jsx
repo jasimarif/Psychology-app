@@ -9,6 +9,7 @@ import { QuestionnaireIcon, CheckIcon } from "@/components/icons/DuoTuneIcons"
 import { Footer } from "../../components"
 import { useAuth } from "@/context/AuthContext"
 import { toast } from "sonner"
+import { getData } from "country-list"
 
 function Questionnaire() {
   const navigate = useNavigate()
@@ -286,17 +287,16 @@ function Questionnaire() {
         </div>
       )
     } else if (currentQuestion === 2) {
+      const countries = getData();
+      const countryOptions = countries.map(country => ({
+        id: country.name,
+        label: country.name
+      }));
+      
       return (
         <DropdownQuestionSelect
           title="What is your country?"
-          options={[
-            { id: 'Pakistan', label: 'Pakistan' },
-            { id: 'United States', label: 'United States' },
-            { id: 'Canada', label: 'Canada' },
-            { id: 'United Kingdom', label: 'United Kingdom' },
-            { id: 'Australia', label: 'Australia' },
-            { id: 'Other', label: 'Other' }
-          ]}
+          options={countryOptions}
           selectedValue={formData.country}
           onChange={(value) => handleRadioChange("country", value)}
           onNext={handleNext}

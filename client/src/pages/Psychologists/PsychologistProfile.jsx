@@ -9,7 +9,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import BookingModal from "@/components/BookingModal"
 import {
   LocationIcon,
-  StarIcon,
   CalendarIcon,
   TimeIcon,
   GlobeIcon,
@@ -210,56 +209,83 @@ const PsychologistProfile = () => {
       {/* Content Area */}
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Stats */}
-          <div className="lg:col-span-1 space-y-6">
-            {/* Stats Card */}
-            <div className="bg-gray-50 rounded-xl p-5">
-              <div className="flex items-center justify-around divide-x divide-gray-200">
-                <div className="text-center px-4">
-                  <p className="text-2xl font-bold text-gray-900">{psychologist.experience}</p>
-                  <p className="text-sm text-gray-500">Experience</p>
-                </div>
-                <div className="text-center px-4">
-                  <div className="flex items-center justify-center gap-1">
-                    <StarIcon className="w-5 h-5 text-yellow-400" />
-                    <p className="text-2xl font-bold text-gray-900">{psychologist.rating}</p>
+          {/* Left Column - Booking Card */}
+          <div className="lg:col-span-1">
+            <div className="bg-lightGray rounded-2xl p-6 sticky top-6">
+              {/* Header - Session Type & Availability */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-gray-500 tracking-wide uppercase">Standard Session</span>
+                <Badge className="bg-customGreen/10 text-customGreen border-0 font-medium">
+                  Available Today
+                </Badge>
+              </div>
+
+              {/* Price */}
+              <div className="mb-6">
+                <span className="text-4xl font-bold text-gray-900">
+                  ${typeof psychologist.price === 'number' ? psychologist.price.toFixed(0) : psychologist.price}
+                </span>
+                <span className="text-gray-500 ml-1">/ hour</span>
+              </div>
+
+              <hr className="border-gray-200 mb-6" />
+
+              {/* Session Details */}
+              <div className="space-y-4 mb-6">
+                {/* Duration */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                    <TimeIcon className="w-5 h-5 text-customGreen" />
                   </div>
-                  <p className="text-sm text-gray-500">{psychologist.reviews} reviews</p>
+                  <div>
+                    <p className="font-semibold text-gray-900">{psychologist.availability?.sessionDuration || 60} Minutes</p>
+                    <p className="text-sm text-gray-500">Session Duration</p>
+                  </div>
+                </div>
+
+                {/* Next Available */}
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                    <CalendarIcon className="w-5 h-5 text-customGreen" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Next Available</p>
+                    <p className="text-sm text-gray-500">Today, 10:00 AM</p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Profile Summary Card */}
-            <div className="bg-gray-50 rounded-xl p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Profile</h3>
-              <p className="text-sm text-gray-600 leading-relaxed line-clamp-4">
-                {psychologist.bio}
-              </p>
-            </div>
+              <hr className="border-gray-200 mb-6" />
 
-            {/* Specialties Card */}
-            <div className="bg-gray-50 rounded-xl p-5">
-              <h3 className="font-semibold text-gray-900 mb-4">Specialties</h3>
-              <div className="flex flex-wrap gap-2">
-                {psychologist.specialties?.map((specialty, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className="bg-customGreen/10 text-customGreen border-0"
-                  >
-                    {specialty}
-                  </Badge>
-                ))}
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <Button
+                  onClick={() => {
+                    if (!currentUser) {
+                      navigate("/login")
+                    } else {
+                      setShowBooking(true)
+                    }
+                  }}
+                  className="w-full bg-customGreen hover:bg-customGreenHover text-white py-6 text-base font-semibold rounded-xl cursor-pointer"
+                >
+                  Book Session
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full py-6 text-base font-semibold rounded-xl border-gray-200 hover:bg-gray-50 cursor-pointer"
+                >
+                  Send Message
+                </Button>
               </div>
-            </div>
 
-            {/* Session Fee Card */}
-            <div className="bg-gray-50 rounded-xl p-5">
-              <h3 className="font-semibold text-gray-900 mb-2">Session Fee</h3>
-              <p className="text-3xl font-bold text-customGreen">
-                ${typeof psychologist.price === 'number' ? psychologist.price.toFixed(2) : psychologist.price}
-              </p>
-              <p className="text-sm text-gray-500">per session</p>
+              {/* Security Note */}
+              <div className="flex items-center justify-center gap-2 mt-6 text-sm text-gray-500">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>Secure & Encrypted Connection</span>
+              </div>
             </div>
           </div>
 

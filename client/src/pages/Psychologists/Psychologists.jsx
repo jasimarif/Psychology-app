@@ -229,21 +229,22 @@ function Psychologists() {
         {/* Hero Header Section */}
         <div className="mb-8">
           <header className="">
-        <div className="">
-          <p className="text-xs font-medium tracking-[0.2em] uppercase text-customGreen mb-4">
-            Find a Therapist
-          </p>
-          <h1 className="text-5xl md:text-6xl font-light text-gray-900 tracking-tight mb-4">
-            Our Specialists<br />
-          </h1>
-          <p className="text-lg text-gray-500 font-light max-w-xl">
-            Connect with licensed mental health professionals who understand your unique journey.
-          </p>
-        </div>
-      </header>
+            <div className="">
+              <p className="text-xs font-medium tracking-[0.2em] uppercase text-customGreen mb-4">
+                Find a Therapist
+              </p>
+              <h1 className="text-5xl md:text-6xl font-light text-gray-700 tracking-tight mb-4">
+                Our Specialists<br />
+              </h1>
+              <p className="text-lg text-customGray font-light max-w-xl">
+                Connect with licensed mental health professionals who understand your unique journey.
+              </p>
+            </div>
+          </header>
 
 
-        </div>        {/* Search and Filter Section */}
+        </div>        
+        {/* Search and Filter Section */}
         <div className="mb-8">
           {/* Search Bar - Full Width */}
           <div className="relative mb-4">
@@ -253,7 +254,7 @@ function Psychologists() {
               placeholder="Search by name, specialty, or keywords..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 h-12 shadow-none border-none bg-gray-100 focus:bg-white focus:border-customGreen focus:ring-2 focus:ring-customGreen/20 rounded-xl text-base transition-all"
+              className="pl-12 h-12 shadow-none border-none bg-lightGray focus:bg-white focus:border-customGreen focus:ring-2 focus:ring-customGreen rounded-xl text-base transition-all"
             />
             {searchTerm && (
               <button
@@ -269,7 +270,7 @@ function Psychologists() {
           <div className="flex flex-wrap items-center gap-3 select-none">
             {/* Sort By */}
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-auto min-w-40 h-10 bg-gray-100 border-none cursor-pointer focus:ring-customGreen rounded-xl">
+              <SelectTrigger className="w-auto min-w-40 h-10 bg-lightGray border-none cursor-pointer focus:ring-customGreen rounded-xl">
                 <ArrowUpDown className="w-4 h-4 mr-2" />
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>

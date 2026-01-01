@@ -46,7 +46,7 @@ const AppSidebar = ({ onClose }) => {
       <div className="mb-10 px-2">
         <Link to="/" className="flex items-center gap-2" onClick={() => onClose && onClose()}>
           <BriefcaseIcon className="w-8 h-8 text-customGreen" />
-          <span className="text-2xl font-extrabold text-customGreenHover font-averia">PsychApp</span>
+          <span className="text-2xl font-extrabold text-customGreen font-averia">PsychApp</span>
         </Link>
       </div>
 
