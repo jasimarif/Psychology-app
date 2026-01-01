@@ -183,7 +183,7 @@ function Psychologists() {
           {/* Cards grid skeleton */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <Card key={i} className="rounded-2xl border-0 shadow-sm overflow-hidden">
+              <Card key={i} className="rounded-2xl border-0 shadow-none overflow-hidden">
                 <CardContent className="p-0">
                   <Skeleton className="h-48 w-full" />
                   <div className="p-5 space-y-3">
