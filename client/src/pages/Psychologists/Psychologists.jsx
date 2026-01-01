@@ -166,7 +166,7 @@ function Psychologists() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col bg-linear-to-br from-teal-50/30 via-white to-emerald-50/30 font-nunito">
-        <div className="py-8">
+      <div className="container mx-auto px-4 lg:px-8 py-8">
           {/* Header skeleton */}
           <div className="mb-8">
             <Skeleton className="h-10 w-72 mb-2" />
