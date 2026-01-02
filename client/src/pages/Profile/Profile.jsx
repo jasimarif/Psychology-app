@@ -82,7 +82,7 @@ function Profile() {
 
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/profiles/${currentUser.uid}`
+          `${import.meta.env.VITE_API_URL}/api/profile/${currentUser.uid}`
         )
 
         if (response.status === 404) {
@@ -123,7 +123,7 @@ function Profile() {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/profiles/${currentUser.uid}`,
+        `${import.meta.env.VITE_API_URL}/api/profile/${currentUser.uid}`,
         {
           method: 'PUT',
           headers: {

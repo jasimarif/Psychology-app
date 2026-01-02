@@ -7,6 +7,7 @@ import connectDB from './config/database.js';
 import psychologistRoutes from './routes/psychologistRoutes.js';
 import bookingRoutes from './routes/bookingRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
+import favoriteRoutes from './routes/favoriteRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import { handleStripeWebhook } from './webhooks/stripeWebhook.js';
 import emailCalendarService from './services/emailCalendarService.js';
@@ -35,10 +36,10 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.use('/api/psychologists', psychologistRoutes);
 app.use('/api/bookings', bookingRoutes);
-app.use('/api/profiles', profileRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/favorites', favoriteRoutes);
 app.use('/api/payment', paymentRoutes);
 
-// Serve index.html for all non-API routes (SPA fallback)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });

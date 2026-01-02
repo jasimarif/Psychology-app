@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import { psychologistService } from "@/services/psychologistService"
+import { favoritesService } from "@/services/favoritesService"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -14,7 +15,7 @@ import {
   GlobeIcon,
   BriefcaseIcon,
 } from "@/components/icons/DuoTuneIcons"
-import { Heart } from "lucide-react"
+import { Heart, Loader2 } from "lucide-react"
 
 const PsychologistProfile = () => {
   const location = useLocation()
@@ -29,14 +30,43 @@ const PsychologistProfile = () => {
   const [activeTab, setActiveTab] = useState("about")
   const [showBooking, setShowBooking] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
+  const [favoritesLoading, setFavoritesLoading] = useState(false)
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = async () => {
     if (!currentUser) {
       navigate("/login")
       return
     }
-    setIsFavorite(!isFavorite)
-    // TODO: Add API call to save favorite status
+
+    try {
+      setFavoritesLoading(true)
+      if (isFavorite) {
+        await favoritesService.removeFavorite(currentUser.uid, id)
+        setIsFavorite(false)
+      } else {
+        await favoritesService.addFavorite(currentUser.uid, id)
+        setIsFavorite(true)
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+    } finally {
+      setFavoritesLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (currentUser && id) {
+      checkIfFavorite()
+    }
+  }, [currentUser, id])
+
+  const checkIfFavorite = async () => {
+    try {
+      const favorites = await favoritesService.getFavorites(currentUser.uid)
+      setIsFavorite(favorites.includes(id))
+    } catch (error) {
+      console.error('Error checking favorite:', error)
+    }
   }
 
   useEffect(() => {
@@ -197,18 +227,23 @@ const PsychologistProfile = () => {
             </nav>
 
             {/* Action Button */}
-            <div
+            <button
               onClick={handleToggleFavorite}
-              variant="outline"
-              className={`flex items-center gap-2 cursor-pointer transition-all px-2 py-1.5 border border-customGray rounded-md ${
+              disabled={favoritesLoading}
+              className={`flex items-center gap-2 cursor-pointer transition-all px-4 py-2 border rounded-md ${
                 isFavorite
-                  ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
-                  : 'border-gray-200 hover:bg-lightGray text-gray-700'
-              }`}
+                  ? 'bg-red-100 border-none text-red-500 hover:bg-red-100/80'
+                  : 'border-none bg-lightGray hover:bg-customGray/10 text-gray-700'
+              } ${favoritesLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500' : ''}`} />
-              {isFavorite ? 'Added to Favorites' : 'Add to Favorites'}
-            </div>
+              {favoritesLoading ? (
+                <>
+                <span>Processing </span>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                </>
+              ) : (isFavorite ? 'Added to Favorites' : 'Add to Favorites')}
+            </button>
           </div>
         </div>
       </div>

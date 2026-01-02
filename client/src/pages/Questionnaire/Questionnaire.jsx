@@ -80,7 +80,7 @@ function Questionnaire() {
 
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/profiles/${currentUser.uid}`
+          `${import.meta.env.VITE_API_URL}/api/profile/${currentUser.uid}`
         )
 
         if (response.status === 404) {
@@ -183,7 +183,7 @@ function Questionnaire() {
         ...formData
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profiles`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

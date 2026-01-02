@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
+import { favoritesService } from "@/services/favoritesService"
 import {
   Search,
   SlidersHorizontal,
@@ -14,7 +15,8 @@ import {
   Filter,
   ArrowUpDown,
   Grid3x3,
-  LayoutList
+  LayoutList,
+  Heart
 } from "lucide-react"
 
 import { PsychologistCard } from "@/components"
@@ -43,6 +45,8 @@ function Psychologists() {
   const [searchTerm, setSearchTerm] = useState("")
   const [sortBy, setSortBy] = useState("recommended")
   const [viewMode, setViewMode] = useState("grid")
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
+  const [favorites, setFavorites] = useState([])
   const [filters, setFilters] = useState({
     specialty: "all",
     location: "all",
@@ -60,6 +64,21 @@ function Psychologists() {
   useEffect(() => {
     fetchPsychologists()
   }, [])
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchFavorites()
+    }
+  }, [currentUser])
+
+  const fetchFavorites = async () => {
+    try {
+      const userFavorites = await favoritesService.getFavorites(currentUser.uid)
+      setFavorites(userFavorites)
+    } catch (error) {
+      console.error('Error fetching favorites:', error)
+    }
+  }
 
   const fetchPsychologists = async () => {
     try {
@@ -102,8 +121,8 @@ function Psychologists() {
 
   useEffect(() => {
     const count = Object.values(filters).filter(v => v && v !== "" && v !== "any" && v !== "all").length
-    setActiveFilterCount(count)
-  }, [filters])
+    setActiveFilterCount(count + (showFavoritesOnly ? 1 : 0))
+  }, [filters, showFavoritesOnly])
 
   useEffect(() => {
     let filtered = psychologists.filter(psychologist => {
@@ -118,8 +137,9 @@ function Psychologists() {
       const matchesRating = !filters.rating || filters.rating === "any" || psychologist.rating >= parseFloat(filters.rating)
       const matchesExperience = !filters.experience || filters.experience === "any" ||
         parseInt(psychologist.experience) >= parseInt(filters.experience)
+      const matchesFavorites = !showFavoritesOnly || favorites.includes(psychologist._id)
 
-      return matchesSearch && matchesSpecialty && matchesLocation && matchesRating && matchesExperience
+      return matchesSearch && matchesSpecialty && matchesLocation && matchesRating && matchesExperience && matchesFavorites
     })
 
     // Sort psychologists
@@ -144,7 +164,7 @@ function Psychologists() {
     }
 
     setFilteredPsychologists(filtered)
-  }, [searchTerm, filters, psychologists, sortBy])
+  }, [searchTerm, filters, psychologists, sortBy, showFavoritesOnly, favorites])
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -161,6 +181,7 @@ function Psychologists() {
     })
     setSearchTerm("")
     setSortBy("recommended")
+    setShowFavoritesOnly(false)
   }
 
   if (loading) {
@@ -228,6 +249,26 @@ function Psychologists() {
     setShowBooking(true)
   }
 
+  const handleToggleFavorite = async (psychologist) => {
+    if (!currentUser) {
+      navigate("/login")
+      return
+    }
+
+    try {
+      const isFavorited = favorites.includes(psychologist._id)
+      if (isFavorited) {
+        await favoritesService.removeFavorite(currentUser.uid, psychologist._id)
+        setFavorites(prev => prev.filter(id => id !== psychologist._id))
+      } else {
+        await favoritesService.addFavorite(currentUser.uid, psychologist._id)
+        setFavorites(prev => [...prev, psychologist._id])
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white rounded-lg px-4 font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="container mx-auto px-4 lg:px-8 py-8">
@@ -252,6 +293,9 @@ function Psychologists() {
         </div>        
         {/* Search and Filter Section */}
         <div className="mb-8 space-y-3 text-gray-700">
+          {/* Favorites Toggle Button - Visible when logged in */}
+        
+          
           {/* Search Bar, Sort, and Filter - Single Line */}
           <div className="flex items-center gap-3 select-none">
             {/* Search Bar */}
@@ -297,11 +341,11 @@ function Psychologists() {
                   variant="outline"
                   className={`flex items-center gap-2 h-12 px-4 shadow-none rounded-xl transition-all ${activeFilterCount > 0
                     ? 'bg-customGreen text-white border-customGreen hover:text-white cursor-pointer hover:bg-customGreenHover'
-                    : 'bg-white border-dotted hover:bg-gray-50 cursor-pointer'
+                    : 'bg-white border-dotted hover:bg-gray-50 cursor-pointer text-gray-700'
                     }`}
                 >
-                  <Filter className="w-4 h-4 text-gray-700" />
-                  <span className="font-medium text-gray-700">Filters</span>
+                  <Filter className="w-4 h-4 " />
+                  <span className="font-medium">Filters</span>
                   {activeFilterCount > 0 && (
                     <Badge className="ml-1 bg-white text-customGreen hover:bg-white text-xs px-1.5 py-0.5">
                       {activeFilterCount}
@@ -310,6 +354,36 @@ function Psychologists() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-72 p-4" align="end">
+                {/* Favorites Toggle */}
+                {currentUser && (
+                  <>
+                    <div className="space-y-1.5 mb-4">
+                      <DropdownMenuLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5 p-0">
+                        <Heart className="w-3.5 h-3.5 text-customGreen" />
+                        Favorites
+                      </DropdownMenuLabel>
+                      <button
+                        onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                        className={`w-full h-10 px-4 rounded-lg flex items-center justify-between transition-all cursor-pointer ${
+                          showFavoritesOnly
+                            ? 'bg-customGreen text-white hover:bg-customGreenHover'
+                            : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <Heart className={`w-4 h-4 ${showFavoritesOnly ? 'fill-white' : ''}`} />
+                          Show Favorites Only
+                        </span>
+                        {showFavoritesOnly && (
+                          <Badge className="bg-white text-customGreen hover:bg-white text-xs px-1.5 py-0.5">
+                            {favorites.length}
+                          </Badge>
+                        )}
+                      </button>
+                    </div>
+                    <DropdownMenuSeparator className="my-3" />
+                  </>
+                )}
                 {/* Specialty Filter */}
                 <div className="space-y-1.5 mb-4">
                   <DropdownMenuLabel className="text-xs font-semibold text-gray-600 uppercase tracking-wide flex items-center gap-1.5 p-0">
@@ -461,16 +535,18 @@ function Psychologists() {
                 psychologist={psychologist}
                 onViewProfile={viewProfile}
                 onBookSession={bookSession}
+                isFavorite={favorites.includes(psychologist._id)}
+                onToggleFavorite={currentUser ? handleToggleFavorite : null}
                 viewMode={viewMode}
               />
             ))}
           </div>
         ) : (
           /* No Results */
-          <Card className="border-none shadow-md bg-white">
+          <Card className="border-none shadow-none bg-lightGray select-none">
             <CardContent className="text-center py-16">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Search className="w-10 h-10 text-gray-400" />
+              <div className="w-20 h-20 bg-customGray/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Search className="w-10 h-10 text-customGray" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">No professionals found</h3>
               <p className="text-gray-600 mb-6 max-w-md mx-auto">
@@ -478,7 +554,7 @@ function Psychologists() {
               </p>
               <Button
                 onClick={clearFilters}
-                className="bg-customGreen hover:bg-customGreenHover text-white rounded-xl"
+                className="bg-customGreen hover:bg-customGreenHover text-white rounded-xl cursor-pointer"
               >
                 <X className="w-4 h-4 mr-2" />
                 Clear All Filters
