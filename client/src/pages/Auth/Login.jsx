@@ -71,9 +71,9 @@ function Login() {
               >
                 <FieldGroup>
                   <div className="flex flex-col items-center gap-2 text-center">
-                    <h1 className="text-3xl md:text-4xl font-bold text-customGreenHover">Welcome back</h1>
-                    <p className="text-muted-foreground text-balance text-base md:text-lg">
-                      Login to your Psychology App account
+                    <h1 className="text-3xl md:text-4xl font-bold text-customGreen select-none">Welcome back</h1>
+                    <p className="text-customGray font-semibold text-base md:text-lg select-none">
+                      Login to your PsychApp account
                     </p>
                   </div>
                   {error && (
@@ -82,7 +82,7 @@ function Login() {
                     </div>
                   )}
                   <Field>
-                    <FieldLabel htmlFor="email" className="text-gray-800 text-base">Email</FieldLabel>
+                    <FieldLabel htmlFor="email" className="text-gray-700 text-base select-none">Email</FieldLabel>
                     <Input
                       id="email"
                       type="email"
@@ -95,8 +95,8 @@ function Login() {
                   </Field>
                   <Field>
                     <div className="flex items-center">
-                      <FieldLabel htmlFor="password" className="text-gray-800 text-base">Password</FieldLabel>
-                      <Link to="/forgot-password" className="ml-auto text-base underline-offset-2 hover:underline text-teal-900">
+                      <FieldLabel htmlFor="password" className="text-gray-700 text-base select-none">Password</FieldLabel>
+                      <Link to="/forgot-password" className="ml-auto text-base underline-offset-2 hover:underline text-customGreen select-none">
                         Forgot your password?
                       </Link>
                     </div>
@@ -111,11 +111,11 @@ function Login() {
                     />
                   </Field>
                   <Field>
-                    <Button type="submit" className="bg-teal-800 hover:bg-teal-900 cursor-pointer shadow-none h-12 text-base" disabled={loading}>
+                    <Button type="submit" className="bg-customGreen hover:bg-customGreenHover cursor-pointer shadow-none h-12 text-base" disabled={loading}>
                       {loading ? "Signing in..." : "Login"}
                     </Button>
                   </Field>
-                  <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-base">
+                  <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-base select-none">
                     Or continue with
                   </FieldSeparator>
                   <Field>
@@ -137,8 +137,8 @@ function Login() {
                       Continue with Google
                     </Button>
                   </Field>
-                  <FieldDescription className="text-center text-base">
-                    Don&apos;t have an account? <Link to="/signup" className="text-teal-900 hover:underline font-medium">Sign up</Link>
+                  <FieldDescription className="text-center text-base select-none">
+                    Don&apos;t have an account? <Link to="/signup" className="text-customGreen hover:underline font-medium">Sign up</Link>
                   </FieldDescription>
                 </FieldGroup>
               </form>

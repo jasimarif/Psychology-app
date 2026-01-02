@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { registerWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase"
+import { Loader2 } from "lucide-react"
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -97,8 +98,8 @@ function Signup() {
               >
                 <FieldGroup>
                   <div className="flex flex-col items-center gap-2 text-center">
-                    <h1 className="text-3xl md:text-4xl font-bold text-customGreenHover">Create an account</h1>
-                    <p className="text-muted-foreground text-balance text-base md:text-lg">
+                    <h1 className="text-3xl md:text-4xl font-bold text-customGreen select-none">Create an account</h1>
+                    <p className="text-customGray font-semibold  text-base md:text-lg select-none">
                       Enter your information to get started
                     </p>
                   </div>
@@ -108,7 +109,7 @@ function Signup() {
                     </div>
                   )}
                   <Field>
-                    <FieldLabel htmlFor="name" className="text-gray-800 text-base">Full Name</FieldLabel>
+                    <FieldLabel htmlFor="name" className="text-gray-700 text-base">Full Name</FieldLabel>
                     <Input
                       id="name"
                       name="name"
@@ -121,7 +122,7 @@ function Signup() {
                     />
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="email" className="text-gray-800 text-base">Email</FieldLabel>
+                    <FieldLabel htmlFor="email" className="text-gray-700 text-base">Email</FieldLabel>
                     <Input
                       id="email"
                       name="email"
@@ -134,7 +135,7 @@ function Signup() {
                     />
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="password" className="text-gray-800 text-base">Password</FieldLabel>
+                    <FieldLabel htmlFor="password" className="text-gray-700 text-base">Password</FieldLabel>
                     <Input
                       id="password"
                       name="password"
@@ -147,7 +148,7 @@ function Signup() {
                     />
                   </Field>
                   <Field>
-                    <FieldLabel htmlFor="confirmPassword" className="text-gray-800 text-base">Confirm Password</FieldLabel>
+                    <FieldLabel htmlFor="confirmPassword" className="text-gray-700 text-base">Confirm Password</FieldLabel>
                     <Input
                       id="confirmPassword"
                       name="confirmPassword"
@@ -160,15 +161,20 @@ function Signup() {
                     />
                   </Field>
                   <Field>
-                    <Button type="submit" className="bg-teal-800 hover:bg-teal-900 cursor-pointer h-12 text-base" disabled={loading}>
-                      {loading ? "Creating account..." : "Create account"}
+                    <Button type="submit" className="bg-customGreen hover:bg-customGreenHover cursor-pointer h-12 text-base select-none" disabled={loading}>
+                      {loading ? (
+                        <>
+                          Creating account
+                          <Loader2 className="ml-2 h-5 w-5 animate-spin" />
+                        </>
+                      ) : "Create account"}
                     </Button>
                   </Field>
-                  <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-base">
+                  <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-base select-none">
                     Or continue with
                   </FieldSeparator>
                   <Field>
-                    <Button variant="outline" type="button" className="cursor-pointer shadow-none h-12 text-base" onClick={handleGoogleSignIn} disabled={loading}>
+                    <Button variant="outline" type="button" className="cursor-pointer shadow-none h-12 text-base select-none" onClick={handleGoogleSignIn} disabled={loading}>
                       <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                         <path
                           d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -186,8 +192,8 @@ function Signup() {
                       Continue with Google
                     </Button>
                   </Field>
-                  <FieldDescription className="text-center text-base">
-                    Already have an account? <Link to="/login" className="text-teal-900 hover:underline font-medium">Sign in</Link>
+                  <FieldDescription className="text-center text-base select-none">
+                    Already have an account? <Link to="/login" className="text-customGreen hover:underline font-medium select-none">Sign in</Link>
                   </FieldDescription>
                   
                 </FieldGroup>
