@@ -185,11 +185,11 @@ function Profile() {
     {
       id: 'basic',
       title: 'Basic Information',
-      icon: <UserIcon className="w-6 h-6 text-blue-600" />,
-      bgColor: 'bg-blue-50',
-      activeColor: 'bg-blue-50',
-      activeTextColor: 'text-blue-800',
-      textColor: 'text-blue-600',
+      icon: <UserIcon className="w-5 h-5" />,
+      bgColor: 'bg-lightGray',
+      activeColor: 'bg-lightGreen',
+      activeTextColor: 'text-customGreen',
+      textColor: 'text-customGray',
       fields: [
         {
           key: 'therapyType',
@@ -256,11 +256,11 @@ function Profile() {
     {
       id: 'therapy',
       title: 'Therapy Preferences',
-      icon: <HeartIcon className="w-6 h-6 text-red-600" />,
-      bgColor: 'bg-red-50',
-      activeColor: 'bg-red-50',
-      activeTextColor: 'text-red-800',
-      textColor: 'text-red-600',
+      icon: <HeartIcon className="w-5 h-5" />,
+      bgColor: 'bg-lightGray',
+      activeColor: 'bg-lightGreen',
+      activeTextColor: 'text-customGreen',
+      textColor: 'text-customGray',
       fields: [
         {
           key: 'religion',
@@ -381,11 +381,11 @@ function Profile() {
     {
       id: 'health',
       title: 'Health & Wellness',
-      icon: <StethoscopeIcon className="w-6 h-6 text-green-600" />,
-      bgColor: 'bg-green-50',
-      activeColor: 'bg-green-50',
-      activeTextColor: 'text-green-800',
-      textColor: 'text-green-600',
+      icon: <StethoscopeIcon className="w-5 h-5" />,
+      bgColor: 'bg-lightGray',
+      activeColor: 'bg-lightGreen',
+      activeTextColor: 'text-customGreen',
+      textColor: 'text-customGray',
       fields: [
         {
           key: 'depression',
@@ -459,11 +459,11 @@ function Profile() {
     {
       id: 'assessment',
       title: 'Mental Health Assessment',
-      icon: <BrainIcon className="w-6 h-6 text-purple-600" />,
-      bgColor: 'bg-purple-50',
-      activeColor: 'bg-purple-50',
-      activeTextColor: 'text-purple-800',
-      textColor: 'text-purple-600',
+      icon: <BrainIcon className="w-5 h-5" />,
+      bgColor: 'bg-lightGray',
+      activeColor: 'bg-lightGreen',
+      activeTextColor: 'text-customGreen',
+      textColor: 'text-customGray',
       fields: [
         {
           key: 'littleInterest',
@@ -558,11 +558,11 @@ function Profile() {
     {
       id: 'preferences',
       title: 'Communication Preferences',
-      icon: <SettingsIcon className="w-6 h-6 text-yellow-600" />,
-      bgColor: 'bg-yellow-50',
-      activeColor: 'bg-yellow-50',
-      activeTextColor: 'text-yellow-800',
-      textColor: 'text-yellow-600',
+      icon: <SettingsIcon className="w-5 h-5" />,
+      bgColor: 'bg-lightGray',
+      activeColor: 'bg-lightGreen',
+      activeTextColor: 'text-customGreen',
+      textColor: 'text-customGray',
       fields: [
         {
           key: 'financialStatus',
@@ -671,31 +671,29 @@ function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white rounded-lg font-nunito">
-        <div className="container mx-auto px-4 lg:px-12 py-8 mb-8">
+      <div className="min-h-screen bg-white rounded-lg px-4 font-nunito">
+        <div className="container mx-auto px-4 lg:px-8 py-8">
           {/* Header skeleton */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <Skeleton className="w-8 h-8 rounded" />
-              <Skeleton className="h-10 w-64" />
-            </div>
+            <Skeleton className="h-4 w-24 mb-4" />
+            <Skeleton className="h-12 w-72 mb-4" />
             <Skeleton className="h-5 w-80" />
           </div>
 
           {/* User Info Card skeleton */}
-          <div className="mb-8 bg-white rounded-lg overflow-hidden border border-gray-100">
-            <div className="bg-gray-50 p-6">
+          <div className="mb-8 rounded-2xl overflow-hidden bg-lightGray">
+            <div className="p-6">
               <div className="flex items-center gap-4">
                 <Skeleton className="w-16 h-16 rounded-full" />
                 <div className="space-y-2">
-                  <Skeleton className="h-6 w-40" />
+                  <Skeleton className="h-5 w-40" />
                   <Skeleton className="h-4 w-56" />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {/* Sidebar skeleton */}
             <div className="md:col-span-1 space-y-2">
               {[...Array(5)].map((_, i) => (
@@ -705,17 +703,17 @@ function Profile() {
 
             {/* Main Content skeleton */}
             <div className="md:col-span-3">
-              <Card className="border-none shadow-none bg-gray-50">
-                <CardHeader className="pb-6 border-b border-gray-100">
+              <Card className="border-0 shadow-none rounded-2xl bg-lightGray">
+                <CardHeader className="pb-6 border-b border-gray-200/50">
                   <div className="flex items-center justify-between">
-                    <Skeleton className="h-8 w-48" />
-                    <Skeleton className="h-10 w-24 rounded-lg" />
+                    <Skeleton className="h-6 w-48" />
+                    <Skeleton className="h-10 w-24 rounded-xl" />
                   </div>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[...Array(6)].map((_, i) => (
-                      <div key={i} className="p-4 rounded-xl bg-white/80 border border-gray-100">
+                      <div key={i} className="p-4 rounded-xl bg-white">
                         <Skeleton className="h-3 w-24 mb-2" />
                         <Skeleton className="h-5 w-32" />
                       </div>
@@ -732,45 +730,57 @@ function Profile() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
-          <Button onClick={() => window.location.reload()}>Retry</Button>
-        </div>
+      <div className="min-h-screen bg-white rounded-lg px-4 font-nunito flex items-center justify-center">
+        <Card className="max-w-md w-full rounded-3xl shadow-none border-0 bg-lightGray">
+          <CardContent className="pt-12 pb-8 px-8 text-center">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <X className="w-10 h-10 text-red-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-700 mb-3">Something went wrong</h2>
+            <p className="text-customGray mb-6">{error}</p>
+            <Button
+              onClick={() => window.location.reload()}
+              className="bg-customGreen hover:bg-customGreenHover text-white rounded-xl shadow-none cursor-pointer"
+            >
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white rounded-lg font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="min-h-screen bg-white rounded-lg px-4 font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500">
 
-
-      <div className="container mx-auto px-4 lg:px-12 py-8 S mb-8">
+      <div className="container mx-auto px-4 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <UserIcon className="w-8 h-8 text-customGreenHover" />
-            <h1 className="text-3xl md:text-4xl font-bold text-customGreenHover">
+          <header className="select-none">
+            <p className="text-xs font-medium tracking-[0.2em] uppercase text-customGreen mb-4">
+              Your Profile
+            </p>
+            <h1 className="text-5xl md:text-6xl font-light text-gray-700 tracking-tight mb-4">
               Personal Information
             </h1>
-          </div>
-          <p className="text-gray-600 text-lg">
-            View and update your questionnaire responses
-          </p>
+            <p className="text-lg text-customGray font-light max-w-xl">
+              View and update your questionnaire responses
+            </p>
+          </header>
         </div>
 
         {/* User Info Card */}
-        <div className="mb-8 bg-white rounded-lg overflow-hidden shadow-none border border-gray-100">
-          <div className="bg-lightGreen/30 p-6">
+        <div className="mb-8 rounded-2xl overflow-hidden shadow-none border-0 bg-lightGray select-none">
+          <div className="p-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-customGreen rounded-full flex items-center justify-center shadow-none">
+              <div className="w-16 h-16 bg-customGreen rounded-full flex items-center justify-center shadow-none ring-4 ring-customGreen/10">
                 <PsychologistsIcon className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-customGreen">
+                <h2 className="text-xl font-bold text-gray-700">
                   {currentUser?.displayName || 'User'}
                 </h2>
-                <p className="flex items-center gap-2 text-base text-gray-600">
+                <p className="flex items-center gap-2 text-sm text-customGray">
                   <MailIcon className="w-4 h-4" />
                   {currentUser?.email}
                 </p>
@@ -779,9 +789,9 @@ function Profile() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Sidebar Navigation */}
-          <div className="md:col-span-1 space-y-2">
+          <div className="md:col-span-1 space-y-2 select-none">
             {sections.map((section) => (
               <button
                 key={section.id}
@@ -789,18 +799,20 @@ function Profile() {
                   setActiveSection(section.id)
                   if (editingSection) handleCancel()
                 }}
-                className={`w-full text-left px-4 py-3 rounded-xl flex items-center justify-between group transition-all duration-200 ${
+                className={`w-full text-left px-4 py-3 rounded-xl flex items-center justify-between group transition-all duration-200 cursor-pointer ${
                   activeSection === section.id
-                    ? `${section.activeColor} ${section.activeTextColor} shadow-none  `
-                    : `bg-white ${section.textColor} hover:bg-gray-50 `
+                    ? `${section.activeColor} ${section.activeTextColor} font-semibold`
+                    : `bg-lightGray text-gray-600 hover:bg-gray-100`
                 }`}
               >
-                <div className="flex items-center gap-3 cursor-pointer">
-                  {section.icon}
-                  <span className="font-medium">{section.title}</span>
+                <div className="flex items-center gap-3">
+                  <span className={activeSection === section.id ? 'text-customGreen' : 'text-customGray'}>
+                    {section.icon}
+                  </span>
+                  <span className="font-medium text-sm">{section.title}</span>
                 </div>
                 {activeSection === section.id && (
-                  <ChevronRight className="w-4 h-4 text-white/80" />
+                  <ChevronRight className="w-4 h-4 text-customGreen" />
                 )}
               </button>
             ))}
@@ -810,21 +822,21 @@ function Profile() {
           <div className="md:col-span-3">
             {sections.map((section) => {
               if (section.id !== activeSection) return null
-              
+
               return (
-                <Card key={section.id} className={`border-none shadow-none ${section.bgColor}`}>
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 border-b border-gray-100">
-                    <CardTitle className="text-2xl font-bold text-customGreen">
+                <Card key={section.id} className="border-0 shadow-none rounded-2xl bg-lightGray">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-6 border-b border-gray-200/50">
+                    <CardTitle className="text-xl font-bold text-gray-700">
                       {section.title}
                     </CardTitle>
                     {!editingSection && (
                       <Button
                         onClick={() => handleEdit(section.id)}
                         variant="outline"
-                        className="flex items-center gap-2 shadow-none cursor-pointer hover:bg-lightGreen hover:text-customGreen border-customGreen/20"
+                        className="flex items-center gap-2 shadow-none cursor-pointer rounded-xl border-gray-300 hover:bg-white hover:border-gray-300 hover:text-customGreen transition-all"
                       >
                         <Edit2 className="w-4 h-4" />
-                        Edit 
+                        Edit
                       </Button>
                     )}
                   </CardHeader>
@@ -836,18 +848,18 @@ function Profile() {
                             {renderEditField(field)}
                           </div>
                         ))}
-                        <div className="flex gap-3 justify-end pt-6 border-t border-gray-100">
+                        <div className="flex gap-3 justify-end pt-6 border-t border-gray-200/50">
                           <Button
                             onClick={handleCancel}
-                            variant="ghost"
-                            className="flex items-center gap-2 shadow-none cursor-pointer hover:bg-red-50 hover:text-red-600"
+                            variant="outline"
+                            className="flex items-center gap-2 shadow-none cursor-pointer rounded-xl border-red-200 text-red-600 hover:text-red-600 hover:bg-red-50 hover:border-red-300 transition-all"
                           >
                             <X className="w-4 h-4" />
                             Cancel
                           </Button>
                           <Button
                             onClick={handleSave}
-                            className="flex items-center gap-2 bg-customGreen hover:bg-customGreenHover shadow-none cursor-pointer "
+                            className="flex items-center gap-2 bg-customGreen hover:bg-customGreenHover shadow-none cursor-pointer rounded-xl transition-all"
                           >
                             <Save className="w-4 h-4" />
                             Save Changes
@@ -855,16 +867,16 @@ function Profile() {
                         </div>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-300">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in duration-300">
                         {section.fields.map((field) => (
                           <div
                             key={field.key}
-                            className="p-4 rounded-xl bg-white/80 transition-colors border border-gray-100"
+                            className="p-4 rounded-xl bg-white transition-colors"
                           >
-                            <div className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wider">
+                            <div className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">
                               {field.label}
                             </div>
-                            <div className="text-gray-900">
+                            <div className="text-sm text-gray-700">
                               {renderFieldValue(field, profileData[field.key])}
                             </div>
                           </div>
