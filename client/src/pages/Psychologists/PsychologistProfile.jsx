@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import { psychologistService } from "@/services/psychologistService"
 import { favoritesService } from "@/services/favoritesService"
+import { useNextAvailable } from "@/hooks/useNextAvailable"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -31,6 +32,8 @@ const PsychologistProfile = () => {
   const [showBooking, setShowBooking] = useState(false)
   const [isFavorite, setIsFavorite] = useState(false)
   const [favoritesLoading, setFavoritesLoading] = useState(false)
+
+  const { displayText: nextAvailableText, loading: nextAvailableLoading, hasAvailability } = useNextAvailable(id)
 
   const handleToggleFavorite = async () => {
     if (!currentUser) {
@@ -257,9 +260,11 @@ const PsychologistProfile = () => {
               {/* Header - Session Type & Availability */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold text-customGray tracking-wide uppercase">Standard Session</span>
-                <Badge className="bg-customGreen/10 text-customGreen border-0 font-medium">
-                  Available Today
-                </Badge>
+                {!nextAvailableLoading && hasAvailability && (
+                  <Badge className="bg-customGreen/10 text-customGreen border-0 font-medium">
+                    {nextAvailableText.startsWith('Today') ? 'Available Today' : 'Available'}
+                  </Badge>
+                )}
               </div>
 
               {/* Price */}
@@ -292,7 +297,16 @@ const PsychologistProfile = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-700">Next Available</p>
-                    <p className="text-sm text-customGray">Today, 10:00 AM</p>
+                    <p className={`text-sm ${hasAvailability ? 'text-customGray' : 'text-gray-400'}`}>
+                      {nextAvailableLoading ? (
+                        <span className="flex items-center gap-1">
+                          Checking
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        </span>
+                      ) : (
+                        nextAvailableText
+                      )}
+                    </p>
                   </div>
                 </div>
               </div>

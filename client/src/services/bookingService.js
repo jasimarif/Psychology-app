@@ -129,5 +129,56 @@ export const bookingService = {
       console.error('Error rescheduling booking:', error);
       throw error;
     }
+  },
+
+  async getNextAvailableSlot(psychologistId, daysToCheck = 14) {
+    const today = new Date();
+
+    for (let i = 0; i < daysToCheck; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(today.getDate() + i);
+      const dateStr = checkDate.toISOString().split('T')[0];
+
+      try {
+        const response = await this.getAvailableSlots(psychologistId, dateStr);
+        const slots = response?.availableSlots || [];
+
+        if (slots.length > 0) {
+          const now = new Date();
+          const isToday = checkDate.toDateString() === now.toDateString();
+
+          for (const slot of slots) {
+            if (isToday) {
+              const [hours, minutes] = slot.startTime.split(':').map(Number);
+              const slotTime = new Date(checkDate);
+              slotTime.setHours(hours, minutes, 0, 0);
+
+              if (slotTime > now) {
+                return {
+                  date: checkDate,
+                  dateStr: dateStr,
+                  startTime: slot.startTime,
+                  endTime: slot.endTime,
+                  isToday: true
+                };
+              }
+            } else {
+              return {
+                date: checkDate,
+                dateStr: dateStr,
+                startTime: slot.startTime,
+                endTime: slot.endTime,
+                isToday: false
+              };
+            }
+          }
+        }
+      } catch (error) {
+        // No slots for this day, continue to next day
+        continue;
+      }
+    }
+
+    return null;
   }
 };
