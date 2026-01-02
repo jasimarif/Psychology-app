@@ -14,8 +14,7 @@ import {
   DashboardSearchIcon,
   DashboardStarIcon,
   CalendarIcon,
-  ArrowRightIcon,
-  DashboardIcon
+  ArrowRightIcon
 } from "@/components/icons/DuoTuneIcons"
 
 function Dashboard() {
@@ -129,15 +128,22 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white rounded-lg font-nunito px-4 md:px-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="w-full px-0 sm:px-4 py-4 sm:py-8">
+      <div className="container mx-auto px-4 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-6 sm:mb-8 px-4 sm:px-0">
-          <div className="flex items-center gap-3 mb-2">
-            <DashboardIcon className="w-8 h-8 text-customGreenHover" />
-            <h1 className="text-3xl md:text-4xl font-bold text-customGreenHover">
-              Dashboard
-            </h1>
-          </div>
+        <div className="mb-8">
+          <header className="select-none">
+            <div className="">
+              <p className="text-xs font-medium tracking-[0.2em] uppercase text-customGreen mb-4">
+                Welcome Back
+              </p>
+              <h1 className="text-5xl md:text-6xl font-light text-gray-700 tracking-tight mb-4">
+                Dashboard
+              </h1>
+              <p className="text-lg text-customGray font-light max-w-xl">
+                Track your mental wellness journey and explore available resources.
+              </p>
+            </div>
+          </header>
         </div>
 
         {/* Stats Row */}

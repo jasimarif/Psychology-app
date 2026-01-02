@@ -810,7 +810,7 @@ function Questionnaire() {
                 </div>
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-gray-700 mb-3 select-none">
-                    Profile Successfully Created
+                    Profile Successfully Created!
                   </h2>
                   <p className="text-customGray leading-relaxed mb-6">
                     Your profile is ready and we've matched you with psychologists tailored to your needs and preferences. You can now browse through our recommended professionals or update your responses anytime from your profile page.

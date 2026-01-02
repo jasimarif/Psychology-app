@@ -827,7 +827,7 @@ const MyBookings = () => {
                           onClick={() => setSelectedSlot(slot)}
                           className={`p-3 rounded-lg border transition-all cursor-pointer ${
                             selectedSlot?.startTime === slot.startTime
-                              ? 'bg-customGreen/30 border-none font-semibold'
+                              ? 'bg-customGreen text-white border-none font-semibold'
                               : 'border-gray-200 hover:bg-gray-50'
                           }`}
                         >

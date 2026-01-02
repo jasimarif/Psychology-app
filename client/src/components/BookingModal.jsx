@@ -116,11 +116,11 @@ const BookingModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto scrollbar-none font-nunito select-none">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <CalendarIcon className="w-6 h-6 text-customGreen" />
+          <DialogTitle className="text-2xl font-bold text-gray-700 flex items-center gap-2">
+            <CalendarIcon className="w-6 h-6 text-customGray" />
             Book a Session with {psychologist.name}
           </DialogTitle>
-          <DialogDescription className="text-gray-600">
+          <DialogDescription className="text-customGray">
             Select a date and time slot for your therapy session
           </DialogDescription>
         </DialogHeader>
@@ -129,8 +129,8 @@ const BookingModal = ({
           {bookingSuccess ? (
             <div className="text-center py-8">
               <CheckIcon className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Booking Successful!</h3>
-              <p className="text-gray-600 mb-4">Your session has been booked successfully.</p>
+              <h3 className="text-xl font-bold text-gray-700 mb-2">Booking Successful!</h3>
+              <p className="text-customGray mb-4">Your session has been booked successfully.</p>
               <Button
                 onClick={() => navigate("/my-bookings")}
                 className="bg-customGreen hover:bg-customGreenHover text-white"
@@ -144,7 +144,7 @@ const BookingModal = ({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Calendar Section */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-3">Select Date</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">Select Date</h3>
                   <Calendar
                     selectedDate={selectedDate}
                     onSelectDate={setSelectedDate}
@@ -156,7 +156,7 @@ const BookingModal = ({
 
                 {/* Time Slots Section */}
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900 mb-3">Available Time Slots</h3>
+                  <h3 className="text-sm font-medium text-gray-700 mb-3">Available Time Slots</h3>
                   {!selectedDate ? (
                     <div className="flex items-center justify-center py-20 bg-gray-50 rounded-lg border border-gray-200 border-dashed">
                       <div className="text-center">
@@ -171,7 +171,7 @@ const BookingModal = ({
                   ) : availableSlots.length === 0 ? (
                     <div className="text-center py-20 bg-gray-50 rounded-lg border border-gray-200">
                       <AlertIcon className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-600">No available slots on this date</p>
+                      <p className="text-customGray">No available slots on this date</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
@@ -181,7 +181,7 @@ const BookingModal = ({
                           onClick={() => setSelectedSlot(slot)}
                           className={`p-3 rounded-lg border transition-all cursor-pointer ${
                             selectedSlot?.startTime === slot.startTime
-                              ? 'bg-customGreen/30 border-none font-semibold'
+                              ? 'bg-customGreen text-white border-none font-semibold'
                               : 'border-gray-200  hover:bg-gray-50'
                           }`}
                         >
@@ -199,7 +199,7 @@ const BookingModal = ({
               {/* Notes Section */}
               {selectedSlot && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Notes (Optional)
                   </label>
                   <textarea
@@ -227,24 +227,24 @@ const BookingModal = ({
               {/* Booking Summary & Confirm */}
               {selectedSlot && (
                 <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
-                  <h4 className="font-semibold text-gray-900">Booking Summary</h4>
+                  <h4 className="font-semibold text-gray-700">Booking Summary</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Psychologist:</span>
+                      <span className="text-customGray">Psychologist:</span>
                       <span className="font-medium">{psychologist.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Date:</span>
+                      <span className="text-customGray">Date:</span>
                       <span className="font-medium">
                         {formatDateOnly(selectedDate, 'medium')}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Time:</span>
+                      <span className="text-customGray">Time:</span>
                       <span className="font-medium">{formatTime24to12(selectedSlot.startTime)} - {formatTime24to12(selectedSlot.endTime)}</span>
                     </div>
                     <div className="flex justify-between border-t border-gray-300 pt-2 mt-2">
-                      <span className="text-gray-900 font-semibold">Total:</span>
+                      <span className="text-gray-700 font-semibold">Total:</span>
                       <span className="text-customGreen font-bold text-lg">
                         ${typeof psychologist.price === 'number' ? psychologist.price.toFixed(2) : psychologist.price}
                       </span>
