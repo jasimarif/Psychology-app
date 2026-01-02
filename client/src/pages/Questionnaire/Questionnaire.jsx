@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { RadioQuestion, DropdownQuestionSelect, CheckboxQuestion } from "@/components"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Info, MessageCircle, Users, ArrowLeft } from 'lucide-react'
 import { QuestionnaireIcon, CheckIcon } from "@/components/icons/DuoTuneIcons"
@@ -782,92 +782,82 @@ function Questionnaire() {
   // Show message if profile already exists
   if (profileExists) {
     return (
-      <div className="min-h-screen flex flex-col bg-white font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500 select-none">
-        <div className="container mx-auto px-4 py-8 max-w-4xl">
-          {/* Header - consistent with questionnaire page */}
-          <div className="mb-8 text-center">
-            <div className="flex items-center justify-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-customGreen/20 rounded-full flex items-center justify-center">
-                <CheckIcon className="w-6 h-6 text-customGreenHover" />
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-customGreenHover">
-                You're All Set!
-              </h1>
-            </div>
-            <p className="text-gray-600 text-lg">
-              Your questionnaire has already been completed
-            </p>
-          </div>
-
-          {/* Progress bar showing 100% */}
+      <div className="min-h-screen bg-white rounded-lg px-4 font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="container mx-auto px-4 lg:px-8 py-8">
+          {/* Header */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-customGreenHover">
-                Questionnaire Complete
-              </span>
-              <span className="text-sm text-gray-600">
-                100% Complete
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-customGreen h-2 rounded-full w-full" />
-            </div>
+            <header className="select-none">
+              <p className="text-xs font-medium tracking-[0.2em] uppercase text-customGreen mb-4">
+                Questionnaire
+              </p>
+              <h1 className="text-5xl md:text-6xl font-light text-gray-700 tracking-tight mb-4">
+                Already Completed
+              </h1>
+              <p className="text-lg text-customGray font-light max-w-xl">
+                Your questionnaire has been submitted and your profile is ready
+              </p>
+            </header>
           </div>
 
-          {/* Main content area */}
-          <div className="space-y-6">
-            {/* Success message card */}
-            <div className="bg-customGreen/20 rounded-2xl p-6">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-customGreen rounded-xl flex items-center justify-center">
-                  <CheckIcon className="w-7 h-7 text-white" />
+         
+
+          {/* Main Content Card */}
+          <Card className="rounded-3xl border-0 shadow-none bg-lightGray mb-6">
+            <CardContent className="p-8">
+              <div className="flex flex-col md:flex-row items-start gap-6">
+                <div className="w-20 h-20 rounded-2xl bg-customGreen flex items-center justify-center shrink-0">
+                  <CheckIcon className="w-10 h-10 text-white" />
                 </div>
                 <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-teal-900 mb-2">
+                  <h2 className="text-2xl font-bold text-gray-700 mb-3 select-none">
                     Profile Successfully Created
                   </h2>
-                  <p className="text-teal-700 leading-relaxed">
-                    Your profile is ready and we've matched you with psychologists tailored to your needs and preferences. You can now browse through our recommended professionals.
+                  <p className="text-customGray leading-relaxed mb-6">
+                    Your profile is ready and we've matched you with psychologists tailored to your needs and preferences. You can now browse through our recommended professionals or update your responses anytime from your profile page.
                   </p>
+                  <div className="flex flex-wrap gap-3 select-none">
+                    <Button
+                      onClick={() => navigate("/browse-psychologists")}
+                      className="bg-customGreen hover:bg-customGreenHover text-white rounded-xl shadow-none cursor-pointer h-11 px-6 "
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      Browse Psychologists
+                    </Button>
+                    <Button
+                      onClick={() => navigate("/profile")}
+                      variant="outline"
+                      className="rounded-xl shadow-none cursor-pointer h-11 px-6 border-gray-300 hover:bg-white hover:border-customGreen hover:text-customGreen"
+                    >
+                      View Profile
+                    </Button>
+                    <Button
+                      onClick={() => navigate("/dashboard")}
+                      variant="outline"
+                      className="rounded-xl shadow-none cursor-pointer h-11 px-6 border-gray-300 hover:bg-white hover:border-customGreen hover:text-customGreen"
+                    >
+                      Go to Dashboard
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Info tip */}
-            <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-4 border border-gray-200">
-              <Info className="w-5 h-5 text-gray-500 flex-shrink-0" />
-              <p className="text-gray-600 text-sm">
-                Want to update your responses? Visit your <button onClick={() => navigate("/profile")} className="text-teal-700 font-medium hover:underline">profile</button> to view and edit your questionnaire answers anytime.
-              </p>
+          {/* Info Tip */}
+          <div className="flex items-center gap-3 bg-amber-50 rounded-2xl p-4 select-none">
+            <div className="w-10 h-10 rounded-xl bg-amber-200/50 flex items-center justify-center shrink-0">
+              <Info className="w-5 h-5 text-amber-700" />
             </div>
-
-            {/* Action buttons */}
-            <div className="pt-4 space-y-4">
-              <Button
-                onClick={() => navigate("/psychologists")}
-                className="w-full h-12 bg-customGreen hover:bg-customGreenHover text-white font-semibold rounded-xl transition-all duration-300 select-none cursor-pointer"
+            <p className="text-amber-800 text-sm">
+              Want to update your responses? Visit your{" "}
+              <button
+                onClick={() => navigate("/profile")}
+                className="font-semibold hover:underline"
               >
-                <Users className="w-5 h-5 mr-2" />
-                Browse Matched Psychologists
-              </Button>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  onClick={() => navigate("/profile")}
-                  variant="outline"
-                  className="h-11  font-medium rounded-xl text-gray-700 select-none cursor-pointer transition-all duration-300"
-                >
-                  View Profile
-                </Button>
-                <Button
-                  onClick={() => navigate("/dashboard")}
-                  variant="outline"
-                  className="h-11 cursor-pointer select-none text-gray-700  font-medium rounded-xl transition-all duration-300"
-                >
-                  Go to Dashboard
-                </Button>
-              </div>
-            </div>
+                profile page
+              </button>{" "}
+              to view and edit your questionnaire answers anytime.
+            </p>
           </div>
         </div>
       </div>

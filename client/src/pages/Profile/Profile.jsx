@@ -877,7 +877,7 @@ function Profile() {
               <Card
                 key={section.id}
                 className={`rounded-3xl border-0 shadow-none transition-all duration-300 overflow-hidden ${
-                  isExpanded ? 'bg-lightGray' : 'bg-lightGray hover:bg-gray-100'
+                  isExpanded ? 'bg-lightGray' : 'bg-lightGray hover:bg-customGray/5'
                 }`}
               >
                 <CardContent className="p-0">
@@ -902,7 +902,7 @@ function Profile() {
                           </h3>
                           <Badge className={`text-xs px-2 py-0.5 ${
                             isComplete
-                              ? 'bg-lightGreen text-customGreen hover:bg-lightGreen'
+                              ? 'bg-customGray/10 text-customGray '
                               : 'bg-amber-100 text-amber-700 hover:bg-amber-100'
                           }`}>
                             {filledCount}/{totalCount}
@@ -915,8 +915,8 @@ function Profile() {
                     </div>
                     <div className="flex items-center gap-3">
                       {isComplete && (
-                        <div className="w-8 h-8 rounded-full bg-lightGreen flex items-center justify-center">
-                          <Check className="w-4 h-4 text-customGreen" />
+                        <div className="w-8 h-8 rounded-full bg-customGray/10 flex items-center justify-center">
+                          <Check className="w-4 h-4 text-customGray" />
                         </div>
                       )}
                       {isExpanded ? (
