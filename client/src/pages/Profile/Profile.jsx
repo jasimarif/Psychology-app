@@ -30,6 +30,7 @@ function Profile() {
   const [editingSection, setEditingSection] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [hasQuestionnaire, setHasQuestionnaire] = useState(false)
 
   const [profileData, setProfileData] = useState({
     therapyType: "",
@@ -85,6 +86,7 @@ function Profile() {
         )
 
         if (response.status === 404) {
+          setHasQuestionnaire(false)
           setLoading(false)
           return
         }
@@ -93,6 +95,7 @@ function Profile() {
 
         if (data.success) {
           setProfileData(data.data)
+          setHasQuestionnaire(true)
         } else {
           setError(data.message)
         }
@@ -724,6 +727,54 @@ function Profile() {
             </Button>
           </CardContent>
         </Card>
+      </div>
+    )
+  }
+
+  // Show empty state if questionnaire hasn't been filled
+  if (!hasQuestionnaire) {
+    return (
+      <div className="min-h-screen bg-white rounded-lg px-4 font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="container mx-auto px-4 lg:px-8 py-8">
+          {/* Header */}
+          <div className="mb-8">
+            <header className="select-none">
+              <p className="text-xs font-medium tracking-[0.2em] uppercase text-customGreen mb-4">
+                Your Profile
+              </p>
+              <h1 className="text-5xl md:text-6xl font-light text-gray-700 tracking-tight mb-4">
+                Personal Information
+              </h1>
+              <p className="text-lg text-customGray font-light max-w-xl">
+                View and update your questionnaire responses
+              </p>
+            </header>
+          </div>
+
+          {/* Empty State */}
+          <Card className="rounded-3xl border-0 shadow-none bg-lightGray">
+            <CardContent className="py-16 px-8">
+              <div className="text-center max-w-lg mx-auto">
+                <div className="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <UserIcon className="w-12 h-12 text-amber-600" />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-700 mb-3">
+                  Complete Your Questionnaire First
+                </h2>
+                <p className="text-customGray mb-8 leading-relaxed">
+                  To view and edit your profile information, you need to complete the initial questionnaire.
+                  This helps us understand your needs and match you with the right therapist.
+                </p>
+                <Button
+                  onClick={() => navigate("/questionnaire")}
+                  className="bg-customGreen hover:bg-customGreenHover text-white rounded-xl shadow-none cursor-pointer px-8 h-12"
+                >
+                  Start Questionnaire
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     )
   }

@@ -131,7 +131,7 @@ function Questionnaire() {
   }
 
   const handleNext = () => {
-    if (currentStep < totalSteps) {
+    if (currentStep <= totalSteps) {
       setIsAnimating(true)
       setTimeout(() => {
         if (currentStep === 1 && currentQuestion < 5) {
@@ -144,9 +144,9 @@ function Questionnaire() {
           setCurrentQuestion(currentQuestion + 1)
         } else if (currentStep === 5 && currentQuestion < 5) {
           setCurrentQuestion(currentQuestion + 1)
-        } else if (currentStep === 6 && currentQuestion < 1) {
+        } else if (currentStep === 6 && currentQuestion < 4) {
           setCurrentQuestion(currentQuestion + 1)
-        } else {
+        } else if (currentStep < totalSteps) {
           setCurrentStep(currentStep + 1)
           setCurrentQuestion(1)
         }
@@ -167,7 +167,7 @@ function Questionnaire() {
         else if (currentStep === 3) setCurrentQuestion(9)
         else if (currentStep === 4) setCurrentQuestion(3)
         else if (currentStep === 5) setCurrentQuestion(10)
-        else if (currentStep === 6) setCurrentQuestion(1)
+        else if (currentStep === 6) setCurrentQuestion(5)
         else setCurrentQuestion(1)
       }
       setIsAnimating(false)
@@ -686,7 +686,52 @@ function Questionnaire() {
             { id: 'unstable', label: 'Unstable' }
           ]}
           selectedValue={formData.financialStatus}
-          onSelect={(value) => handleRadioChange("financialStatus", value)}
+          onSelect={(value) => handleAutoNext("financialStatus", value)}
+        />
+      )
+    } else if (currentQuestion === 2) {
+      return (
+        <CheckboxQuestion
+          title="Which resources would be most useful to you?"
+          options={[
+            "Support Groups",
+            "Therapy journals",
+            "Worksheets",
+            "Goal/habit tracking",
+            "Others",
+            "I don't know"
+          ]}
+          selectedValues={formData.usefulResources}
+          onToggle={(option) => handleCheckboxChange("usefulResources", option)}
+          onNext={handleNext}
+        />
+      )
+    } else if (currentQuestion === 3) {
+      return (
+        <RadioQuestion
+          title="How would you prefer to communicate with your therapist?"
+          options={[
+            { id: 'mostly-text', label: 'Mostly text-based (chat, email)' },
+            { id: 'video-calls', label: 'Video calls' },
+            { id: 'in-person', label: 'In-person sessions' }
+          ]}
+          selectedValue={formData.communicateTherapist}
+          onSelect={(value) => handleAutoNext("communicateTherapist", value)}
+          banner="Different communication methods work better for different people. Choose what feels most comfortable for you."
+        />
+      )
+    } else if (currentQuestion === 4) {
+      return (
+        <RadioQuestion
+          title="Do you have a preference for your therapist's gender?"
+          options={[
+            { id: 'male-therapist', label: 'Male therapist' },
+            { id: 'female-therapist', label: 'Female therapist' },
+            { id: 'no-preference', label: 'No preference' }
+          ]}
+          selectedValue={formData.preferredTherapist}
+          onSelect={(value) => handleRadioChange("preferredTherapist", value)}
+          banner="Some people feel more comfortable with a therapist of a specific gender. There's no right or wrong answer."
         />
       )
     }
@@ -875,7 +920,7 @@ function Questionnaire() {
 
         {/* Navigation Buttons */}
         <div className="mt-8 mb-14 flex justify-end ">
-          {currentStep === totalSteps && currentQuestion === 1 ? (
+          {currentStep === totalSteps && currentQuestion === 4 ? (
             <Button
               onClick={handleSubmit}
               className="px-8 bg-teal-800 hover:bg-teal-900"
