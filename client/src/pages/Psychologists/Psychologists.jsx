@@ -270,7 +270,7 @@ function Psychologists() {
   }
 
   return (
-    <div className="min-h-screen bg-white rounded-lg px-4 font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500">
+  <div className="min-h-screen bg-white rounded-lg px-4 font-nunito animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="container mx-auto px-4 lg:px-8 py-8">
 
         {/* Hero Header Section */}
@@ -292,18 +292,18 @@ function Psychologists() {
 
         </div>        
         {/* Search and Filter Section */}
-        <div className="mb-8 space-y-3 text-gray-700">
+        <div className="mb-6 sm:mb-8 space-y-3 text-gray-700">
           {/* Favorites Toggle Button - Visible when logged in */}
-        
-          
-          {/* Search Bar, Sort, and Filter - Single Line */}
-          <div className="flex items-center gap-3 select-none">
+
+
+          {/* Search Bar, Sort, and Filter */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 select-none">
             {/* Search Bar */}
-            <div className="relative flex-1 min-w-[200px]">
+            <div className="relative flex-1 min-w-0 sm:min-w-[200px]">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 type="text"
-                placeholder="Search by name, specialty, or keywords..."
+                placeholder="Search by name, specialty..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-12 h-12 shadow-none border-none bg-lightGray focus:bg-white focus:border-customGreen focus:ring-2 focus:ring-customGreen rounded-xl text-base transition-all"
@@ -318,41 +318,43 @@ function Psychologists() {
               )}
             </div>
 
-            {/* Sort By */}
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-auto min-w-40 h-12 bg-lightGray border-none cursor-pointer focus:ring-customGreen rounded-xl py-0">
-                <ArrowUpDown className="w-4 h-4 mr-2" />
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="recommended" className='cursor-pointer'>Recommended</SelectItem>
-                <SelectItem value="rating" className='cursor-pointer'>Highest Rated</SelectItem>
-                <SelectItem value="experience" className='cursor-pointer'>Most Experienced</SelectItem>
-                <SelectItem value="reviews" className='cursor-pointer'>Most Reviewed</SelectItem>
-                <SelectItem value="price-low" className='cursor-pointer'>Price: Low to High</SelectItem>
-                <SelectItem value="price-high" className='cursor-pointer'>Price: High to Low</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Sort and Filter Row - Always together on mobile */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Sort By */}
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="flex-1 sm:flex-none w-auto sm:min-w-40 h-12 bg-lightGray border-none cursor-pointer focus:ring-customGreen rounded-xl py-0">
+                  <ArrowUpDown className="w-4 h-4 mr-1 sm:mr-2" />
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recommended" className='cursor-pointer'>Recommended</SelectItem>
+                  <SelectItem value="rating" className='cursor-pointer'>Highest Rated</SelectItem>
+                  <SelectItem value="experience" className='cursor-pointer'>Most Experienced</SelectItem>
+                  <SelectItem value="reviews" className='cursor-pointer'>Most Reviewed</SelectItem>
+                  <SelectItem value="price-low" className='cursor-pointer'>Price: Low to High</SelectItem>
+                  <SelectItem value="price-high" className='cursor-pointer'>Price: High to Low</SelectItem>
+                </SelectContent>
+              </Select>
 
-            {/* Filter Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={`flex items-center gap-2 h-12 px-4 shadow-none rounded-xl transition-all ${activeFilterCount > 0
-                    ? 'bg-customGreen text-white border-customGreen hover:text-white cursor-pointer hover:bg-customGreenHover'
-                    : 'bg-white border-dotted hover:bg-gray-50 cursor-pointer text-gray-700'
-                    }`}
-                >
-                  <Filter className="w-4 h-4 " />
-                  <span className="font-medium">Filters</span>
-                  {activeFilterCount > 0 && (
-                    <Badge className="ml-1 bg-white text-customGreen hover:bg-white text-xs px-1.5 py-0.5">
-                      {activeFilterCount}
-                    </Badge>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
+              {/* Filter Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={`flex items-center gap-1 sm:gap-2 h-12 px-3 sm:px-4 shadow-none rounded-xl transition-all ${activeFilterCount > 0
+                      ? 'bg-customGreen text-white border-customGreen hover:text-white cursor-pointer hover:bg-customGreenHover'
+                      : 'bg-white border-dotted hover:bg-gray-50 cursor-pointer text-gray-700'
+                      }`}
+                  >
+                    <Filter className="w-4 h-4" />
+                    <span className="font-medium hidden sm:inline">Filters</span>
+                    {activeFilterCount > 0 && (
+                      <Badge className="ml-1 bg-white text-customGreen hover:bg-white text-xs px-1.5 py-0.5">
+                        {activeFilterCount}
+                      </Badge>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent className="w-72 p-4" align="end">
                 {/* Favorites Toggle */}
                 {currentUser && (
@@ -482,6 +484,7 @@ function Psychologists() {
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
+            </div>
           </div>
 
           {/* View Mode Toggle - Second Line */}
@@ -510,13 +513,13 @@ function Psychologists() {
         </div>
 
         {/* Results Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div>
-            <p className="text-gray-700 font-medium">
-              Found <span className="text-customGreen font-bold text-lg">{filteredPsychologists.length}</span> professional{filteredPsychologists.length !== 1 ? 's' : ''}
+            <p className="text-sm sm:text-base text-gray-700 font-medium">
+              Found <span className="text-customGreen font-bold text-base sm:text-lg">{filteredPsychologists.length}</span> professional{filteredPsychologists.length !== 1 ? 's' : ''}
             </p>
             {searchTerm && (
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-xs sm:text-sm text-gray-500 mt-1">
                 Searching for: <span className="font-medium">"{searchTerm}"</span>
               </p>
             )}
@@ -525,7 +528,7 @@ function Psychologists() {
 
         {/* Psychologists Grid/List */}
         {filteredPsychologists.length > 0 ? (
-          <div className={`grid gap-6 ${viewMode === "grid"
+          <div className={`grid gap-4 sm:gap-6 ${viewMode === "grid"
             ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
             : 'grid-cols-1'
             }`}>
@@ -544,12 +547,12 @@ function Psychologists() {
         ) : (
           /* No Results */
           <Card className="border-none shadow-none bg-lightGray select-none">
-            <CardContent className="text-center py-16">
-              <div className="w-20 h-20 bg-customGray/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Search className="w-10 h-10 text-customGray" />
+            <CardContent className="text-center py-10 sm:py-16 px-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-customGray/5 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                <Search className="w-8 h-8 sm:w-10 sm:h-10 text-customGray" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No professionals found</h3>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">No professionals found</h3>
+              <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto">
                 We couldn't find any matches for your search criteria. Try adjusting your filters or search terms.
               </p>
               <Button

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { registerWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase"
-import { Loader2 } from "lucide-react"
+import { Loader2, ArrowLeft } from "lucide-react"
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -97,6 +97,15 @@ function Signup() {
                 onSubmit={handleSubmit}
               >
                 <FieldGroup>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="self-start cursor-pointer text-customGray hover:text-customGreen"
+                    onClick={() => navigate('/')}
+                  >
+                    <ArrowLeft className="w-5 h-5 mr-1" />
+                    Back
+                  </Button>
                   <div className="flex flex-col items-center gap-2 text-center">
                     <h1 className="text-3xl md:text-4xl font-bold text-customGreen select-none">Create an account</h1>
                     <p className="text-customGray font-semibold  text-base md:text-lg select-none">

@@ -21,7 +21,7 @@ const AppSidebar = ({ onClose }) => {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/login');
+      navigate('/');
     } catch (error) {
       console.error('Logout error:', error);
     }

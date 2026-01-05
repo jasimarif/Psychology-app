@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { loginWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase"
+import { ArrowLeft, Loader2 } from "lucide-react"
 
 function Login() {
   const [email, setEmail] = useState("")
@@ -70,6 +71,15 @@ function Login() {
                 onSubmit={handleSubmit}
               >
                 <FieldGroup>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="self-start cursor-pointer text-customGray hover:text-customGreen"
+                    onClick={() => navigate('/')}
+                  >
+                    <ArrowLeft className="w-5 h-5 mr-1" />
+                    Back
+                  </Button>
                   <div className="flex flex-col items-center gap-2 text-center">
                     <h1 className="text-3xl md:text-4xl font-bold text-customGreen select-none">Welcome back</h1>
                     <p className="text-customGray font-semibold text-base md:text-lg select-none">
@@ -112,7 +122,12 @@ function Login() {
                   </Field>
                   <Field>
                     <Button type="submit" className="bg-customGreen hover:bg-customGreenHover cursor-pointer shadow-none h-12 text-base" disabled={loading}>
-                      {loading ? "Signing in..." : "Login"}
+                      {loading ? (
+                        <>
+                        Logging in
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        </>
+                      ) : "Login"}
                     </Button>
                   </Field>
                   <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card text-base select-none">
