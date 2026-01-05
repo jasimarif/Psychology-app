@@ -26,7 +26,12 @@ const PsychologistCard = ({ psychologist, onViewProfile, onBookSession }) => {
         {/* Rating Badge - Top Right */}
         <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-sm">
           <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-          <span className="text-sm font-semibold text-customGreen">{psychologist.rating}</span>
+          <span className="text-sm font-semibold text-customGreen">
+            {psychologist.rating > 0 ? psychologist.rating.toFixed(1) : 'New'}
+          </span>
+          {psychologist.reviews > 0 && (
+            <span className="text-xs text-gray-500">({psychologist.reviews})</span>
+          )}
         </div>
       </div>
 

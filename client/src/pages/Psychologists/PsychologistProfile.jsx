@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import BookingModal from "@/components/BookingModal"
+import { ReviewsList } from "@/components"
 import {
   LocationIcon,
   CalendarIcon,
@@ -16,7 +17,7 @@ import {
   GlobeIcon,
   BriefcaseIcon,
 } from "@/components/icons/DuoTuneIcons"
-import { Heart, Loader2 } from "lucide-react"
+import { Heart, Loader2, Star } from "lucide-react"
 
 const PsychologistProfile = () => {
   const location = useLocation()
@@ -101,6 +102,7 @@ const PsychologistProfile = () => {
     { id: "about", label: "About" },
     { id: "education", label: "Education" },
     { id: "experience", label: "Experience" },
+    { id: "reviews", label: "Reviews" },
     { id: "availability", label: "Availability" },
   ]
 
@@ -187,6 +189,19 @@ const PsychologistProfile = () => {
                 </svg>
               )}
             </div>
+
+            {/* Rating */}
+            {psychologist.reviews > 0 && (
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span className="font-semibold text-gray-700">{psychologist.rating?.toFixed(1) || '0.0'}</span>
+                </div>
+                <span className="text-sm text-customGray">
+                  ({psychologist.reviews} review{psychologist.reviews !== 1 ? 's' : ''})
+                </span>
+              </div>
+            )}
 
             {/* Info Row */}
             <div className="flex items-center flex-wrap justify-center gap-2 sm:gap-4 mt-2 sm:mt-3 text-xs sm:text-sm text-customGray px-2">
@@ -501,6 +516,17 @@ const PsychologistProfile = () => {
                     </Button>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Reviews Tab */}
+            {activeTab === "reviews" && (
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <ReviewsList 
+                  psychologistId={id}
+                  initialRating={psychologist.rating}
+                  initialReviewCount={psychologist.reviews}
+                />
               </div>
             )}
           </div>

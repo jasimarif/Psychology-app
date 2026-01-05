@@ -21,6 +21,7 @@ import TherapySection from './LandingPage/TherapySection';
 import VirtualHealthStats from './LandingPage/VirtualHealthStats';
 import WhatsIncluded from './LandingPage/WhatsIncluded';
 import  PsychologistCard  from './Psychologist/PsychologistCard';
+import { ReviewDialog, ReviewsList } from './Review';
 export {
   Button,
   buttonVariants,
@@ -68,5 +69,7 @@ export {
   TherapySection,
   VirtualHealthStats,
   WhatsIncluded,
-  PsychologistCard
+  PsychologistCard,
+  ReviewDialog,
+  ReviewsList
 };

@@ -9,6 +9,7 @@ import bookingRoutes from './routes/bookingRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
 import favoriteRoutes from './routes/favoriteRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
 import { handleStripeWebhook } from './webhooks/stripeWebhook.js';
 import emailCalendarService from './services/emailCalendarService.js';
 
@@ -39,6 +40,7 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));

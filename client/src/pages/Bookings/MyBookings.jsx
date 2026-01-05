@@ -28,7 +28,8 @@ import {
 import { Calendar } from "@/components/ui/calendar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { bookingService } from "@/services/bookingService"
-import { Loader2 } from "lucide-react"
+import { reviewService } from "@/services/reviewService"
+import { Loader2, Star } from "lucide-react"
 import {
   CalendarIcon,
   TimeIcon,
@@ -41,6 +42,7 @@ import {
   ArrowRightIcon
 } from "@/components/icons/DuoTuneIcons"
 import { formatDateOnly, formatTime24to12, formatTimeRange } from "@/lib/timezone"
+import ReviewDialog from "@/components/Review/ReviewDialog"
 
 const MyBookings = () => {
   const navigate = useNavigate()
@@ -66,11 +68,40 @@ const MyBookings = () => {
   const [bookingToCancel, setBookingToCancel] = useState(null)
   const [cancelError, setCancelError] = useState("")
 
+  // Review dialog state
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false)
+  const [bookingToReview, setBookingToReview] = useState(null)
+  const [reviewedBookings, setReviewedBookings] = useState(new Set())
+
   useEffect(() => {
     if (currentUser) {
       loadBookings()
     }
   }, [currentUser])
+
+  useEffect(() => {
+    if (bookings.length > 0) {
+      checkReviewedBookings()
+    }
+  }, [bookings])
+
+  const checkReviewedBookings = async () => {
+    const completedBookings = bookings.filter(b => b.status === 'completed')
+    const reviewedSet = new Set()
+    
+    for (const booking of completedBookings) {
+      try {
+        const result = await reviewService.checkReviewExists(booking._id)
+        if (result.exists) {
+          reviewedSet.add(booking._id)
+        }
+      } catch (error) {
+        console.error('Error checking review status:', error)
+      }
+    }
+    
+    setReviewedBookings(reviewedSet)
+  }
 
   useEffect(() => {
     if (selectedDate && reschedulingBooking) {
@@ -155,6 +186,18 @@ const MyBookings = () => {
     setBookingToCancel(booking)
     setCancelError("")
     setCancelDialogOpen(true)
+  }
+
+  const openReviewDialog = (booking) => {
+    setBookingToReview(booking)
+    setReviewDialogOpen(true)
+  }
+
+  const handleReviewSubmitted = () => {
+    if (bookingToReview) {
+      setReviewedBookings(prev => new Set([...prev, bookingToReview._id]))
+    }
+    setBookingToReview(null)
   }
 
   const handleCancelBooking = async () => {
@@ -742,10 +785,27 @@ const MyBookings = () => {
 
                         {booking.status === 'completed' && (
                           <div className="mt-auto pt-4 border-t border-gray-200">
-                            <div className="flex items-center gap-2 text-emerald-600 text-sm">
-                              <CheckIcon className="w-4 h-4" />
-                              <span className="font-medium">Session completed</span>
-                            </div>
+                            {reviewedBookings.has(booking._id) ? (
+                              <div className="flex items-center gap-2 text-emerald-600 text-sm">
+                                <CheckIcon className="w-4 h-4" />
+                                <span className="font-medium">Review submitted</span>
+                              </div>
+                            ) : (
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-emerald-600 text-sm">
+                                  <CheckIcon className="w-4 h-4" />
+                                  <span className="font-medium">Session completed</span>
+                                </div>
+                                <Button
+                                  variant="outline"
+                                  className="w-full justify-start rounded-xl border-yellow-300 text-yellow-600 hover:text-yellow-600 hover:bg-yellow-50 hover:border-yellow-400 transition-all cursor-pointer"
+                                  onClick={() => openReviewDialog(booking)}
+                                >
+                                  <Star className="w-4 h-4 mr-2" />
+                                  Leave a Review
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -946,6 +1006,14 @@ const MyBookings = () => {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+
+        {/* Review Dialog */}
+        <ReviewDialog
+          open={reviewDialogOpen}
+          onOpenChange={setReviewDialogOpen}
+          booking={bookingToReview}
+          onReviewSubmitted={handleReviewSubmitted}
+        />
       </div>
     </div>
   )
