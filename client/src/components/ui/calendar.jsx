@@ -8,6 +8,7 @@ export function Calendar({
   onSelectDate,
   minDate = new Date(),
   maxDays = 30,
+  availableDaysOfWeek = null, 
   className,
   ...props
 }) {
@@ -39,7 +40,19 @@ export function Calendar({
     today.setHours(0, 0, 0, 0)
     const checkDate = new Date(date)
     checkDate.setHours(0, 0, 0, 0)
-    return checkDate < today || checkDate > maxDate
+    
+    if (checkDate < today || checkDate > maxDate) {
+      return true
+    }
+    
+    if (availableDaysOfWeek !== null && availableDaysOfWeek.length > 0) {
+      const dayOfWeek = checkDate.getDay()
+      if (!availableDaysOfWeek.includes(dayOfWeek)) {
+        return true
+      }
+    }
+    
+    return false
   }
 
   const isDateSelected = (date) => {

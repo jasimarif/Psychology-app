@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import { Loader2 } from "lucide-react"
@@ -28,6 +28,18 @@ const BookingModal = ({
   const [bookingLoading, setBookingLoading] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
   const [bookingError, setBookingError] = useState("")
+
+  // Get available days of week from psychologist's schedule
+  const availableDaysOfWeek = useMemo(() => {
+    if (!psychologist?.availability?.schedule) return null
+    
+    // Extract unique days of week where psychologist has active slots
+    const days = psychologist.availability.schedule
+      .filter(day => day.slots && day.slots.some(slot => slot.isActive))
+      .map(day => day.dayOfWeek)
+    
+    return days.length > 0 ? days : null
+  }, [psychologist?.availability?.schedule])
 
   // Reset state when modal opens/closes or psychologist changes
   useEffect(() => {
@@ -140,19 +152,40 @@ const BookingModal = ({
             </div>
           ) : (
             <>
-              {/* Calendar and Time Slots Section - Side by Side */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Calendar Section */}
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Select Date</h3>
-                  <Calendar
-                    selectedDate={selectedDate}
-                    onSelectDate={setSelectedDate}
-                    minDate={new Date()}
-                    maxDays={30}
-                    className="border rounded-lg"
-                  />
+              {/* Check if psychologist has availability */}
+              {!availableDaysOfWeek || availableDaysOfWeek.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CalendarIcon className="w-10 h-10 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-700 mb-3">Not Currently Available</h3>
+                  <p className="text-customGray mb-6 max-w-md mx-auto">
+                    {psychologist.name} hasn't set up their availability schedule yet. Please check back later or contact them directly.
+                  </p>
+                  <Button
+                    onClick={handleClose}
+                    variant="outline"
+                    className="rounded-xl cursor-pointer"
+                  >
+                    Close
+                  </Button>
                 </div>
+              ) : (
+                <>
+                  {/* Calendar and Time Slots Section - Side by Side */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Calendar Section */}
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-700 mb-3">Select Date</h3>
+                      <Calendar
+                        selectedDate={selectedDate}
+                        onSelectDate={setSelectedDate}
+                        minDate={new Date()}
+                        maxDays={30}
+                        availableDaysOfWeek={availableDaysOfWeek}
+                        className="border rounded-lg"
+                      />
+                    </div>
 
                 {/* Time Slots Section */}
                 <div>
@@ -265,6 +298,8 @@ const BookingModal = ({
                     )}
                   </Button>
                 </div>
+              )}
+                </>
               )}
             </>
           )}

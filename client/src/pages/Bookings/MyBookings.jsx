@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
@@ -72,6 +72,17 @@ const MyBookings = () => {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false)
   const [bookingToReview, setBookingToReview] = useState(null)
   const [reviewedBookings, setReviewedBookings] = useState(new Set())
+
+  // Get available days of week for rescheduling calendar
+  const rescheduleAvailableDays = useMemo(() => {
+    if (!reschedulingBooking?.psychologistId?.availability?.schedule) return null
+    
+    const days = reschedulingBooking.psychologistId.availability.schedule
+      .filter(day => day.slots && day.slots.some(slot => slot.isActive))
+      .map(day => day.dayOfWeek)
+    
+    return days.length > 0 ? days : null
+  }, [reschedulingBooking?.psychologistId?.availability?.schedule])
 
   useEffect(() => {
     if (currentUser) {
@@ -842,23 +853,44 @@ const MyBookings = () => {
             </DialogHeader>
 
             <div className="space-y-6">
-              {/* Calendar and Time Slots Section - Side by Side */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Calendar Section */}
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Select New Date</h3>
-                  <Calendar
-                    selectedDate={selectedDate}
-                    onSelectDate={(dateStr) => {
-                      const [year, month, day] = dateStr.split('-').map(Number)
-                      const date = new Date(year, month - 1, day)
-                      setSelectedDate(date)
-                    }}
-                    className="border rounded-lg"
-                    minDate={new Date()}
-                    maxDays={30}
-                  />
+              {/* Check if psychologist has availability */}
+              {!rescheduleAvailableDays || rescheduleAvailableDays.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CalendarIcon className="w-10 h-10 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-700 mb-3">Not Currently Available</h3>
+                  <p className="text-customGray mb-6 max-w-md mx-auto">
+                    {reschedulingBooking?.psychologistId?.name} hasn't set up their availability schedule. Please contact them directly to reschedule.
+                  </p>
+                  <Button
+                    onClick={() => setRescheduleModalOpen(false)}
+                    variant="outline"
+                    className="rounded-xl cursor-pointer"
+                  >
+                    Close
+                  </Button>
                 </div>
+              ) : (
+                <>
+                  {/* Calendar and Time Slots Section - Side by Side */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Calendar Section */}
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-700 mb-3">Select New Date</h3>
+                      <Calendar
+                        selectedDate={selectedDate}
+                        onSelectDate={(dateStr) => {
+                          const [year, month, day] = dateStr.split('-').map(Number)
+                          const date = new Date(year, month - 1, day)
+                          setSelectedDate(date)
+                        }}
+                        className="border rounded-lg"
+                        minDate={new Date()}
+                        maxDays={30}
+                        availableDaysOfWeek={rescheduleAvailableDays}
+                      />
+                    </div>
 
                 {/* Time Slots Section */}
                 <div>
@@ -947,6 +979,8 @@ const MyBookings = () => {
                     )}
                   </Button>
                 </div>
+              )}
+                </>
               )}
             </div>
           </DialogContent>
