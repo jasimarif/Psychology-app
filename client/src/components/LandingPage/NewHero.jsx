@@ -26,42 +26,38 @@ const NewHero = () => {
             {/* Grid Pattern Overlay */}
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNMzAgMzBtLTEgMGExIDEgMCAxIDAgMiAwIDEgMSAwIDEgMCAtMiAwIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiLz48L2c+PC9zdmc+')] opacity-40" />
 
-            {/* Floating Icon - Desktop Only (Right) */}
-            <div className="hidden lg:block">
-                <div
-                    className={`absolute bottom-32 right-[3%] z-10 transition-all duration-1000 ease-out ${
-                        isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-                    }`}
-                    style={{ transitionDelay: '800ms' }}
-                >
-                    <div className="relative group">
-                        <div className="relative w-92 h-92 p-2 flex items-center justify-center  transition-transform">
-                            <img
-                                src={onIcon}
-                                alt="Feature icon"
-                                className="w-full h-full object-contain"
-                            />
-                        </div>
+            {/* Floating Icon (Right) */}
+            <div
+                className={`absolute bottom-24 right-[2%] sm:bottom-28 sm:right-[3%] lg:bottom-32 lg:right-[3%] z-10 transition-all duration-1000 ease-out ${
+                    isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+                }`}
+                style={{ transitionDelay: '800ms' }}
+            >
+                <div className="relative group">
+                    <div className="relative w-20 h-20 sm:w-28 sm:h-28 lg:w-92 lg:h-92 p-2 flex items-center justify-center transition-transform">
+                        <img
+                            src={onIcon}
+                            alt="Feature icon"
+                            className="w-full h-full object-contain"
+                        />
                     </div>
                 </div>
             </div>
 
-            {/* Floating Membership Icon - Desktop Only (Left) */}
-            <div className="hidden lg:block">
-                <div
-                    className={`absolute top-32 left-[5%] z-10 transition-all duration-1000 ease-out ${
-                        isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-                    }`}
-                    style={{ transitionDelay: '600ms' }}
-                >
-                    <div className="relative group">
-                        <div className="relative w-88 h-88 p-2 flex items-center justify-center">
-                            <img
-                                src={membershipIcon}
-                                alt="Membership icon"
-                                className="w-full h-full object-contain animate-bounce-slow"
-                            />
-                        </div>
+            {/* Floating Membership Icon (Left) */}
+            <div
+                className={`absolute top-24 left-[2%] sm:top-28 sm:left-[4%] lg:top-32 lg:left-[5%] z-10 transition-all duration-1000 ease-out ${
+                    isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+                }`}
+                style={{ transitionDelay: '600ms' }}
+            >
+                <div className="relative group">
+                    <div className="relative w-20 h-20 sm:w-24 sm:h-24 lg:w-88 lg:h-88 p-2 flex items-center justify-center">
+                        <img
+                            src={membershipIcon}
+                            alt="Membership icon"
+                            className="w-full h-full object-contain animate-bounce-slow"
+                        />
                     </div>
                 </div>
             </div>
