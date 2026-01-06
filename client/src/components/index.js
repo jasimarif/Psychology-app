@@ -13,6 +13,7 @@ import DropdownQuestionSelect from './Questionaire/DropdownQuestionSelect';
 import CheckboxQuestion from './Questionaire/CheckboxQuestion';
 import Footer from './layout/Footer';
 import Header from './layout/Header';
+// Legacy Landing Page Components
 import FAQSection from './LandingPage/FAQSection';
 import FooterSection from './LandingPage/FooterSection';
 import Hero from './LandingPage/Hero';
@@ -20,6 +21,17 @@ import ProfessionalTherapists from './LandingPage/TherapistSection';
 import TherapySection from './LandingPage/TherapySection';
 import VirtualHealthStats from './LandingPage/VirtualHealthStats';
 import WhatsIncluded from './LandingPage/WhatsIncluded';
+// New Landing Page Components
+import NewNavbar from './LandingPage/NewNavbar';
+import NewHero from './LandingPage/NewHero';
+import Features from './LandingPage/Features';
+import HowItWorks from './LandingPage/HowItWorks';
+import TherapistsShowcase from './LandingPage/TherapistsShowcase';
+import Testimonials from './LandingPage/Testimonials';
+import StatsSection from './LandingPage/StatsSection';
+import NewFAQSection from './LandingPage/NewFAQSection';
+import CTASection from './LandingPage/CTASection';
+import NewFooter from './LandingPage/NewFooter';
 import  PsychologistCard  from './Psychologist/PsychologistCard';
 import { ReviewDialog, ReviewsList } from './Review';
 export {
@@ -62,6 +74,7 @@ export {
   CheckboxQuestion,
   Footer,
   Header,
+  // Legacy Landing Page Components
   FAQSection,
   FooterSection,
   Hero,
@@ -69,6 +82,17 @@ export {
   TherapySection,
   VirtualHealthStats,
   WhatsIncluded,
+  // New Landing Page Components
+  NewNavbar,
+  NewHero,
+  Features,
+  HowItWorks,
+  TherapistsShowcase,
+  Testimonials,
+  StatsSection,
+  NewFAQSection,
+  CTASection,
+  NewFooter,
   PsychologistCard,
   ReviewDialog,
   ReviewsList

@@ -8,7 +8,6 @@ import { Layout } from "./components";
 import { useAuth } from "./context/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 
-// Component to redirect logged-in users from public pages
 function PublicRoute({ children }) {
   const { currentUser } = useAuth();
   return currentUser ? <Navigate to="/dashboard" replace /> : children;
