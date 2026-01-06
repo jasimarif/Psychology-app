@@ -49,7 +49,7 @@ const TherapistsShowcase = () => {
     ];
 
     return (
-        <section id="therapists" className="py-24 relative overflow-hidden font-nunito bg-customYellow">
+        <section id="therapists" className="py-24 relative overflow-hidden font-nunito bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div 
@@ -59,7 +59,7 @@ const TherapistsShowcase = () => {
                     }`}
                 >
                     <div className="max-w-2xl">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-darkYellow text-customGreen text-sm font-semibold mb-6">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-customGreen/10 text-customGreen text-sm font-semibold mb-6">
                             <Award className="w-4 h-4" />
                             Licensed Professionals
                         </div>
@@ -97,7 +97,7 @@ const TherapistCard = ({ therapist, index }) => {
     return (
         <div
             ref={ref}
-            className={`group relative bg-darkYellow rounded-3xl  cursor-pointer overflow-hidden hover:shadow-2xl hover:shadow-gray-200/60 transition-all duration-500 ${
+            className={`group relative bg-white border rounded-3xl  cursor-pointer overflow-hidden hover:shadow-2xl hover:shadow-gray-200/60 transition-all duration-500 ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
             style={{ transitionDelay: `${index * 100}ms` }}
@@ -153,7 +153,7 @@ const TherapistCard = ({ therapist, index }) => {
             </div>
 
             {/* Hover CTA */}
-            <div className="absolute bottom-0 left-0 right-0 p-6  translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+            <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-white via-white to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                 <button className="w-full py-3 cursor-pointer select-none bg-customGreen to-teal-500 text-white font-semibold rounded-xl hover:shadow-lg transition-shadow">
                     Book Session
                 </button>
