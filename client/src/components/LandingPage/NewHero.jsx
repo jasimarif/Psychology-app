@@ -14,7 +14,7 @@ const NewHero = () => {
     }, []);
 
     return (
-        <section className="relative min-h-screen overflow-hidden bg-customGreen font-nunito select-none">
+        <section className="relative min-h-screen overflow-hidden bg-customGreen font-nunito select-none border-0">
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-customGreen/10 rounded-full blur-3xl animate-pulse" />
@@ -125,8 +125,8 @@ const NewHero = () => {
             </div>
 
             {/* Bottom Wave */}
-            <div className="absolute bottom-0 left-0 right-0">
-                <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+            <div className="absolute -bottom-1 left-0 right-0">
+                <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full block">
                     <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="white"/>
                 </svg>
             </div>

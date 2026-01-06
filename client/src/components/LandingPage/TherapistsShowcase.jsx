@@ -97,7 +97,7 @@ const TherapistCard = ({ therapist, index }) => {
     return (
         <div
             ref={ref}
-            className={`group relative bg-white rounded-3xl border border-gray-100 cursor-pointer overflow-hidden hover:shadow-2xl hover:shadow-gray-200/60 transition-all duration-500 ${
+            className={`group relative bg-darkYellow rounded-3xl  cursor-pointer overflow-hidden hover:shadow-2xl hover:shadow-gray-200/60 transition-all duration-500 ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}
             style={{ transitionDelay: `${index * 100}ms` }}
@@ -130,7 +130,7 @@ const TherapistCard = ({ therapist, index }) => {
 
             {/* Content */}
             <div className="p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-1">{therapist.name}</h3>
+                <h3 className="text-lg font-bold text-gray-700 mb-1">{therapist.name}</h3>
                 <p className="text-customGreen font-medium text-sm mb-3">{therapist.title}</p>
                 
                 {/* Experience */}
@@ -144,7 +144,7 @@ const TherapistCard = ({ therapist, index }) => {
                     {therapist.specialties.map((specialty, idx) => (
                         <span 
                             key={idx}
-                            className="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full"
+                            className="px-3 py-1 bg-customYellow text-customGreen text-xs font-medium rounded-full"
                         >
                             {specialty}
                         </span>
@@ -153,7 +153,7 @@ const TherapistCard = ({ therapist, index }) => {
             </div>
 
             {/* Hover CTA */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-white via-white to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+            <div className="absolute bottom-0 left-0 right-0 p-6  translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                 <button className="w-full py-3 cursor-pointer select-none bg-customGreen to-teal-500 text-white font-semibold rounded-xl hover:shadow-lg transition-shadow">
                     Book Session
                 </button>

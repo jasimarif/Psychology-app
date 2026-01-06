@@ -128,10 +128,10 @@ const StatCard = ({ stat, index, shouldAnimate }) => {
             }`}
             style={{ transitionDelay: `${index * 150}ms` }}
         >
-            <div ref={countRef} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-2 font-averia">
+            <div ref={countRef} className="text-4xl sm:text-5xl lg:text-6xl font-bold text-darkYellow mb-2 font-averia">
                 {formatNumber(count)}{stat.suffix}
             </div>
-            <div className="text-lg font-semibold text-darkYellow mb-1">
+            <div className="text-lg font-semibold text-white mb-1">
                 {stat.label}
             </div>
             <div className="text-sm text-white/50">

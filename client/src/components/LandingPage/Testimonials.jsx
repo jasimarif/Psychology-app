@@ -98,7 +98,7 @@ const Testimonials = () => {
                     onMouseLeave={() => setIsPaused(false)}
                 >
                     {/* Main Card */}
-                    <div className="relative overflow-hidden rounded-3xl bg-white  ">
+                    <div className="relative overflow-hidden rounded-3xl bg-darkYellow  ">
                         <div className="flex transition-transform duration-700 ease-out" style={{ transform: `translateX(-${activeIndex * 100}%)` }}>
                             {testimonials.map((testimonial, index) => (
                                 <div 
@@ -157,7 +157,7 @@ const Testimonials = () => {
                     <div className="flex items-center justify-center gap-4 mt-8">
                         <button 
                             onClick={prevSlide}
-                            className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-gray-600 hover:text-customGreen hover:border-customGreen transition-all"
+                            className="w-12 h-12 rounded-full bg-darkYellow flex items-center justify-center text-gray-600 hover:text-customGreen hover:border-customGreen transition-all"
                         >
                             <ChevronLeft className="w-6 h-6" />
                         </button>
@@ -178,7 +178,7 @@ const Testimonials = () => {
 
                         <button 
                             onClick={nextSlide}
-                            className="w-12 h-12 rounded-full bg-white  flex items-center justify-center text-gray-600 hover:text-customGreen hover:border-customGreen transition-all"
+                            className="w-12 h-12 rounded-full bg-darkYellow  flex items-center justify-center text-gray-600 hover:text-customGreen hover:border-customGreen transition-all"
                         >
                             <ChevronRight className="w-6 h-6" />
                         </button>
