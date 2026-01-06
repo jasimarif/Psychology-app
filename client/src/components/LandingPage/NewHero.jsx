@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Play, Star, Shield, Clock, Users } from 'lucide-react';
 import onIcon from '@/assets/on.svg';
-import calendarIcon from '@/assets/calendar.svg';
+import membershipIcon from '@/assets/Membership.svg';
 
 const NewHero = () => {
     const [isLoaded, setIsLoaded] = useState(false);
@@ -14,7 +14,7 @@ const NewHero = () => {
     }, []);
 
     return (
-        <section className="relative min-h-screen overflow-hidden bg-customGreen font-nunito">
+        <section className="relative min-h-screen overflow-hidden bg-customGreen font-nunito select-none">
             {/* Animated Background Elements */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-customGreen/10 rounded-full blur-3xl animate-pulse" />
@@ -45,8 +45,8 @@ const NewHero = () => {
                 </div>
             </div>
 
-            {/* Floating Calendar Icon - Desktop Only (Left) */}
-            {/* <div className="hidden lg:block">
+            {/* Floating Membership Icon - Desktop Only (Left) */}
+            <div className="hidden lg:block">
                 <div
                     className={`absolute top-32 left-[5%] z-10 transition-all duration-1000 ease-out ${
                         isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
@@ -54,16 +54,16 @@ const NewHero = () => {
                     style={{ transitionDelay: '600ms' }}
                 >
                     <div className="relative group">
-                        <div className="relative w-72 h-72 p-2 flex items-center justify-center transition-transform">
+                        <div className="relative w-88 h-88 p-2 flex items-center justify-center">
                             <img
-                                src={calendarIcon}
-                                alt="Calendar icon"
-                                className="w-full h-full object-contain"
+                                src={membershipIcon}
+                                alt="Membership icon"
+                                className="w-full h-full object-contain animate-bounce-slow"
                             />
                         </div>
                     </div>
                 </div>
-            </div> */}
+            </div>
 
             {/* Main Content */}
             <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20 min-h-screen flex flex-col justify-center">
