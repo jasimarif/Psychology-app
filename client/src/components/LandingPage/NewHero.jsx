@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Play, Star, Shield, Clock, Users } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import onIcon from '@/assets/on.svg';
 import membershipIcon from '@/assets/Membership.svg';
 
@@ -73,9 +74,18 @@ const NewHero = () => {
                         isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                     }`}>
                         <div className="flex -space-x-2">
-                            {[1, 2, 3].map((_, i) => (
-                                <div key={i} className="w-6 h-6 rounded-full bg-customGreenHover border-2 " />
-                            ))}
+                            <Avatar className="w-7 h-7 border-2 border-white">
+                                <AvatarImage src="https://github.com/shadcn.png" alt="User" />
+                                <AvatarFallback>U1</AvatarFallback>
+                            </Avatar>
+                            <Avatar className="w-7 h-7 border-2 border-white">
+                                <AvatarImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop" alt="User" />
+                                <AvatarFallback>U2</AvatarFallback>
+                            </Avatar>
+                            <Avatar className="w-7 h-7 border-2 border-white">
+                                <AvatarImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="User" />
+                                <AvatarFallback>U3</AvatarFallback>
+                            </Avatar>
                         </div>
                         <span className="text-white/90 text-sm font-medium">Join 50,000+ members finding peace</span>
                     </div>

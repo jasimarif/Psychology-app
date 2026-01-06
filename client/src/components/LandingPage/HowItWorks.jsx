@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 
 // Duotune Icons
@@ -35,6 +36,7 @@ const HeartIcon = () => (
 
 const HowItWorks = () => {
     const [headerRef, headerVisible] = useScrollAnimation({ threshold: 0.2 });
+    const navigate = useNavigate();
 
     const steps = [
         {
@@ -106,8 +108,11 @@ const HowItWorks = () => {
 
                 {/* CTA */}
                 <div className="text-center mt-16">
-                    <button className="group relative px-8 py-4 bg-customGreen shadow-none cursor-pointer select-none text-white font-semibold rounded-2xl  transition-all duration-300 ">
-                        Get Started Now - It's Free
+                    <button
+                        onClick={() => navigate('/login')}
+                        className="group relative px-8 py-4 bg-customGreen shadow-none cursor-pointer select-none text-white font-semibold rounded-2xl  transition-all duration-300 "
+                    >
+                        Get Started Now
                         <span className="absolute -top-3 -right-3 px-2 py-1 bg-amber-400 text-amber-900 text-xs font-bold rounded-full">
                             $0
                         </span>

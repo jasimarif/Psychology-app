@@ -144,7 +144,7 @@ const TherapistCard = ({ therapist, index }) => {
                     {therapist.specialties.map((specialty, idx) => (
                         <span 
                             key={idx}
-                            className="px-3 py-1 bg-customYellow text-customGreen text-xs font-medium rounded-full"
+                            className="px-3 py-1 bg-lightGray text-customGreen text-xs font-medium rounded-full"
                         >
                             {specialty}
                         </span>
