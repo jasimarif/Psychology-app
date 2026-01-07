@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react"
-import { Star, ChevronDown, Loader2 } from "lucide-react"
+import { Star, Loader2 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination"
 import { reviewService } from "@/services/reviewService"
 import { PsychologistsIcon } from "@/components/icons/DuoTuneIcons"
 
 const ReviewsList = ({ psychologistId, initialRating = 0, initialReviewCount = 0 }) => {
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
+  const [reviewsLoading, setReviewsLoading] = useState(false)
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -31,16 +32,12 @@ const ReviewsList = ({ psychologistId, initialRating = 0, initialReviewCount = 0
       if (page === 1) {
         setLoading(true)
       } else {
-        setLoadingMore(true)
+        setReviewsLoading(true)
       }
 
-      const data = await reviewService.getReviewsByPsychologist(psychologistId, page, 5)
+      const data = await reviewService.getReviewsByPsychologist(psychologistId, page, 3)
       
-      if (page === 1) {
-        setReviews(data.reviews)
-      } else {
-        setReviews(prev => [...prev, ...data.reviews])
-      }
+      setReviews(data.reviews)
       
       setPagination(data.pagination)
       setRatingDistribution(data.ratingDistribution)
@@ -49,14 +46,12 @@ const ReviewsList = ({ psychologistId, initialRating = 0, initialReviewCount = 0
       console.error('Error loading reviews:', error)
     } finally {
       setLoading(false)
-      setLoadingMore(false)
+      setReviewsLoading(false)
     }
   }
 
-  const loadMoreReviews = () => {
-    if (pagination.hasMore) {
-      loadReviews(pagination.currentPage + 1)
-    }
+  const handlePageChange = (page) => {
+    loadReviews(page)
   }
 
   const formatDate = (dateString) => {
@@ -163,59 +158,74 @@ const ReviewsList = ({ psychologistId, initialRating = 0, initialReviewCount = 0
 
             {/* Reviews List */}
             <div className="space-y-4">
-              {reviews.map((review) => (
-                <div 
-                  key={review._id} 
-                  className="p-4 bg-white rounded-xl"
-                >
-                  <div className="flex items-start gap-3">
-                    <Avatar className="w-10 h-10 select-none">
-                      <AvatarFallback className="bg-customGreen/10 text-customGreen text-sm font-medium">
-                        {review.isAnonymous ? 'A' : getInitials(review.userName)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold text-gray-700">
-                          {review.isAnonymous ? 'Anonymous' : review.userName}
-                        </h4>
-                        <span className="text-xs text-gray-400 select-none">
-                          {formatDate(review.createdAt)}
-                        </span>
+              {reviewsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-8 h-8 animate-spin text-customGreen" />
+                </div>
+              ) : (
+                reviews.map((review) => (
+                  <div 
+                    key={review._id} 
+                    className="p-4 bg-white rounded-xl"
+                  >
+                    <div className="flex items-start gap-3">
+                      <Avatar className="w-10 h-10 select-none">
+                        <AvatarFallback className="bg-customGreen/10 text-customGreen text-sm font-medium">
+                          {review.isAnonymous ? 'A' : getInitials(review.userName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <h4 className="font-semibold text-gray-700">
+                            {review.isAnonymous ? 'Anonymous' : review.userName}
+                          </h4>
+                          <span className="text-xs text-gray-400 select-none">
+                            {formatDate(review.createdAt)}
+                          </span>
+                        </div>
+                        <div className="mb-2">
+                          {renderStars(review.rating)}
+                        </div>
+                        <p className="text-sm text-gray-600 leading-relaxed">
+                          {review.reviewText}
+                        </p>
                       </div>
-                      <div className="mb-2">
-                        {renderStars(review.rating)}
-                      </div>
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        {review.reviewText}
-                      </p>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
-            {/* Load More Button */}
-            {pagination.hasMore && (
-              <div className="text-center pt-2">
-                <Button
-                  variant="outline"
-                  onClick={loadMoreReviews}
-                  disabled={loadingMore}
-                  className="rounded-xl border-gray-300 hover:bg-white cursor-pointer"
-                >
-                  {loadingMore ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Loading...
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="w-4 h-4 mr-2" />
-                      Load More Reviews
-                    </>
-                  )}
-                </Button>
+            {/* Pagination */}
+            {pagination.totalPages > 1 && (
+              <div className="flex justify-center pt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => handlePageChange(Math.max(1, pagination.currentPage - 1))}
+                        className={pagination.currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer text-gray-700"}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => handlePageChange(page)}
+                          isActive={page === pagination.currentPage}
+                          className="cursor-pointer shadow-none "
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => handlePageChange(Math.min(pagination.totalPages, pagination.currentPage + 1))}
+                        className={pagination.currentPage === pagination.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer text-gray-700"}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               </div>
             )}
           </div>

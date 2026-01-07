@@ -343,12 +343,12 @@ const PsychologistProfile = () => {
                   <CalendarIcon className="w-4 h-4 mr-2" />
                   Book Session
                 </Button>
-                <Button
+                {/* <Button
                   variant="outline"
                   className="w-full py-5 sm:py-6 text-sm sm:text-base font-semibold rounded-xl border-gray-200 hover:bg-lightGray cursor-pointer"
                 >
                   Send Message
-                </Button>
+                </Button> */}
               </div>
 
               {/* Security Note */}
