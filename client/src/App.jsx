@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import {Login, Signup, ForgotPassword, LandingPage, Dashboard, Questionnaire, Profile, Psychologists, PsychologistProfile, MyBookings} from "./pages";
+import {Login, Signup, ForgotPassword, LandingPage, Dashboard, Questionnaire, Profile, Psychologists, PsychologistProfile, MyBookings, NotFound} from "./pages";
 import BookingSuccess from "./pages/Bookings/BookingSuccess";
 import BookingCancelled from "./pages/Bookings/BookingCancelled";
 import { AuthProvider } from "./context/AuthContext";
@@ -32,6 +32,7 @@ function App() {
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
         <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
      </Router>
    </AuthProvider>

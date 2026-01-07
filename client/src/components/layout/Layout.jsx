@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import AppSidebar from '../sidebar/AppSidebar';
 import {
   Breadcrumb,
@@ -10,14 +10,31 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { SearchIcon, BellIcon, FileIcon, DashboardIcon } from '../icons/DuoTuneIcons';
 import { useAuth } from '@/context/AuthContext';
-import { Menu } from 'lucide-react';
+import { logout } from '@/lib/firebase';
+import { Menu, LogOut } from 'lucide-react';
 
 const Layout = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   const generateBreadcrumbs = () => {
     const pathnames = location.pathname.split('/').filter((x) => x);
@@ -33,7 +50,6 @@ const Layout = ({ children }) => {
         'browse-psychologists': 'Psychologists',
       };
 
-      // If this is a psychologist ID (after /psychologist/), show psychologist name
       if (pathnames[index - 1] === 'psychologist' && psychologist?.name) {
         return psychologist.name;
       }
@@ -42,7 +58,6 @@ const Layout = ({ children }) => {
     };
 
     const getLink = (value, index) => {
-      // For psychologist route, link to browse-psychologists instead
       if (value === 'psychologist') {
         return '/browse-psychologists';
       }
@@ -163,12 +178,22 @@ const Layout = ({ children }) => {
                   {currentUser?.email || 'user@example.com'}
                 </p>
               </div>
-              <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-white shadow-sm cursor-pointer">
-                <AvatarImage src={currentUser?.photoURL} alt={currentUser?.displayName} />
-                <AvatarFallback className="bg-customGreen text-white">
-                  {currentUser?.displayName?.charAt(0) || 'U'}
-                </AvatarFallback>
-              </Avatar>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-white shadow-sm cursor-pointer">
+                    <AvatarImage src={currentUser?.photoURL} alt={currentUser?.displayName} />
+                    <AvatarFallback className="bg-customGreen text-white">
+                      {currentUser?.displayName?.charAt(0) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={handleLogout} className="text-gray-600 hover:text-gray-700 cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </header>

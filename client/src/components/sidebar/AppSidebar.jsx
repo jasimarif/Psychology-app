@@ -1,31 +1,17 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   DashboardIcon,
   QuestionnaireIcon,
   ProfileIcon,
   PsychologistsIcon,
   BookingsIcon,
-  LogoutIcon,
   BriefcaseIcon
 } from '../icons/DuoTuneIcons';
-import { useAuth } from '@/context/AuthContext';
-import { logout } from '@/lib/firebase';
-import { useNavigate } from 'react-router-dom';
 
 const AppSidebar = ({ onClose }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   const menuItems = [
     { icon: DashboardIcon, label: 'Dashboard', path: '/dashboard' },
@@ -71,16 +57,6 @@ const AppSidebar = ({ onClose }) => {
         })}
       </div>
 
-      {/* Logout */}
-      <div className="mt-auto select-none">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 text-customGray hover:text-red-600 hover:bg-red-100 cursor-pointer rounded-lg w-full transition-colors group"
-        >
-          <LogoutIcon className="w-5 h-5 text-customGray font-medium group-hover:text-red-600" />
-          <span>Logout</span>
-        </button>
-      </div>
     </div>
   );
 };
