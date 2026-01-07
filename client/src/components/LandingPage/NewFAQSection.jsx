@@ -29,7 +29,7 @@ const NewFAQSection = () => {
         },
         {
             question: "Does insurance cover online therapy?",
-            answer: "Many insurance plans do cover online therapy. We work with various insurance providers, and you can check your eligibility during the sign-up process. We also offer flexible payment plans and sliding scale options for those without insurance coverage."
+            answer: "Currently, insurance does not cover our online therapy services. We do not work with insurance providers at this time. All sessions are self-pay with transparent pricing."
         },
         {
             question: "Can I use this service for crisis situations?",

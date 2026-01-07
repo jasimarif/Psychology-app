@@ -73,8 +73,8 @@ const Features = () => {
         },
         {
             icon: <MessageIcon />,
-            title: 'Unlimited Messaging',
-            description: 'Text your therapist anytime between sessions for continuous support.',
+            title: 'Progress Tracking',
+            description: 'Monitor your mental health journey with detailed progress reports and insights.',
             iconBg: 'bg-emerald-500',
             cardBg: 'bg-emerald-50',
         },
