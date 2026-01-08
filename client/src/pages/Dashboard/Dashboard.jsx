@@ -27,7 +27,7 @@ function Dashboard() {
   }
 
   const handleViewResults = () => {
-    console.log("View matched psychologists")
+    navigate("/recommended-psychologists")
   }
 
 
@@ -101,12 +101,11 @@ function Dashboard() {
     },
     {
       icon: DashboardStarIcon,
-      title: "Your Matches",
-      description: "View psychologists matched based on your questionnaire responses",
+      title: "Recommended For You",
+      description: "View psychologists matched based on your questionnaire responses and preferences",
       action: handleViewResults,
-      buttonText: hasCompletedQuestionnaire ? "View Matched Psychologists" : "Complete Questionnaire First",
-      buttonVariant: hasCompletedQuestionnaire ? "default" : "outline",
-      disabled: !hasCompletedQuestionnaire,
+      buttonText: "View Recommended Psychologists",
+      buttonVariant: "default",
       iconBg: "bg-amber-50 text-amber-600",
     },
     {

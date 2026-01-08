@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import { RadioQuestion, DropdownQuestionSelect, CheckboxQuestion, Card, CardContent } from "@/components"
+import { RadioQuestion, DropdownQuestionSelect, CheckboxQuestion, MultiSelectDropdown, Card, CardContent } from "@/components"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
@@ -17,11 +17,13 @@ import {
 import {
   ProfileIcon as UserIcon,
   DocumentIcon as HeartIcon,
-  StethoscopeIcon,
-  FileIcon as BrainIcon,
   BellIcon as SettingsIcon,
   CloseIcon
 } from "@/components/icons/DuoTuneIcons"
+import languages from "@cospired/i18n-iso-languages"
+import enLang from "@cospired/i18n-iso-languages/langs/en.json"
+
+languages.registerLocale(enLang)
 
 function Profile() {
   const navigate = useNavigate()
@@ -33,45 +35,49 @@ function Profile() {
   const [hasQuestionnaire, setHasQuestionnaire] = useState(false)
 
   const [profileData, setProfileData] = useState({
+    // Step 1: Basic Info
     therapyType: "",
     country: "",
-    relationshipStatus: "",
     age: "",
     gender: "",
-    religion: "",
-    religionImportance: "",
-    spiritual: "",
-    therapyHistory: "",
+    // Step 2: What You're Looking For
     therapyReasons: [],
-    therapistExpectations: [],
-    therapistStyle: "",
-    therapistApproach: "",
-    therapistManner: "",
-    depression: "",
-    eatingHabits: "",
-    physicalHealth: "",
-    littleInterest: "",
-    motorActivity: "",
-    feelingDown: "",
-    troubleSleeping: "",
-    feelingTired: "",
-    poorAppetite: "",
-    feelingBad: "",
-    troubleConcentrating: "",
-    thoughtsHurting: "",
-    difficultyForWork: "",
-    employmentStatus: "",
-    drinkingHabits: "",
-    suicidalThoughts: "",
-    panicAttacks: "",
-    medication: "",
-    financialStatus: "",
-    usefulResources: [],
-    communicateTherapist: "",
+    preferredLanguages: [],
+    // Step 3: Preferences
     preferredTherapist: ""
   })
 
   const [tempData, setTempData] = useState({})
+  const [otherReasonText, setOtherReasonText] = useState("")
+
+  // Predefined therapy reasons options
+  const predefinedTherapyReasons = [
+    "Depression",
+    "Anxiety",
+    "Stress Management",
+    "Relationship Issues",
+    "Trauma & PTSD",
+    "Grief & Loss",
+    "Self-Esteem",
+    "Career Counseling",
+    "Family Issues",
+    "Addiction",
+    "Eating Disorders",
+    "Other"
+  ]
+
+  // Helper to find custom "other" value from therapyReasons
+  const getOtherReasonFromData = (reasons) => {
+    if (!Array.isArray(reasons)) return ""
+    const customReason = reasons.find(r => !predefinedTherapyReasons.includes(r))
+    return customReason || ""
+  }
+
+  // Helper to get display values (replace custom with "Other" for checkbox display)
+  const getDisplayTherapyReasons = (reasons) => {
+    if (!Array.isArray(reasons)) return []
+    return reasons.map(r => predefinedTherapyReasons.includes(r) ? r : "Other")
+  }
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -112,7 +118,14 @@ function Profile() {
 
   const handleEdit = (section) => {
     setEditingSection(section)
-    setTempData({ ...profileData })
+    // When editing, convert custom therapy reasons to "Other" for checkbox display
+    const editData = { ...profileData }
+    if (section === 'needs' && profileData.therapyReasons) {
+      const otherValue = getOtherReasonFromData(profileData.therapyReasons)
+      setOtherReasonText(otherValue)
+      editData.therapyReasons = getDisplayTherapyReasons(profileData.therapyReasons)
+    }
+    setTempData(editData)
   }
 
   const handleSave = async () => {
@@ -122,6 +135,19 @@ function Profile() {
     }
 
     try {
+      // Prepare data for saving - replace "Other" with actual text
+      const saveData = { ...tempData }
+      if (saveData.therapyReasons && saveData.therapyReasons.includes("Other")) {
+        if (otherReasonText.trim()) {
+          saveData.therapyReasons = saveData.therapyReasons.map(r =>
+            r === "Other" ? otherReasonText.trim() : r
+          )
+        } else {
+          // Remove "Other" if no text provided
+          saveData.therapyReasons = saveData.therapyReasons.filter(r => r !== "Other")
+        }
+      }
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/profile/${currentUser.uid}`,
         {
@@ -129,15 +155,16 @@ function Profile() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(tempData)
+          body: JSON.stringify(saveData)
         }
       )
 
       const data = await response.json()
 
       if (data.success) {
-        setProfileData({ ...tempData })
+        setProfileData({ ...saveData })
         setEditingSection(null)
+        setOtherReasonText("")
         toast.success("Profile updated!", {
           description: "Your changes have been saved successfully."
         })
@@ -157,6 +184,7 @@ function Profile() {
   const handleCancel = () => {
     setEditingSection(null)
     setTempData({})
+    setOtherReasonText("")
   }
 
   const handleRadioChange = (field, value) => {
@@ -179,6 +207,22 @@ function Profile() {
     return option ? option.label : value
   }
 
+  const allLanguages = useMemo(() => {
+    const langCodes = languages.getAlpha2Codes()
+    const languageList = Object.keys(langCodes).map(code => {
+      return languages.getName(code, "en")
+    }).filter(Boolean).sort()
+    
+    return languageList
+  }, [])
+
+  const getFieldOptions = (field) => {
+    if (field.options === 'languages') {
+      return allLanguages
+    }
+    return field.options
+  }
+
   const toggleSection = (sectionId) => {
     if (editingSection) return
     setExpandedSection(expandedSection === sectionId ? null : sectionId)
@@ -196,7 +240,7 @@ function Profile() {
     {
       id: 'basic',
       title: 'Basic Information',
-      description: 'Your personal details and demographics',
+      description: 'Your personal details and therapy type',
       icon: <UserIcon className="w-6 h-6" />,
       fields: [
         {
@@ -219,20 +263,8 @@ function Profile() {
             { id: 'Canada', label: 'Canada' },
             { id: 'United Kingdom', label: 'United Kingdom' },
             { id: 'Australia', label: 'Australia' },
+            { id: 'India', label: 'India' },
             { id: 'Other', label: 'Other' }
-          ]
-        },
-        {
-          key: 'relationshipStatus',
-          label: 'Relationship Status',
-          type: 'radio',
-          options: [
-            { id: 'single', label: 'Single' },
-            { id: 'in-a-relationship', label: 'In a relationship' },
-            { id: 'married', label: 'Married' },
-            { id: 'divorced', label: 'Divorced' },
-            { id: 'widowed', label: 'Widowed' },
-            { id: 'other', label: 'Other' }
           ]
         },
         {
@@ -262,344 +294,51 @@ function Profile() {
       ]
     },
     {
-      id: 'therapy',
-      title: 'Therapy Preferences',
-      description: 'Your expectations and preferences for therapy',
+      id: 'needs',
+      title: 'What You\'re Looking For',
+      description: 'Your therapy needs and language preferences',
       icon: <HeartIcon className="w-6 h-6" />,
       fields: [
         {
-          key: 'religion',
-          label: 'Religion',
-          type: 'radio',
-          options: [
-            { id: 'islam', label: 'Islam' },
-            { id: 'christianity', label: 'Christianity' },
-            { id: 'judaism', label: 'Judaism' },
-            { id: 'hinduism', label: 'Hinduism' },
-            { id: 'buddhism', label: 'Buddhism' },
-            { id: 'other', label: 'Other' }
-          ]
-        },
-        {
-          key: 'religionImportance',
-          label: 'Religion Importance',
-          type: 'radio',
-          options: [
-            { id: 'very-important', label: 'Very Important' },
-            { id: 'important', label: 'Important' },
-            { id: 'somewhat-important', label: 'Somewhat Important' },
-            { id: 'not-important', label: 'Not Important' }
-          ]
-        },
-        {
-          key: 'spiritual',
-          label: 'Spiritual',
-          type: 'radio',
-          options: [
-            { id: 'yes', label: 'Yes' },
-            { id: 'no', label: 'No' }
-          ]
-        },
-        {
-          key: 'therapyHistory',
-          label: 'Previous Therapy Experience',
-          type: 'radio',
-          options: [
-            { id: 'yes', label: 'Yes' },
-            { id: 'no', label: 'No' }
-          ]
-        },
-        {
           key: 'therapyReasons',
-          label: 'Reasons for Therapy',
+          label: 'What are you seeking help with?',
           type: 'checkbox',
           options: [
-            "I've been feeling depressed",
-            "I feel anxious or overwhelmed",
-            "My mood is interfering with my job/school performance",
-            "I struggle with building or maintaining relationships",
-            "I can't find purpose and meaning in my life",
-            "I am grieving",
-            "I have experienced trauma",
-            "I need to talk through a specific challenge",
-            "I want to gain self confidence",
-            "I want to improve myself but I don't know where to start",
-            "Recommended to me (friend, family, doctor)",
-            "Just exploring",
+            "Depression",
+            "Anxiety",
+            "Stress Management",
+            "Relationship Issues",
+            "Trauma & PTSD",
+            "Grief & Loss",
+            "Self-Esteem",
+            "Career Counseling",
+            "Family Issues",
+            "Addiction",
+            "Eating Disorders",
             "Other"
           ]
         },
         {
-          key: 'therapistExpectations',
-          label: 'Therapist Expectations',
+          key: 'preferredLanguages',
+          label: 'Preferred Languages',
           type: 'checkbox',
-          options: [
-            'Listens',
-            'Explores my past',
-            'Teaches me new skills',
-            'Challenges my beliefs',
-            'Assigns me homework',
-            'Guides me to set goals',
-            'Proactively checks in with me',
-            'Other',
-            "I don't know"
-          ]
-        },
-        {
-          key: 'therapistStyle',
-          label: 'Preferred Style',
-          type: 'radio',
-          options: [
-            { id: 'casual', label: 'Casual' },
-            { id: 'somewhat-casual', label: 'Somewhat casual' },
-            { id: 'no-preference', label: 'No preference' },
-            { id: 'somewhat-formal', label: 'Somewhat formal' },
-            { id: 'formal', label: 'Formal' }
-          ]
-        },
-        {
-          key: 'therapistApproach',
-          label: 'Therapist Approach',
-          type: 'radio',
-          options: [
-            { id: 'flexible', label: 'Flexible' },
-            { id: 'somewhat-flexible', label: 'Somewhat flexible' },
-            { id: 'no-preference', label: 'No preference' },
-            { id: 'somewhat-structured', label: 'Somewhat structured' },
-            { id: 'structured', label: 'Structured' }
-          ]
-        },
-        {
-          key: 'therapistManner',
-          label: 'Therapist Manner',
-          type: 'radio',
-          options: [
-            { id: 'gentle', label: 'Gentle' },
-            { id: 'somewhat-gentle', label: 'Somewhat gentle' },
-            { id: 'no-preference', label: 'No preference' },
-            { id: 'somewhat-direct', label: 'Somewhat direct' },
-            { id: 'direct', label: 'Direct' }
-          ]
-        }
-      ]
-    },
-    {
-      id: 'health',
-      title: 'Health & Wellness',
-      description: 'Your current health and lifestyle information',
-      icon: <StethoscopeIcon className="w-6 h-6" />,
-      fields: [
-        {
-          key: 'depression',
-          label: 'Current Depression',
-          type: 'radio',
-          options: [
-            { id: 'yes', label: 'Yes' },
-            { id: 'no', label: 'No' }
-          ]
-        },
-        {
-          key: 'eatingHabits',
-          label: 'Eating Habits',
-          type: 'radio',
-          options: [
-            { id: 'good', label: 'Good' },
-            { id: 'fair', label: 'Fair' },
-            { id: 'poor', label: 'Poor' }
-          ]
-        },
-        {
-          key: 'physicalHealth',
-          label: 'Physical Health',
-          type: 'radio',
-          options: [
-            { id: 'good', label: 'Good' },
-            { id: 'fair', label: 'Fair' },
-            { id: 'poor', label: 'Poor' }
-          ]
-        },
-        {
-          key: 'employmentStatus',
-          label: 'Employment Status',
-          type: 'radio',
-          options: [
-            { id: 'employed', label: 'Employed' },
-            { id: 'unemployed', label: 'Unemployed' }
-          ]
-        },
-        {
-          key: 'drinkingHabits',
-          label: 'Drinking Habits',
-          type: 'radio',
-          options: [
-            { id: 'never', label: 'Never' },
-            { id: 'occasionally', label: 'Occasionally' },
-            { id: 'regularly', label: 'Regularly' },
-            { id: 'frequently', label: 'Frequently' }
-          ]
-        },
-        {
-          key: 'panicAttacks',
-          label: 'Anxiety/Panic Attacks',
-          type: 'radio',
-          options: [
-            { id: 'yes', label: 'Yes' },
-            { id: 'no', label: 'No' }
-          ]
-        },
-        {
-          key: 'medication',
-          label: 'Mental Health Medication',
-          type: 'radio',
-          options: [
-            { id: 'yes', label: 'Yes' },
-            { id: 'no', label: 'No' }
-          ]
-        }
-      ]
-    },
-    {
-      id: 'assessment',
-      title: 'Mental Health Assessment',
-      description: 'Your responses to standard mental health questions',
-      icon: <BrainIcon className="w-6 h-6" />,
-      fields: [
-        {
-          key: 'littleInterest',
-          label: 'Little interest or pleasure in doing things',
-          type: 'radio',
-          options: [
-            { id: 'not-at-all', label: 'Not at all' },
-            { id: 'several-days', label: 'Several days' },
-            { id: 'more-than-half', label: 'More than half the days' },
-            { id: 'nearly-every-day', label: 'Nearly every day' }
-          ]
-        },
-        {
-          key: 'feelingDown',
-          label: 'Feeling down, depressed or hopeless',
-          type: 'radio',
-          options: [
-            { id: 'not-at-all', label: 'Not at all' },
-            { id: 'several-days', label: 'Several days' },
-            { id: 'more-than-half', label: 'More than half the days' },
-            { id: 'nearly-every-day', label: 'Nearly every day' }
-          ]
-        },
-        {
-          key: 'troubleSleeping',
-          label: 'Trouble falling/staying asleep',
-          type: 'radio',
-          options: [
-            { id: 'not-at-all', label: 'Not at all' },
-            { id: 'several-days', label: 'Several days' },
-            { id: 'more-than-half', label: 'More than half the days' },
-            { id: 'nearly-every-day', label: 'Nearly every day' }
-          ]
-        },
-        {
-          key: 'feelingTired',
-          label: 'Feeling tired or having little energy',
-          type: 'radio',
-          options: [
-            { id: 'not-at-all', label: 'Not at all' },
-            { id: 'several-days', label: 'Several days' },
-            { id: 'more-than-half', label: 'More than half the days' },
-            { id: 'nearly-every-day', label: 'Nearly every day' }
-          ]
-        },
-        {
-          key: 'poorAppetite',
-          label: 'Poor appetite or overeating',
-          type: 'radio',
-          options: [
-            { id: 'not-at-all', label: 'Not at all' },
-            { id: 'several-days', label: 'Several days' },
-            { id: 'more-than-half', label: 'More than half the days' },
-            { id: 'nearly-every-day', label: 'Nearly every day' }
-          ]
-        },
-        {
-          key: 'feelingBad',
-          label: 'Feeling bad about yourself',
-          type: 'radio',
-          options: [
-            { id: 'not-at-all', label: 'Not at all' },
-            { id: 'several-days', label: 'Several days' },
-            { id: 'more-than-half', label: 'More than half the days' },
-            { id: 'nearly-every-day', label: 'Nearly every day' }
-          ]
-        },
-        {
-          key: 'troubleConcentrating',
-          label: 'Trouble concentrating',
-          type: 'radio',
-          options: [
-            { id: 'not-at-all', label: 'Not at all' },
-            { id: 'several-days', label: 'Several days' },
-            { id: 'more-than-half', label: 'More than half the days' },
-            { id: 'nearly-every-day', label: 'Nearly every day' }
-          ]
-        },
-        {
-          key: 'difficultyForWork',
-          label: 'Difficulty with daily activities',
-          type: 'radio',
-          options: [
-            { id: 'not-difficult', label: 'Not difficult at all' },
-            { id: 'somewhat-difficult', label: 'Somewhat difficult' },
-            { id: 'very-difficult', label: 'Very difficult' },
-            { id: 'extremely-difficult', label: 'Extremely difficult' }
-          ]
+          options: 'languages' // Special marker to use dynamic language list
         }
       ]
     },
     {
       id: 'preferences',
-      title: 'Communication Preferences',
-      description: 'How you prefer to communicate with your therapist',
+      title: 'Session Preferences',
+      description: 'Your therapist preferences',
       icon: <SettingsIcon className="w-6 h-6" />,
       fields: [
         {
-          key: 'financialStatus',
-          label: 'Financial Situation',
-          type: 'radio',
-          options: [
-            { id: 'stable', label: 'Stable' },
-            { id: 'somewhat-stable', label: 'Somewhat Stable' },
-            { id: 'unstable', label: 'Unstable' }
-          ]
-        },
-        {
-          key: 'usefulResources',
-          label: 'Useful Resources',
-          type: 'checkbox',
-          options: [
-            "Support Groups",
-            "Therapy journals",
-            "Worksheets",
-            "Goal/habit tracking",
-            "Others",
-            "I don't know"
-          ]
-        },
-        {
-          key: 'communicateTherapist',
-          label: 'Communication Method',
-          type: 'radio',
-          options: [
-            { id: 'mostly-text', label: 'Mostly text-based (chat, email)' },
-            { id: 'video-calls', label: 'Video calls' },
-            { id: 'in-person', label: 'In-person sessions' }
-          ]
-        },
-        {
           key: 'preferredTherapist',
-          label: 'Therapist Preference',
+          label: 'Therapist Gender Preference',
           type: 'radio',
           options: [
-            { id: 'male-therapist', label: 'Male therapist' },
-            { id: 'female-therapist', label: 'Female therapist' },
+            { id: 'male', label: 'Male therapist' },
+            { id: 'female', label: 'Female therapist' },
             { id: 'no-preference', label: 'No preference' }
           ]
         }
@@ -627,18 +366,20 @@ function Profile() {
       return <span className="text-customGray italic text-sm">Not specified</span>
     }
 
-    const label = getLabelForValue(value, field.options)
+    const options = getFieldOptions(field)
+    const label = getLabelForValue(value, options)
     return <span className="text-gray-700 font-medium">{label}</span>
   }
 
   const renderEditField = (field) => {
     const data = editingSection ? tempData : profileData
+    const options = getFieldOptions(field)
 
     if (field.type === 'radio') {
       return (
         <RadioQuestion
           title={field.label}
-          options={field.options}
+          options={options}
           selectedValue={data[field.key]}
           onSelect={(value) => handleRadioChange(field.key, value)}
         />
@@ -647,19 +388,34 @@ function Profile() {
       return (
         <DropdownQuestionSelect
           title={field.label}
-          options={field.options}
+          options={options}
           selectedValue={data[field.key]}
           onChange={(value) => handleRadioChange(field.key, value)}
           placeholder={`Select ${field.label.toLowerCase()}`}
         />
       )
     } else if (field.type === 'checkbox') {
+      if (field.options === 'languages') {
+        return (
+          <MultiSelectDropdown
+            title={field.label}
+            options={options}
+            selectedValues={data[field.key] || []}
+            onChange={(values) => setTempData(prev => ({ ...prev, [field.key]: values }))}
+            placeholder="Select languages..."
+            searchPlaceholder="Search languages..."
+          />
+        )
+      }
       return (
         <CheckboxQuestion
           title={field.label}
-          options={field.options}
+          options={options}
           selectedValues={data[field.key] || []}
           onToggle={(option) => handleCheckboxChange(field.key, option)}
+          otherOption={field.key === 'therapyReasons'}
+          otherValue={field.key === 'therapyReasons' ? otherReasonText : ""}
+          onOtherChange={field.key === 'therapyReasons' ? (value) => setOtherReasonText(value) : undefined}
         />
       )
     }
@@ -825,7 +581,7 @@ function Profile() {
                   <p className="text-2xl font-bold text-amber-900">
                     {getFilledFieldsCount(sections[1])}/{sections[1].fields.length}
                   </p>
-                  <p className="text-sm text-amber-700">Therapy</p>
+                  <p className="text-sm text-amber-700">Needs</p>
                 </div>
               </div>
             </CardContent>
@@ -835,13 +591,13 @@ function Profile() {
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-blue-200/50 flex items-center justify-center">
-                  <StethoscopeIcon className="w-6 h-6 text-blue-700" />
+                  <SettingsIcon className="w-6 h-6 text-blue-700" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-blue-900">
                     {getFilledFieldsCount(sections[2])}/{sections[2].fields.length}
                   </p>
-                  <p className="text-sm text-blue-700">Health</p>
+                  <p className="text-sm text-blue-700">Preferences</p>
                 </div>
               </div>
             </CardContent>
@@ -851,11 +607,11 @@ function Profile() {
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-customGray/10 flex items-center justify-center">
-                  <BrainIcon className="w-6 h-6 text-customGray" />
+                  <Check className="w-6 h-6 text-customGray" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-gray-700">
-                    {sections.reduce((acc, section) => acc + getFilledFieldsCount(section), 0)}
+                    {sections.reduce((acc, section) => acc + getFilledFieldsCount(section), 0)}/7
                   </p>
                   <p className="text-sm text-customGray">Total Fields</p>
                 </div>

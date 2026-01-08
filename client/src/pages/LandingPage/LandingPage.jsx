@@ -19,9 +19,9 @@ const LandingPage = () => {
             <HowItWorks />
             <TherapistsShowcase />
             <Testimonials />
-            <StatsSection />
+            {/* <StatsSection /> */}
             <NewFAQSection />
-            <CTASection />
+            {/* <CTASection /> */}
             <NewFooter />
         </div>
     );

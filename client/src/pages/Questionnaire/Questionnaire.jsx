@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
-import { RadioQuestion, DropdownQuestionSelect, CheckboxQuestion } from "@/components"
+import { RadioQuestion, DropdownQuestionSelect, CheckboxQuestion, MultiSelectDropdown } from "@/components"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -10,12 +10,16 @@ import { Footer } from "../../components"
 import { useAuth } from "@/context/AuthContext"
 import { toast } from "sonner"
 import { getData } from "country-list"
+import languages from "@cospired/i18n-iso-languages"
+import enLang from "@cospired/i18n-iso-languages/langs/en.json"
+
+languages.registerLocale(enLang)
 
 function Questionnaire() {
   const navigate = useNavigate()
   const { currentUser } = useAuth()
   const [currentStep, setCurrentStep] = useState(1)
-  const totalSteps = 6
+  const totalSteps = 3
   const [currentQuestion, setCurrentQuestion] = useState(1)
   const [isAnimating, setIsAnimating] = useState(false)
   const [profileExists, setProfileExists] = useState(false)
@@ -25,49 +29,15 @@ function Questionnaire() {
     // Step 1: Therapy Type & Basic Info
     therapyType: "",
     country: "Pakistan",
-    relationshipStatus: "",
     age: "",
     gender: "",
 
-    // Step 2: Religion & Therapy Preferences
-    religion: "",
-    religionImportance: "",
-    spiritual: "",
-    therapyHistory: "",
+    // Step 2: What You're Looking For
     therapyReasons: [],
-    therapistExpectations: [],
-    therapistStyle: "",
-    therapistApproach: "",
-    therapistManner: "",
+    otherReason: "",
+    preferredLanguages: [],
 
-    // Step 3: Current State
-    depression: "",
-    eatingHabits: "",
-    physicalHealth: "",
-
-    // Step 4: Past 2 Weeks Assessment
-    littleInterest: "",
-    motorActivity: "",
-    feelingDown: "",
-    troubleSleeping: "",
-    feelingTired: "",
-    poorAppetite: "",
-    feelingBad: "",
-    troubleConcentrating: "",
-    thoughtsHurting: "",
-    difficultyForWork: "",
-
-    // Step 5: Additional Health Info
-    employmentStatus: "",
-    drinkingHabits: "",
-    suicidalThoughts: "",
-    panicAttacks: "",
-    medication: "",
-
-    // Step 6: Preferences & Resources
-    financialStatus: "",
-    usefulResources: [],
-    communicateTherapist: "",
+    // Step 3: Preferences
     preferredTherapist: ""
   })
 
@@ -134,18 +104,13 @@ function Questionnaire() {
     if (currentStep <= totalSteps) {
       setIsAnimating(true)
       setTimeout(() => {
-        if (currentStep === 1 && currentQuestion < 5) {
+        // Step 1: 4 questions (therapyType, country, age, gender)
+        if (currentStep === 1 && currentQuestion < 4) {
           setCurrentQuestion(currentQuestion + 1)
-        } else if (currentStep === 2 && currentQuestion < 9) {
+        // Step 2: 2 questions (therapyReasons, preferredLanguages)
+        } else if (currentStep === 2 && currentQuestion < 2) {
           setCurrentQuestion(currentQuestion + 1)
-        } else if (currentStep === 3 && currentQuestion < 3) {
-          setCurrentQuestion(currentQuestion + 1)
-        } else if (currentStep === 4 && currentQuestion < 10) {
-          setCurrentQuestion(currentQuestion + 1)
-        } else if (currentStep === 5 && currentQuestion < 5) {
-          setCurrentQuestion(currentQuestion + 1)
-        } else if (currentStep === 6 && currentQuestion < 4) {
-          setCurrentQuestion(currentQuestion + 1)
+        // Step 3: 1 question (preferredTherapist)
         } else if (currentStep < totalSteps) {
           setCurrentStep(currentStep + 1)
           setCurrentQuestion(1)
@@ -163,11 +128,8 @@ function Questionnaire() {
       } else if (currentStep > 1) {
         setCurrentStep(currentStep - 1)
         // Set to last question of previous step
-        if (currentStep === 2) setCurrentQuestion(5)
-        else if (currentStep === 3) setCurrentQuestion(9)
-        else if (currentStep === 4) setCurrentQuestion(3)
-        else if (currentStep === 5) setCurrentQuestion(10)
-        else if (currentStep === 6) setCurrentQuestion(5)
+        if (currentStep === 2) setCurrentQuestion(4) // Step 1 has 4 questions
+        else if (currentStep === 3) setCurrentQuestion(2) // Step 2 has 2 questions
         else setCurrentQuestion(1)
       }
       setIsAnimating(false)
@@ -176,11 +138,25 @@ function Questionnaire() {
 
   const handleSubmit = async () => {
     try {
+      // Replace "Other" with the actual otherReason text in therapyReasons
+      let finalTherapyReasons = [...formData.therapyReasons]
+      if (finalTherapyReasons.includes("Other") && formData.otherReason.trim()) {
+        finalTherapyReasons = finalTherapyReasons.map(reason =>
+          reason === "Other" ? formData.otherReason.trim() : reason
+        )
+      } else if (finalTherapyReasons.includes("Other")) {
+        // Remove "Other" if no text was provided
+        finalTherapyReasons = finalTherapyReasons.filter(reason => reason !== "Other")
+      }
+
+      // Exclude otherReason from the data sent to server (it's merged into therapyReasons)
+      const { otherReason, ...restFormData } = formData
       const profileData = {
         userId: currentUser.uid,
         userEmail: currentUser.email,
         userName: currentUser.displayName || '',
-        ...formData
+        ...restFormData,
+        therapyReasons: finalTherapyReasons
       }
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/profile`, {
@@ -292,7 +268,7 @@ function Questionnaire() {
         id: country.name,
         label: country.name
       }));
-      
+
       return (
         <DropdownQuestionSelect
           title="What is your country?"
@@ -301,25 +277,10 @@ function Questionnaire() {
           onChange={(value) => handleRadioChange("country", value)}
           onNext={handleNext}
           placeholder="Select your country"
+          banner="This helps us find psychologists who practice in your region."
         />
       )
     } else if (currentQuestion === 3) {
-      return (
-        <RadioQuestion
-          title="What is your relationship status?"
-          options={[
-            { id: 'single', label: 'Single' },
-            { id: 'in-a-relationship', label: 'In a relationship' },
-            { id: 'married', label: 'Married' },
-            { id: 'divorced', label: 'Divorced' },
-            { id: 'widowed', label: 'Widowed' },
-            { id: 'other', label: 'Other' }
-          ]}
-          selectedValue={formData.relationshipStatus}
-          onSelect={(value) => handleAutoNext("relationshipStatus", value)}
-        />
-      )
-    } else if (currentQuestion === 4) {
       return (
         <DropdownQuestionSelect
           title="What is your age?"
@@ -335,406 +296,93 @@ function Questionnaire() {
           onChange={(value) => handleRadioChange("age", value)}
           onNext={handleNext}
           placeholder="Select your age range"
-          banner="Almost a fifth of older adults in the United States have experienced depression."
         />
       )
-    } else if (currentQuestion === 5) {
+    } else if (currentQuestion === 4) {
       return (
         <RadioQuestion
           title="What is your gender identity?"
           options={[
             { id: 'male', label: 'Male' },
             { id: 'female', label: 'Female' },
-            { id: 'non-binary', label: 'Non-binary' },
             { id: 'prefer-not-to-say', label: 'Prefer not to say' }
           ]}
           selectedValue={formData.gender}
           onSelect={(value) => handleAutoNext("gender", value)}
-          banner="Gender plays an important role in shaping personal identity and experiences. This information will help your therapist create a more personalized approach."
         />
       )
     }
   }
 
-  // STEP 2: Religion & Therapy Preferences
+  const allLanguages = useMemo(() => {
+    const langCodes = languages.getAlpha2Codes()
+    const languageList = Object.keys(langCodes).map(code => {
+      return languages.getName(code, "en")
+    }).filter(Boolean).sort()
+    
+    return languageList
+  }, [])
+
+  // STEP 2: What You're Looking For
   const renderStep2 = () => {
     if (currentQuestion === 1) {
       return (
-        <RadioQuestion
-          title="What is your religion?"
-          options={[
-            { id: 'islam', label: 'Islam' },
-            { id: 'christianity', label: 'Christianity' },
-            { id: 'judaism', label: 'Judaism' },
-            { id: 'hinduism', label: 'Hinduism' },
-            { id: 'buddhism', label: 'Buddhism' },
-            { id: 'other', label: 'Other' }
-          ]}
-          selectedValue={formData.religion}
-          onSelect={(value) => handleAutoNext("religion", value)}
-        />
-      )
-    } else if (currentQuestion === 2) {
-      return (
-        <RadioQuestion
-          title="How important is religion in your life?"
-          options={[
-            { id: 'very-important', label: 'Very Important' },
-            { id: 'important', label: 'Important' },
-            { id: 'somewhat-important', label: 'Somewhat Important' },
-            { id: 'not-important', label: 'Not Important' }
-          ]}
-          selectedValue={formData.religionImportance}
-          onSelect={(value) => handleAutoNext("religionImportance", value)}
-          banner="We ask questions about religion so we can match you to a therapist who can empathize with your background."
-        />
-      )
-    } else if (currentQuestion === 3) {
-      return (
-        <RadioQuestion
-          title="Do you consider yourself to be spiritual?"
-          options={[
-            { id: 'yes', label: 'Yes' },
-            { id: 'no', label: 'No' }
-          ]}
-          selectedValue={formData.spiritual}
-          onSelect={(value) => handleAutoNext("spiritual", value)}
-        />
-      )
-    } else if (currentQuestion === 4) {
-      return (
-        <RadioQuestion
-          title="Have you ever been in therapy before?"
-          options={[
-            { id: 'yes', label: 'Yes' },
-            { id: 'no', label: 'No' }
-          ]}
-          selectedValue={formData.therapyHistory}
-          onSelect={(value) => handleAutoNext("therapyHistory", value)}
-          banner="Understanding therapeutic history helps your therapist create a more effective plan."
-        />
-      )
-    } else if (currentQuestion === 5) {
-      return (
         <CheckboxQuestion
-          title="What led you to consider therapy today?"
+          title="What are you seeking help with?"
           options={[
-            "I've been feeling depressed",
-            "I feel anxious or overwhelmed",
-            "My mood is interfering with my job/school performance",
-            "I struggle with building or maintaining relationships",
-            "I can't find purpose and meaning in my life",
-            "I am grieving",
-            "I have experienced trauma",
-            "I need to talk through a specific challenge",
-            "I want to gain self confidence",
-            "I want to improve myself but I don't know where to start",
-            "Recommended to me (friend, family, doctor)",
-            "Just exploring",
+            "Depression",
+            "Anxiety",
+            "Stress Management",
+            "Relationship Issues",
+            "Trauma & PTSD",
+            "Grief & Loss",
+            "Self-Esteem",
+            "Career Counseling",
+            "Family Issues",
+            "Addiction",
+            "Eating Disorders",
             "Other"
           ]}
           selectedValues={formData.therapyReasons}
           onToggle={(option) => handleCheckboxChange("therapyReasons", option)}
           onNext={handleNext}
+          banner="Select all that apply. This helps us match you with psychologists who specialize in these areas."
+          otherOption={true}
+          otherValue={formData.otherReason}
+          onOtherChange={(value) => setFormData(prev => ({ ...prev, otherReason: value }))}
         />
       )
-    } else if (currentQuestion === 6) {
+    } else if (currentQuestion === 2) {
       return (
-        <CheckboxQuestion
-          title="What do you expect from your therapist?"
-          options={[
-            'Listens',
-            'Explores my past',
-            'Teaches me new skills',
-            'Challenges my beliefs',
-            'Assigns me homework',
-            'Guides me to set goals',
-            'Proactively checks in with me',
-            'Other',
-            "I don't know"
-          ]}
-          selectedValues={formData.therapistExpectations}
-          onToggle={(option) => handleCheckboxChange("therapistExpectations", option)}
+        <MultiSelectDropdown
+          title="What languages do you prefer for your sessions?"
+          options={allLanguages}
+          selectedValues={formData.preferredLanguages}
+          onChange={(values) => setFormData(prev => ({ ...prev, preferredLanguages: values }))}
           onNext={handleNext}
-        />
-      )
-    } else if (currentQuestion === 7) {
-      return (
-        <RadioQuestion
-          title="What style of therapy do you prefer?"
-          options={[
-            { id: 'casual', label: 'Casual' },
-            { id: 'somewhat-casual', label: 'Somewhat casual' },
-            { id: 'no-preference', label: 'No preference' },
-            { id: 'somewhat-formal', label: 'Somewhat formal' },
-            { id: 'formal', label: 'Formal' }
-          ]}
-          selectedValue={formData.therapistStyle}
-          onSelect={(value) => handleAutoNext("therapistStyle", value)}
-        />
-      )
-    } else if (currentQuestion === 8) {
-      return (
-        <RadioQuestion
-          title="Would you prefer a therapist who is flexible or structured?"
-          options={[
-            { id: 'flexible', label: 'Flexible' },
-            { id: 'somewhat-flexible', label: 'Somewhat flexible' },
-            { id: 'no-preference', label: 'No preference' },
-            { id: 'somewhat-structured', label: 'Somewhat structured' },
-            { id: 'structured', label: 'Structured' }
-          ]}
-          selectedValue={formData.therapistApproach}
-          onSelect={(value) => handleAutoNext("therapistApproach", value)}
-        />
-      )
-    } else if (currentQuestion === 9) {
-      return (
-        <RadioQuestion
-          title="Would you prefer a therapist who is gentle or direct?"
-          options={[
-            { id: 'gentle', label: 'Gentle' },
-            { id: 'somewhat-gentle', label: 'Somewhat gentle' },
-            { id: 'no-preference', label: 'No preference' },
-            { id: 'somewhat-direct', label: 'Somewhat direct' },
-            { id: 'direct', label: 'Direct' }
-          ]}
-          selectedValue={formData.therapistManner}
-          onSelect={(value) => handleAutoNext("therapistManner", value)}
+          placeholder="Select languages..."
+          searchPlaceholder="Search languages..."
+          banner="Select all languages you're comfortable with. We'll prioritize psychologists who speak your preferred languages."
         />
       )
     }
   }
 
-  // STEP 3: Current State
+  // STEP 3: Preferences
   const renderStep3 = () => {
-    if (currentQuestion === 1) {
-      return (
-        <RadioQuestion
-          title="Are you currently experiencing overwhelming sadness, grief, or depression?"
-          options={[
-            { id: 'yes', label: 'Yes' },
-            { id: 'no', label: 'No' }
-          ]}
-          selectedValue={formData.depression}
-          onSelect={(value) => handleAutoNext("depression", value)}
-          banner="Psychotherapy can serve as an effective treatment for clinical depression."
-        />
-      )
-    } else if (currentQuestion === 2) {
-      return (
-        <RadioQuestion
-          title="How would you rate your current eating habits?"
-          options={[
-            { id: 'good', label: 'Good' },
-            { id: 'fair', label: 'Fair' },
-            { id: 'poor', label: 'Poor' }
-          ]}
-          selectedValue={formData.eatingHabits}
-          onSelect={(value) => handleAutoNext("eatingHabits", value)}
-        />
-      )
-    } else if (currentQuestion === 3) {
-      return (
-        <RadioQuestion
-          title="How would you rate your current physical health?"
-          options={[
-            { id: 'good', label: 'Good' },
-            { id: 'fair', label: 'Fair' },
-            { id: 'poor', label: 'Poor' }
-          ]}
-          selectedValue={formData.physicalHealth}
-          onSelect={(value) => handleAutoNext("physicalHealth", value)}
-          banner="Studies show that exercise can help with depression as effectively as antidepressant medication."
-        />
-      )
-    }
-  }
-
-  // STEP 4: Past 2 Weeks Assessment
-  const renderStep4 = () => {
-    const past2WeeksOptions = [
-      { id: 'not-at-all', label: 'Not at all' },
-      { id: 'several-days', label: 'Several days' },
-      { id: 'more-than-half', label: 'More than half the days' },
-      { id: 'nearly-every-day', label: 'Nearly every day' }
-    ]
-
-    const questions = [
-      { field: "littleInterest", title: "Little interest or pleasure in doing things", banner: "The next few questions will help your therapist understand how you've been feeling and where to begin treatment." },
-      { field: "motorActivity", title: "Moving or speaking so slowly that other people could have noticed? Or the opposite - being so fidgety or restless that you have been moving around a lot more than usual" },
-      { field: "feelingDown", title: "Feeling down, depressed or hopeless" },
-      { field: "troubleSleeping", title: "Trouble falling asleep, staying asleep, or sleeping too much" },
-      { field: "feelingTired", title: "Feeling tired or having little energy" },
-      { field: "poorAppetite", title: "Poor appetite or overeating" },
-      { field: "feelingBad", title: "Feeling bad about yourself - or that you are a failure or have let yourself or your family down" },
-      { field: "troubleConcentrating", title: "Trouble concentrating on things, such as reading the newspaper or watching television" },
-      { field: "thoughtsHurting", title: "Thoughts that you would be better off dead or of hurting yourself in some way" }
-    ]
-
-    if (currentQuestion >= 1 && currentQuestion <= 9) {
-      const currentQ = questions[currentQuestion - 1]
-      return (
-        <RadioQuestion
-          title={currentQ.title}
-          description="Over the past 2 weeks, how often have you been bothered by any of the following problems:"
-          options={past2WeeksOptions}
-          selectedValue={formData[currentQ.field]}
-          onSelect={(value) => handleAutoNext(currentQ.field, value)}
-          banner={currentQ.banner}
-        />
-      )
-    } else if (currentQuestion === 10) {
-      return (
-        <RadioQuestion
-          title="How difficult have these problems made it for you to do your work, take care of things at home, or get along with other people?"
-          description="Over the past 2 weeks, how often have you been bothered by any of the following problems:"
-          options={[
-            { id: 'not-difficult', label: 'Not difficult at all' },
-            { id: 'somewhat-difficult', label: 'Somewhat difficult' },
-            { id: 'very-difficult', label: 'Very difficult' },
-            { id: 'extremely-difficult', label: 'Extremely difficult' }
-          ]}
-          selectedValue={formData.difficultyForWork}
-          onSelect={(value) => handleAutoNext("difficultyForWork", value)}
-        />
-      )
-    }
-  }
-
-  // STEP 5: Additional Health Info
-  const renderStep5 = () => {
-    if (currentQuestion === 1) {
-      return (
-        <RadioQuestion
-          title="What is your current employment status?"
-          options={[
-            { id: 'employed', label: 'Employed' },
-            { id: 'unemployed', label: 'Unemployed' }
-          ]}
-          selectedValue={formData.employmentStatus}
-          onSelect={(value) => handleAutoNext("employmentStatus", value)}
-        />
-      )
-    } else if (currentQuestion === 2) {
-      return (
-        <RadioQuestion
-          title="How often do you consume alcoholic beverages?"
-          options={[
-            { id: 'never', label: 'Never' },
-            { id: 'occasionally', label: 'Occasionally' },
-            { id: 'regularly', label: 'Regularly' },
-            { id: 'frequently', label: 'Frequently' }
-          ]}
-          selectedValue={formData.drinkingHabits}
-          onSelect={(value) => handleAutoNext("drinkingHabits", value)}
-        />
-      )
-    } else if (currentQuestion === 3) {
-      return (
-        <RadioQuestion
-          title="When was the last time you had thoughts of ending your life?"
-          options={[
-            { id: 'never', label: 'Never' },
-            { id: 'more-than-a-year-ago', label: 'More than a year ago' },
-            { id: 'over-3-months-ago', label: 'Over 3 months ago' },
-            { id: 'over-a-month-ago', label: 'Over a month ago' },
-            { id: 'over-2-weeks-ago', label: 'Over 2 weeks ago' },
-            { id: 'within-2-weeks', label: 'Within the last 2 weeks' }
-          ]}
-          selectedValue={formData.suicidalThoughts}
-          onSelect={(value) => handleAutoNext("suicidalThoughts", value)}
-        />
-      )
-    } else if (currentQuestion === 4) {
-      return (
-        <RadioQuestion
-          title="Are you currently experiencing anxiety, panic attacks or have any phobias?"
-          options={[
-            { id: 'yes', label: 'Yes' },
-            { id: 'no', label: 'No' }
-          ]}
-          selectedValue={formData.panicAttacks}
-          onSelect={(value) => handleAutoNext("panicAttacks", value)}
-          banner="Some symptoms of panic attacks include a racing heart, dizziness, or chest pains."
-        />
-      )
-    } else if (currentQuestion === 5) {
-      return (
-        <RadioQuestion
-          title="Are you currently taking any medication for mental health issues?"
-          options={[
-            { id: 'yes', label: 'Yes' },
-            { id: 'no', label: 'No' }
-          ]}
-          selectedValue={formData.medication}
-          onSelect={(value) => handleAutoNext("medication", value)}
-        />
-      )
-    }
-  }
-
-  // STEP 6: Preferences & Resources
-  const renderStep6 = () => {
-    if (currentQuestion === 1) {
-      return (
-        <RadioQuestion
-          title="How would you describe your current financial situation?"
-          options={[
-            { id: 'stable', label: 'Stable' },
-            { id: 'somewhat-stable', label: 'Somewhat Stable' },
-            { id: 'unstable', label: 'Unstable' }
-          ]}
-          selectedValue={formData.financialStatus}
-          onSelect={(value) => handleAutoNext("financialStatus", value)}
-        />
-      )
-    } else if (currentQuestion === 2) {
-      return (
-        <CheckboxQuestion
-          title="Which resources would be most useful to you?"
-          options={[
-            "Support Groups",
-            "Therapy journals",
-            "Worksheets",
-            "Goal/habit tracking",
-            "Others",
-            "I don't know"
-          ]}
-          selectedValues={formData.usefulResources}
-          onToggle={(option) => handleCheckboxChange("usefulResources", option)}
-          onNext={handleNext}
-        />
-      )
-    } else if (currentQuestion === 3) {
-      return (
-        <RadioQuestion
-          title="How would you prefer to communicate with your therapist?"
-          options={[
-            { id: 'mostly-text', label: 'Mostly text-based (chat, email)' },
-            { id: 'video-calls', label: 'Video calls' },
-            { id: 'in-person', label: 'In-person sessions' }
-          ]}
-          selectedValue={formData.communicateTherapist}
-          onSelect={(value) => handleAutoNext("communicateTherapist", value)}
-          banner="Different communication methods work better for different people. Choose what feels most comfortable for you."
-        />
-      )
-    } else if (currentQuestion === 4) {
-      return (
-        <RadioQuestion
-          title="Do you have a preference for your therapist's gender?"
-          options={[
-            { id: 'male-therapist', label: 'Male therapist' },
-            { id: 'female-therapist', label: 'Female therapist' },
-            { id: 'no-preference', label: 'No preference' }
-          ]}
-          selectedValue={formData.preferredTherapist}
-          onSelect={(value) => handleRadioChange("preferredTherapist", value)}
-          banner="Some people feel more comfortable with a therapist of a specific gender. There's no right or wrong answer."
-        />
-      )
-    }
+    return (
+      <RadioQuestion
+        title="Do you have a preference for your therapist's gender?"
+        options={[
+          { id: 'male', label: 'Male therapist' },
+          { id: 'female', label: 'Female therapist' },
+          { id: 'no-preference', label: 'No preference' }
+        ]}
+        selectedValue={formData.preferredTherapist}
+        onSelect={(value) => handleRadioChange("preferredTherapist", value)}
+        banner="Some people feel more comfortable with a therapist of a specific gender. There's no right or wrong answer."
+      />
+    )
   }
 
   // Show loading state
@@ -893,24 +541,21 @@ function Questionnaire() {
           </button>
         )}
 
-        <div 
+        <div
           className={`transition-all duration-300 ${
-            isAnimating 
-              ? 'opacity-0 translate-y-4' 
+            isAnimating
+              ? 'opacity-0 translate-y-4'
               : 'opacity-100 translate-y-0'
           }`}
         >
           {currentStep === 1 && renderStep1()}
           {currentStep === 2 && renderStep2()}
           {currentStep === 3 && renderStep3()}
-          {currentStep === 4 && renderStep4()}
-          {currentStep === 5 && renderStep5()}
-          {currentStep === 6 && renderStep6()}
         </div>
 
         {/* Navigation Buttons */}
         <div className="mt-8 mb-14 flex justify-end ">
-          {currentStep === totalSteps && currentQuestion === 4 ? (
+          {currentStep === totalSteps && currentQuestion === 1 ? (
             <Button
               onClick={handleSubmit}
               className="px-8 bg-teal-800 hover:bg-teal-900"

@@ -71,13 +71,13 @@ const Features = () => {
             iconBg: 'bg-blue-500',
             cardBg: 'bg-blue-50',
         },
-        {
-            icon: <MessageIcon />,
-            title: 'Progress Tracking',
-            description: 'Monitor your mental health journey with detailed progress reports and insights.',
-            iconBg: 'bg-emerald-500',
-            cardBg: 'bg-emerald-50',
-        },
+        // {
+        //     icon: <MessageIcon />,
+        //     title: 'Progress Tracking',
+        //     description: 'Monitor your mental health journey with detailed progress reports and insights.',
+        //     iconBg: 'bg-emerald-500',
+        //     cardBg: 'bg-emerald-50',
+        // },
         {
             icon: <CalendarIcon />,
             title: 'Flexible Scheduling',
@@ -99,27 +99,27 @@ const Features = () => {
             iconBg: 'bg-rose-500',
             cardBg: 'bg-rose-50',
         },
-        {
-            icon: <ShieldIcon />,
-            title: 'Complete Privacy',
-            description: 'HIPAA compliant platform with end-to-end encryption for your peace of mind.',
-            iconBg: 'bg-slate-600',
-            cardBg: 'bg-slate-50',
-        },
-        {
-            icon: <ClockIcon />,
-            title: '24/7 Support',
-            description: 'Access resources and emergency support whenever you need it most.',
-            iconBg: 'bg-indigo-500',
-            cardBg: 'bg-indigo-50',
-        },
-        {
-            icon: <SmartphoneIcon />,
-            title: 'Mobile App',
-            description: 'Take your therapy journey anywhere with our iOS and Android apps.',
-            iconBg: 'bg-teal-500',
-            cardBg: 'bg-teal-50',
-        },
+        // {
+        //     icon: <ShieldIcon />,
+        //     title: 'Complete Privacy',
+        //     description: 'HIPAA compliant platform with end-to-end encryption for your peace of mind.',
+        //     iconBg: 'bg-slate-600',
+        //     cardBg: 'bg-slate-50',
+        // },
+        // {
+        //     icon: <ClockIcon />,
+        //     title: '24/7 Support',
+        //     description: 'Access resources and emergency support whenever you need it most.',
+        //     iconBg: 'bg-indigo-500',
+        //     cardBg: 'bg-indigo-50',
+        // },
+        // {
+        //     icon: <SmartphoneIcon />,
+        //     title: 'Mobile App',
+        //     description: 'Take your therapy journey anywhere with our iOS and Android apps.',
+        //     iconBg: 'bg-teal-500',
+        //     cardBg: 'bg-teal-50',
+        // },
     ];
 
     return (

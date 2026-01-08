@@ -11,6 +11,7 @@ import Layout from './layout/Layout';
 import RadioQuestion from './Questionaire/RadioQuestion';
 import DropdownQuestionSelect from './Questionaire/DropdownQuestionSelect';
 import CheckboxQuestion from './Questionaire/CheckboxQuestion';
+import MultiSelectDropdown from './Questionaire/MultiSelectDropdown';
 import Footer from './layout/Footer';
 import Header from './layout/Header';
 // Legacy Landing Page Components
@@ -72,6 +73,7 @@ export {
   RadioQuestion,
   DropdownQuestionSelect,
   CheckboxQuestion,
+  MultiSelectDropdown,
   Footer,
   Header,
   // Legacy Landing Page Components
