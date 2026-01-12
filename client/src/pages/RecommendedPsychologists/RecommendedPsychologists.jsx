@@ -17,6 +17,15 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination"
 import BookingModal from "@/components/BookingModal"
 import { PsychologistsIcon, CalendarIcon } from "@/components/icons/DuoTuneIcons"
 
@@ -127,6 +136,10 @@ function RecommendedPsychologists() {
   const [favorites, setFavorites] = useState([])
   const [hasProfile, setHasProfile] = useState(false)
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 15
+
   // Booking modal state
   const [showBooking, setShowBooking] = useState(false)
   const [selectedPsychologist, setSelectedPsychologist] = useState(null)
@@ -205,7 +218,53 @@ function RecommendedPsychologists() {
     filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0))
 
     setFilteredPsychologists(filtered)
+    setCurrentPage(1) // Reset to first page when search changes
   }, [searchTerm, psychologists])
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredPsychologists.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedPsychologists = filteredPsychologists.slice(startIndex, endIndex)
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const getPageNumbers = () => {
+    const pages = []
+    const maxVisiblePages = 5
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i)
+        }
+        pages.push('ellipsis')
+        pages.push(totalPages)
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1)
+        pages.push('ellipsis')
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i)
+        }
+      } else {
+        pages.push(1)
+        pages.push('ellipsis')
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i)
+        }
+        pages.push('ellipsis')
+        pages.push(totalPages)
+      }
+    }
+    return pages
+  }
 
   const viewProfile = (psychologist) => {
     navigate(`/psychologist/${psychologist._id}`, { state: { psychologist } })
@@ -399,16 +458,60 @@ function RecommendedPsychologists() {
 
         {/* Psychologists Grid */}
         {filteredPsychologists.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPsychologists.map((psychologist) => (
-              <RecommendedPsychologistCard
-                key={psychologist._id}
-                psychologist={psychologist}
-                onViewProfile={viewProfile}
-                onBookSession={bookSession}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {paginatedPsychologists.map((psychologist) => (
+                <RecommendedPsychologistCard
+                  key={psychologist._id}
+                  psychologist={psychologist}
+                  onViewProfile={viewProfile}
+                  onBookSession={bookSession}
+                />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex flex-col items-center gap-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    
+                    {getPageNumbers().map((page, index) => (
+                      <PaginationItem key={index}>
+                        {page === 'ellipsis' ? (
+                          <PaginationEllipsis />
+                        ) : (
+                          <PaginationLink
+                            onClick={() => handlePageChange(page)}
+                            isActive={currentPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        )}
+                      </PaginationItem>
+                    ))}
+                    
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+                <p className="text-sm text-gray-500">
+                  Showing {startIndex + 1}-{Math.min(endIndex, filteredPsychologists.length)} of {filteredPsychologists.length} psychologists
+                </p>
+              </div>
+            )}
+          </>
         ) : (
           <div className="text-center py-16">
             <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">

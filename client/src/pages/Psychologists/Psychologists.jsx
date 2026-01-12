@@ -33,6 +33,15 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+  PaginationEllipsis,
+} from "@/components/ui/pagination"
 import BookingModal from "@/components/BookingModal"
 import { PsychologistsIcon } from "@/components/icons/DuoTuneIcons"
 
@@ -56,6 +65,10 @@ function Psychologists() {
     availability: ""
   })
   const [activeFilterCount, setActiveFilterCount] = useState(0)
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 15
 
   // Booking modal state
   const [showBooking, setShowBooking] = useState(false)
@@ -164,7 +177,53 @@ function Psychologists() {
     }
 
     setFilteredPsychologists(filtered)
+    setCurrentPage(1)
   }, [searchTerm, filters, psychologists, sortBy, showFavoritesOnly, favorites])
+
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredPsychologists.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedPsychologists = filteredPsychologists.slice(startIndex, endIndex)
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const getPageNumbers = () => {
+    const pages = []
+    const maxVisiblePages = 5
+    
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i)
+      }
+    } else {
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) {
+          pages.push(i)
+        }
+        pages.push('ellipsis')
+        pages.push(totalPages)
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1)
+        pages.push('ellipsis')
+        for (let i = totalPages - 3; i <= totalPages; i++) {
+          pages.push(i)
+        }
+      } else {
+        pages.push(1)
+        pages.push('ellipsis')
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i)
+        }
+        pages.push('ellipsis')
+        pages.push(totalPages)
+      }
+    }
+    return pages
+  }
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -528,22 +587,66 @@ function Psychologists() {
 
         {/* Psychologists Grid/List */}
         {filteredPsychologists.length > 0 ? (
-          <div className={`grid gap-4 sm:gap-6 ${viewMode === "grid"
-            ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-            : 'grid-cols-1'
-            }`}>
-            {filteredPsychologists.map((psychologist) => (
-              <PsychologistCard
-                key={psychologist.id}
-                psychologist={psychologist}
-                onViewProfile={viewProfile}
-                onBookSession={bookSession}
-                isFavorite={favorites.includes(psychologist._id)}
-                onToggleFavorite={currentUser ? handleToggleFavorite : null}
-                viewMode={viewMode}
-              />
-            ))}
-          </div>
+          <>
+            <div className={`grid gap-4 sm:gap-6 ${viewMode === "grid"
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              : 'grid-cols-1'
+              }`}>
+              {paginatedPsychologists.map((psychologist) => (
+                <PsychologistCard
+                  key={psychologist.id}
+                  psychologist={psychologist}
+                  onViewProfile={viewProfile}
+                  onBookSession={bookSession}
+                  isFavorite={favorites.includes(psychologist._id)}
+                  onToggleFavorite={currentUser ? handleToggleFavorite : null}
+                  viewMode={viewMode}
+                />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-8 flex flex-col items-center gap-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    
+                    {getPageNumbers().map((page, index) => (
+                      <PaginationItem key={index}>
+                        {page === 'ellipsis' ? (
+                          <PaginationEllipsis />
+                        ) : (
+                          <PaginationLink
+                            onClick={() => handlePageChange(page)}
+                            isActive={currentPage === page}
+                            className="cursor-pointer"
+                          >
+                            {page}
+                          </PaginationLink>
+                        )}
+                      </PaginationItem>
+                    ))}
+                    
+                    <PaginationItem>
+                      <PaginationNext
+                        onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+                <p className="text-sm text-gray-500">
+                  Showing {startIndex + 1}-{Math.min(endIndex, filteredPsychologists.length)} of {filteredPsychologists.length} professionals
+                </p>
+              </div>
+            )}
+          </>
         ) : (
           /* No Results */
           <Card className="border-none shadow-none bg-lightGray select-none">
