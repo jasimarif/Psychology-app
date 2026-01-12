@@ -118,7 +118,10 @@ const NewHero = () => {
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </span>
                         </button>
-                        <button className="group flex items-center gap-3 px-6 py-4 text-white/90 font-medium rounded-2xl hover:bg-white/10 transition-all duration-300">
+                        <button
+                            onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
+                            className="group flex items-center gap-3 px-6 py-4 text-white/90 font-medium rounded-2xl hover:bg-white/10 transition-all duration-300"
+                        >
                             <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform cursor-pointer select-none">
                                 <Play className="w-5 h-5 text-white fill-white ml-1" />
                             </div>

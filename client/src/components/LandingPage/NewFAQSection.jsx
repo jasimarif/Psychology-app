@@ -78,9 +78,12 @@ const NewFAQSection = () => {
                 {/* Contact CTA */}
                 <div className="mt-16 text-center">
                     <p className="text-gray-600 mb-4">Still have questions?</p>
-                    <button className="inline-flex items-center gap-2 px-6 py-3 bg-customGreen text-white font-semibold rounded-xl hover:bg-customGreenHover cursor-pointer select-none transition-colors">
+                    <a
+                        href="mailto:psychapp@google.com"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-customGreen text-white font-semibold rounded-xl hover:bg-customGreenHover cursor-pointer select-none transition-colors"
+                    >
                         Contact Support
-                    </button>
+                    </a>
                 </div>
             </div>
         </section>

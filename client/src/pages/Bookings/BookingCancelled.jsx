@@ -128,12 +128,12 @@ const BookingCancelled = () => {
           <div className="border-t border-gray-200 pt-4">
             <p className="text-center text-sm text-gray-600">
               Need help?{" "}
-              <button
-                onClick={() => navigate("/dashboard")}
+              <a
+                href="mailto:psychapp@google.com"
                 className="text-customGreen hover:underline font-medium"
               >
                 Contact Support
-              </button>
+              </a>
             </p>
           </div>
         </CardContent>

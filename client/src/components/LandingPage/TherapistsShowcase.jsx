@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { Star, Award, GraduationCap, Clock, ArrowRight } from 'lucide-react';
 
 const TherapistsShowcase = () => {
     const [headerRef, headerVisible] = useScrollAnimation({ threshold: 0.2 });
+    const navigate = useNavigate();
 
     const therapists = [
         {
@@ -72,7 +74,10 @@ const TherapistsShowcase = () => {
                         </p>
                     </div>
                     
-                    <button className="group flex items-center gap-2 text-customGreen hover:text-customGreenHover cursor-pointer select-none transition-colors">
+                    <button
+                        onClick={() => navigate('/login')}
+                        className="group flex items-center gap-2 text-customGreen hover:text-customGreenHover cursor-pointer select-none transition-colors"
+                    >
                         View All Therapists
                         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </button>
@@ -93,6 +98,7 @@ const TherapistsShowcase = () => {
 
 const TherapistCard = ({ therapist, index }) => {
     const [ref, isVisible] = useScrollAnimation({ threshold: 0.1 });
+    const navigate = useNavigate();
 
     return (
         <div
@@ -154,13 +160,16 @@ const TherapistCard = ({ therapist, index }) => {
 
             {/* Hover CTA */}
             <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-white via-white to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                <button className="w-full py-3 cursor-pointer select-none bg-customGreen to-teal-500 text-white font-semibold rounded-xl hover:shadow-lg transition-shadow">
+                <button
+                    onClick={() => navigate('/login')}
+                    className="w-full py-3 cursor-pointer select-none bg-customGreen to-teal-500 text-white font-semibold rounded-xl hover:shadow-lg transition-shadow"
+                >
                     Book Session
                 </button>
             </div>
         </div>
     );
 };
-;
+
 
 export default TherapistsShowcase;

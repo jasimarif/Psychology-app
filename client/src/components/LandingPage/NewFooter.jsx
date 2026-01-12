@@ -14,18 +14,16 @@ const NewFooter = () => {
 
     const footerLinks = {
         services: [
-            { name: 'Individual Therapy', href: '/services/individual' },
-            { name: 'Couples Therapy', href: '/services/couples' },
-            { name: 'Teen Therapy', href: '/services/teens' },
-            { name: 'Psychiatry', href: '/services/psychiatry' },
-            { name: 'Group Sessions', href: '/services/group' },
+            { name: 'Individual Therapy', href: '/login' },
+            { name: 'Couples Therapy', href: '/login' },
+            { name: 'Teen Therapy', href: '/login' },
+            { name: 'Psychiatry', href: '/login' },
+            { name: 'Group Sessions', href: '/login' },
         ],
         company: [
             { name: 'About Us', href: '/about' },
-            { name: 'Careers', href: '/careers' },
-            { name: 'Press', href: '/press' },
-            { name: 'Research', href: '/research' },
-            { name: 'Reviews', href: '/reviews' },
+            { name: 'Research', href: '/' },
+            { name: 'Reviews', href: '/' },
         ],
         resources: [
             { name: 'Help Center', href: '/help' },
@@ -97,7 +95,7 @@ const NewFooter = () => {
                         <div className="space-y-3 text-sm text-white">
                             <div className="flex items-center gap-3">
                                 <Mail className="w-4 h-4 text-white" />
-                                <span>support@mindfulpath.com</span>
+                                <span>psychapp@gmail.com</span>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Phone className="w-4 h-4 text-white" />
@@ -105,7 +103,7 @@ const NewFooter = () => {
                             </div>
                             <div className="flex items-center gap-3">
                                 <MapPin className="w-4 h-4 text-white" />
-                                <span>San Francisco, CA</span>
+                                <span>Toronto, ON</span>
                             </div>
                         </div>
                     </div>
@@ -153,7 +151,7 @@ const NewFooter = () => {
                     </div>
 
                     {/* Legal */}
-                    <div>
+                    {/* <div>
                         <h4 className="text-lg font-semibold mb-4">Legal</h4>
                         <ul className="space-y-3">
                             {footerLinks.legal.map((link, index) => (
@@ -164,7 +162,7 @@ const NewFooter = () => {
                                 </li>
                             ))}
                         </ul>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
