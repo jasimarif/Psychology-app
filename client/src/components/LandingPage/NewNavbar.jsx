@@ -33,10 +33,10 @@ const NewNavbar = () => {
         {
             label: 'Services',
             items: [
-                { name: 'Individual Therapy', href: '/' },
-                { name: 'Couples Therapy', href: '/' },
-                { name: 'Teen Therapy', href: '/' },
-                { name: 'Psychiatry', href: '/' },
+                { name: 'Individual Therapy', href: '/login' },
+                { name: 'Couples Therapy', href: '/login' },
+                { name: 'Teen Therapy', href: '/login' },
+                { name: 'Psychiatry', href: '/login' },
             ]
         },
         {
