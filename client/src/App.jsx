@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import {Login, Signup, ForgotPassword, LandingPage, Dashboard, Questionnaire, Profile, Psychologists, PsychologistProfile, MyBookings, RecommendedPsychologists, NotFound} from "./pages";
+import VerifyEmail from "./pages/Auth/VerifyEmail";
 import BookingSuccess from "./pages/Bookings/BookingSuccess";
 import BookingCancelled from "./pages/Bookings/BookingCancelled";
 import { AuthProvider } from "./context/AuthContext";
@@ -32,6 +33,7 @@ function App() {
         <Route path="/booking-cancelled" element={<ProtectedRoute><Layout><BookingCancelled /></Layout></ProtectedRoute>} />
         <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="/signup" element={<PublicRoute><Signup /></PublicRoute>} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>

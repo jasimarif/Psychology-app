@@ -8,7 +8,8 @@ import {
   signInWithPopup,
   updateProfile,
   onAuthStateChanged,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendEmailVerification
 } from 'firebase/auth';
 
 
@@ -53,9 +54,23 @@ export const registerWithEmailAndPassword = async (email, password, name) => {
     await updateProfile(userCredential.user, {
       displayName: name
     });
+    // Send email verification
+    await sendEmailVerification(userCredential.user);
     return { user: userCredential.user, error: null };
   } catch (error) {
     return { user: null, error: getFirebaseErrorMessage(error.code) };
+  }
+};
+
+export const resendVerificationEmail = async () => {
+  try {
+    if (auth.currentUser) {
+      await sendEmailVerification(auth.currentUser);
+      return { error: null };
+    }
+    return { error: 'No user is currently signed in.' };
+  } catch (error) {
+    return { error: getFirebaseErrorMessage(error.code) };
   }
 };
 

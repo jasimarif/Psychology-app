@@ -49,8 +49,8 @@ function Signup() {
       return
     }
 
-    if (formData.password.length < 6) {
-      setError("Password should be at least 6 characters long")
+    if (formData.password.length < 8) {
+      setError("Password should be at least 8 characters long")
       return
     }
 
@@ -67,7 +67,8 @@ function Signup() {
       setLoading(false)
     } else {
       console.log("Signup successful:", user)
-      navigate("/dashboard")
+      // Redirect to email verification page
+      navigate("/verify-email")
     }
   }
 
@@ -82,6 +83,7 @@ function Signup() {
       setLoading(false)
     } else {
       console.log("Google sign-in successful:", user)
+      // Google accounts are already verified, go directly to dashboard
       navigate("/dashboard")
     }
   }

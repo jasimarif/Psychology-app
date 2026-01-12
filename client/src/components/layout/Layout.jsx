@@ -75,35 +75,31 @@ const Layout = ({ children }) => {
               </Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          {pathnames.length === 0 || (pathnames.length === 1 && pathnames[0] === 'dashboard') ? (
-             <BreadcrumbItem className="select-none">
-               <BreadcrumbPage>Default</BreadcrumbPage>
-             </BreadcrumbItem>
-          ) : (
-            pathnames.map((value, index) => {
-              if (value === 'dashboard' && index === 0) return null;
-
-              const to = getLink(value, index);
-              const isLast = index === pathnames.length - 1;
-              const label = getLabel(value, index);
-
-              return (
-                <React.Fragment key={to + index}>
-                  <BreadcrumbItem>
-                    {isLast ? (
-                      <BreadcrumbPage>{label}</BreadcrumbPage>
-                    ) : (
-                      <BreadcrumbLink asChild>
-                        <Link to={to}>{label}</Link>
-                      </BreadcrumbLink>
-                    )}
-                  </BreadcrumbItem>
-                  {!isLast && <BreadcrumbSeparator />}
-                </React.Fragment>
-              );
-            })
+          {pathnames.length > 0 && pathnames[0] !== 'dashboard' && (
+            <BreadcrumbSeparator />
           )}
+          {pathnames.map((value, index) => {
+            if (value === 'dashboard') return null;
+
+            const to = getLink(value, index);
+            const isLast = index === pathnames.length - 1;
+            const label = getLabel(value, index);
+
+            return (
+              <React.Fragment key={to + index}>
+                <BreadcrumbItem>
+                  {isLast ? (
+                    <BreadcrumbPage>{label}</BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <Link to={to}>{label}</Link>
+                    </BreadcrumbLink>
+                  )}
+                </BreadcrumbItem>
+                {!isLast && <BreadcrumbSeparator />}
+              </React.Fragment>
+            );
+          })}
         </BreadcrumbList>
       </Breadcrumb>
     );
@@ -162,12 +158,12 @@ const Layout = ({ children }) => {
 
           {/* Right: Actions & Profile */}
           <div className="flex items-center gap-2 sm:gap-4 select-none">
-            <button className="p-2 text-gray-500 hover:bg-white rounded-lg transition-colors hidden sm:block">
+            {/* <button className="p-2 text-gray-500 hover:bg-white rounded-lg transition-colors hidden sm:block">
               <BellIcon className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
             <button className="p-2 text-gray-500 hover:bg-white rounded-lg transition-colors hidden sm:block">
               <FileIcon className="h-5 w-5 sm:h-6 sm:w-6" />
-            </button>
+            </button> */}
 
             <div className="flex items-center gap-2 sm:gap-3 sm:pl-2 sm:border-l sm:border-gray-200">
               <div className="text-right hidden md:block">
