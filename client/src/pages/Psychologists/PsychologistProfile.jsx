@@ -213,6 +213,11 @@ const PsychologistProfile = () => {
                 <LocationIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-customGray" />
                 <span>{psychologist.location}</span>
               </div>
+              {psychologist.gender && (
+                <div className="flex items-center gap-1 sm:gap-1.5">
+                  <span className="capitalize">{psychologist.gender}</span>
+                </div>
+              )}
               {psychologist.languages && psychologist.languages.length > 0 && (
                 <div className="flex items-center gap-1 sm:gap-1.5">
                   <GlobeIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-customGray" />

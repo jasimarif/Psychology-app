@@ -91,25 +91,19 @@ const calculateMatchScore = (userProfile, psychologist) => {
 
   // 4. THERAPIST GENDER PREFERENCE (10 points max)
   const genderPref = userProfile.preferredTherapist || 'no-preference';
+  const psychGender = (psychologist.gender || '').toLowerCase();
 
   if (genderPref === 'no-preference') {
     breakdown.genderPreferenceScore = 10;
+  } else if (!psychGender) {
+    // Psychologist hasn't set their gender
+    breakdown.genderPreferenceScore = 5;
+  } else if (genderPref === psychGender) {
+    // Exact match
+    breakdown.genderPreferenceScore = 10;
   } else {
-    const psychName = (psychologist.name || '').toLowerCase();
-    const psychTitle = (psychologist.title || '').toLowerCase();
-
-    // Common titles that indicate gender
-    const isFemale = psychTitle.includes('ms.') || psychTitle.includes('mrs.') ||
-                     psychTitle.includes('miss') || psychName.includes('dr. ') === false;
-    const isMale = psychTitle.includes('mr.');
-
-    if (!isFemale && !isMale) {
-      breakdown.genderPreferenceScore = 7;
-    } else if ((genderPref === 'female' && isFemale) || (genderPref === 'male' && isMale)) {
-      breakdown.genderPreferenceScore = 10;
-    } else {
-      breakdown.genderPreferenceScore = 3;
-    }
+    // Gender doesn't match preference
+    breakdown.genderPreferenceScore = 2;
   }
   totalScore += breakdown.genderPreferenceScore;
 
