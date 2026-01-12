@@ -26,11 +26,10 @@ const NewFooter = () => {
             { name: 'Reviews', href: '/' },
         ],
         resources: [
-            { name: 'Help Center', href: '/help' },
-            { name: 'Blog', href: '/blog' },
-            { name: 'Mental Health Tests', href: '/tests' },
-            { name: 'Therapist Directory', href: '/therapists' },
-            { name: 'Crisis Resources', href: '/crisis' },
+            { name: 'Mental Health Info', href: 'https://www.nimh.nih.gov/health', external: true },
+            { name: 'Anxiety Resources', href: 'https://adaa.org/understanding-anxiety', external: true },
+            // { name: 'Depression Help', href: 'https://www.helpguide.org/articles/depression/coping-with-depression.htm', external: true },
+            { name: 'Crisis Lifeline', href: 'https://988lifeline.org/', external: true },
         ],
         legal: [
             { name: 'Privacy Policy', href: '/privacy' },
@@ -142,9 +141,14 @@ const NewFooter = () => {
                         <ul className="space-y-3">
                             {footerLinks.resources.map((link, index) => (
                                 <li key={index}>
-                                    <Link to={link.href} className="text-white hover:text-gray-200 transition-colors text-sm">
+                                    <a
+                                        href={link.href}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-white hover:text-gray-200 transition-colors text-sm"
+                                    >
                                         {link.name}
-                                    </Link>
+                                    </a>
                                 </li>
                             ))}
                         </ul>

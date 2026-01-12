@@ -10,5 +10,6 @@ import PsychologistProfile from "./Psychologists/PsychologistProfile";
 import MyBookings from "./Bookings/MyBookings";
 import RecommendedPsychologists from "./RecommendedPsychologists/RecommendedPsychologists";
 import NotFound from "./NotFound";
+import AboutUs from "./About/AboutUs";
 
-export { Login, Signup, ForgotPassword, LandingPage, Dashboard, Questionnaire, Profile, Psychologists, PsychologistProfile, MyBookings, RecommendedPsychologists, NotFound };
+export { Login, Signup, ForgotPassword, LandingPage, Dashboard, Questionnaire, Profile, Psychologists, PsychologistProfile, MyBookings, RecommendedPsychologists, NotFound, AboutUs };
