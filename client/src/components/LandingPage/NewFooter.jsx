@@ -2,14 +2,192 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, MapPin, Phone, ArrowRight, Heart } from 'lucide-react';
 import { BriefcaseIcon } from '@/components/icons/DuoTuneIcons';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
 
 const NewFooter = () => {
     const [email, setEmail] = useState('');
+    const [activeModal, setActiveModal] = useState(null);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log('Newsletter signup:', email);
         setEmail('');
+    };
+
+    const legalContent = {
+        privacy: {
+            title: 'Privacy Policy',
+            content: (
+                <div className="space-y-4 text-gray-600">
+                    <p className="text-sm text-gray-500">Last updated: January 12, 2026</p>
+                    
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">1. Information We Collect</h3>
+                        <p>We collect information you provide directly to us, such as when you create an account, book a session, or contact us for support. This includes:</p>
+                        <ul className="list-disc pl-5 mt-2 space-y-1">
+                            <li>Name, email address, and contact information</li>
+                            <li>Health and wellness information you choose to share</li>
+                            <li>Payment and billing information</li>
+                            <li>Communications with therapists</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">2. How We Use Your Information</h3>
+                        <p>We use the information we collect to:</p>
+                        <ul className="list-disc pl-5 mt-2 space-y-1">
+                            <li>Provide, maintain, and improve our services</li>
+                            <li>Match you with appropriate mental health professionals</li>
+                            <li>Process transactions and send related information</li>
+                            <li>Send you technical notices and support messages</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">3. Data Security</h3>
+                        <p>We implement appropriate security measures to protect your personal information. All therapy sessions are encrypted end-to-end, and we comply with HIPAA regulations for handling health information.</p>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">4. Your Rights</h3>
+                        <p>You have the right to access, correct, or delete your personal information. You may also opt out of marketing communications at any time.</p>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">5. Contact Us</h3>
+                        <p>If you have questions about this Privacy Policy, please contact us at psychapp@gmail.com.</p>
+                    </section>
+                </div>
+            )
+        },
+        terms: {
+            title: 'Terms of Service',
+            content: (
+                <div className="space-y-4 text-gray-600">
+                    <p className="text-sm text-gray-500">Last updated: January 12, 2026</p>
+                    
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">1. Acceptance of Terms</h3>
+                        <p>By accessing or using PsychApp, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our services.</p>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">2. Description of Service</h3>
+                        <p>PsychApp provides an online platform connecting users with licensed mental health professionals. Our services include:</p>
+                        <ul className="list-disc pl-5 mt-2 space-y-1">
+                            <li>Online therapy sessions via video, voice, or messaging</li>
+                            <li>Appointment scheduling and management</li>
+                            <li>Secure communication tools</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">3. User Responsibilities</h3>
+                        <p>You agree to:</p>
+                        <ul className="list-disc pl-5 mt-2 space-y-1">
+                            <li>Provide accurate and complete information</li>
+                            <li>Maintain the confidentiality of your account</li>
+                            <li>Use the service only for lawful purposes</li>
+                            <li>Respect the privacy and rights of therapists</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">4. Payment Terms</h3>
+                        <p>Session fees are charged at the time of booking. Cancellations made less than 24 hours before a scheduled session may be subject to a cancellation fee.</p>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">5. Limitation of Liability</h3>
+                        <p>PsychApp is not a substitute for emergency mental health services. If you are in crisis, please contact emergency services or a crisis hotline immediately.</p>
+                    </section>
+                </div>
+            )
+        },
+        accessibility: {
+            title: 'Accessibility Statement',
+            content: (
+                <div className="space-y-4 text-gray-600">
+                    <p className="text-sm text-gray-500">Last updated: January 12, 2026</p>
+                    
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">Our Commitment</h3>
+                        <p>PsychApp is committed to ensuring digital accessibility for people with disabilities. We are continually improving the user experience for everyone and applying the relevant accessibility standards.</p>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">Conformance Status</h3>
+                        <p>We aim to conform to the Web Content Accessibility Guidelines (WCAG) 2.1 at Level AA. These guidelines help make web content more accessible to people with disabilities.</p>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">Accessibility Features</h3>
+                        <ul className="list-disc pl-5 mt-2 space-y-1">
+                            <li>Keyboard navigation support</li>
+                            <li>Screen reader compatibility</li>
+                            <li>High contrast color options</li>
+                            <li>Resizable text without loss of functionality</li>
+                            <li>Alternative text for images</li>
+                            <li>Clear and consistent navigation</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">Feedback</h3>
+                        <p>We welcome your feedback on the accessibility of PsychApp. Please let us know if you encounter any barriers:</p>
+                        <ul className="list-disc pl-5 mt-2 space-y-1">
+                            <li>Email: psychapp@gmail.com</li>
+                            <li>Phone: 1-800-THERAPY</li>
+                        </ul>
+                    </section>
+                </div>
+            )
+        },
+        cookies: {
+            title: 'Cookie Policy',
+            content: (
+                <div className="space-y-4 text-gray-600">
+                    <p className="text-sm text-gray-500">Last updated: January 12, 2026</p>
+                    
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">What Are Cookies?</h3>
+                        <p>Cookies are small text files stored on your device when you visit a website. They help websites remember your preferences and improve your browsing experience.</p>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">How We Use Cookies</h3>
+                        <p>We use cookies for the following purposes:</p>
+                        <ul className="list-disc pl-5 mt-2 space-y-1">
+                            <li><strong>Essential Cookies:</strong> Required for the website to function properly</li>
+                            <li><strong>Authentication:</strong> To keep you signed in to your account</li>
+                            <li><strong>Preferences:</strong> To remember your settings and preferences</li>
+                            <li><strong>Analytics:</strong> To understand how visitors use our website</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">Managing Cookies</h3>
+                        <p>You can control and manage cookies through your browser settings. Please note that disabling certain cookies may affect the functionality of our website.</p>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">Third-Party Cookies</h3>
+                        <p>Some cookies are placed by third-party services that appear on our pages. We do not control these cookies and recommend reviewing the privacy policies of these third parties.</p>
+                    </section>
+
+                    <section>
+                        <h3 className="font-semibold text-gray-800 mb-2">Updates to This Policy</h3>
+                        <p>We may update this Cookie Policy from time to time. We encourage you to review this page periodically for the latest information.</p>
+                    </section>
+                </div>
+            )
+        }
     };
 
     const footerLinks = {
@@ -32,10 +210,10 @@ const NewFooter = () => {
             { name: 'Crisis Lifeline', href: 'https://988lifeline.org/', external: true },
         ],
         legal: [
-            { name: 'Privacy Policy', href: '/privacy' },
-            { name: 'Terms of Service', href: '/terms' },
-            { name: 'Accessibility', href: '/accessibility' },
-            { name: 'Cookie Policy', href: '/cookies' },
+            { name: 'Privacy Policy', key: 'privacy' },
+            { name: 'Terms of Service', key: 'terms' },
+            { name: 'Accessibility', key: 'accessibility' },
+            { name: 'Cookie Policy', key: 'cookies' },
         ],
     };
 
@@ -155,19 +333,38 @@ const NewFooter = () => {
                     </div>
 
                     {/* Legal */}
-                    {/* <div>
+                    <div>
                         <h4 className="text-lg font-semibold mb-4">Legal</h4>
                         <ul className="space-y-3">
                             {footerLinks.legal.map((link, index) => (
                                 <li key={index}>
-                                    <Link to={link.href} className="text-white hover:text-gray-200 transition-colors text-sm">
+                                    <button 
+                                        onClick={() => setActiveModal(link.key)}
+                                        className="text-white hover:text-gray-200 transition-colors text-sm cursor-pointer text-left"
+                                    >
                                         {link.name}
-                                    </Link>
+                                    </button>
                                 </li>
                             ))}
                         </ul>
-                    </div> */}
+                    </div>
                 </div>
+
+                {/* Legal Modals */}
+                {Object.keys(legalContent).map((key) => (
+                    <Dialog key={key} open={activeModal === key} onOpenChange={(open) => !open && setActiveModal(null)}>
+                        <DialogContent className="max-w-2xl max-h-[80vh]">
+                            <DialogHeader>
+                                <DialogTitle className="text-xl font-bold text-customGreen">
+                                    {legalContent[key].title}
+                                </DialogTitle>
+                            </DialogHeader>
+                            <div className="max-h-[60vh] overflow-y-auto pr-4">
+                                {legalContent[key].content}
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                ))}
             </div>
 
             {/* Bottom Bar */}
