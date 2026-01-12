@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/context/AuthContext"
 
@@ -17,10 +17,33 @@ import {
   ArrowRightIcon
 } from "@/components/icons/DuoTuneIcons"
 
+// Avatar color combinations
+const avatarColors = [
+  { bgColor: "bg-blue-100", textColor: "text-blue-700" },
+  { bgColor: "bg-green-100", textColor: "text-green-700" },
+  { bgColor: "bg-purple-100", textColor: "text-purple-700" },
+  { bgColor: "bg-amber-100", textColor: "text-amber-700" },
+  { bgColor: "bg-rose-100", textColor: "text-rose-700" },
+  { bgColor: "bg-teal-100", textColor: "text-teal-700" },
+]
+
+// Get initials from name
+const getInitials = (name) => {
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+}
+
 function Dashboard() {
   const { currentUser } = useAuth()
   const navigate = useNavigate()
   const [hasCompletedQuestionnaire, setHasCompletedQuestionnaire] = useState(false)
+  const [therapists, setTherapists] = useState([])
+  const [loadingTherapists, setLoadingTherapists] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState("All")
 
   const handleStartQuestionnaire = () => {
     navigate("/questionnaire")
@@ -30,6 +53,32 @@ function Dashboard() {
     navigate("/recommended-psychologists")
   }
 
+  // Fetch therapists from API
+  useEffect(() => {
+    const fetchTherapists = async () => {
+      try {
+        setLoadingTherapists(true)
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/psychologists`)
+        const result = await response.json()
+        if (result.success) {
+          setTherapists(result.data)
+        }
+      } catch (error) {
+        console.error('Error fetching therapists:', error)
+      } finally {
+        setLoadingTherapists(false)
+      }
+    }
+    fetchTherapists()
+  }, [])
+
+  // Get unique categories from therapists' specialties
+  const categories = ["All", ...new Set(therapists.flatMap(t => t.specialties || []))]
+
+  // Filter therapists by selected category
+  const filteredTherapists = selectedCategory === "All"
+    ? therapists.slice(0, 4)
+    : therapists.filter(t => t.specialties?.includes(selectedCategory)).slice(0, 4)
 
   const performanceMetrics = [
     { category: "Anxiety", value: 450, size: 180, color: "bg-blue-400", x: 15, y: 50 },
@@ -38,45 +87,6 @@ function Dashboard() {
     { category: "Relationship", value: 520, size: 200, color: "bg-purple-400", x: 60, y: 38 },
     { category: "Trauma", value: 320, size: 130, color: "bg-red-400", x: 52, y: 58 },
     { category: "Other", value: 280, size: 115, color: "bg-teal-400", x: 75, y: 55 },
-  ]
-
-   const therapistAchievements = [
-    {
-      name: "Dr. Sarah Johnson",
-      specialty: "Anxiety & Depression",
-      convRate: "78.34%",
-      trend: "up",
-      avatar: "SJ",
-      bgColor: "bg-blue-100",
-      textColor: "text-blue-700"
-    },
-    {
-      name: "Dr. Michael Chen",
-      specialty: "Cognitive Therapy",
-      convRate: "83.63%",
-      trend: "down",
-      avatar: "MC",
-      bgColor: "bg-green-100",
-      textColor: "text-green-700"
-    },
-    {
-      name: "Dr. Emily Davis",
-      specialty: "Family Counseling",
-      convRate: "92.56%",
-      trend: "up",
-      avatar: "ED",
-      bgColor: "bg-purple-100",
-      textColor: "text-purple-700"
-    },
-    {
-      name: "Dr. James Wilson",
-      specialty: "Trauma Recovery",
-      convRate: "63.08%",
-      trend: "up",
-      avatar: "JW",
-      bgColor: "bg-amber-100",
-      textColor: "text-amber-700"
-    },
   ]
 
   const quickActions = [
@@ -259,20 +269,21 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Top Therapists Achievements - Right Column */}
+          {/* Top Therapists - Right Column */}
           <Card className="rounded-2xl sm:rounded-3xl border shadow-none bg-white/80 backdrop-blur">
             <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
               <CardTitle className="text-lg sm:text-xl font-bold text-customGreen">Top Therapists</CardTitle>
-              <CardDescription className="text-xs sm:text-sm text-gray-500">Avg. 89.34% Success Rate</CardDescription>
+              <CardDescription className="text-xs sm:text-sm text-gray-500">Our highest rated professionals</CardDescription>
             </CardHeader>
             <CardContent className="px-4 sm:px-6">
-              {/* Tabs */}
+              {/* Category Tabs */}
               <div className="flex gap-1 mb-4 sm:mb-6 bg-gray-100 rounded-xl p-1 overflow-x-auto">
-                {["All", "Anxiety", "Stress", "Trauma", "Other"].map((tab) => (
+                {categories.slice(0, 5).map((tab) => (
                   <button
                     key={tab}
-                    className={`shrink-0 px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-medium rounded-lg transition-all ${
-                      tab === "All"
+                    onClick={() => setSelectedCategory(tab)}
+                    className={`shrink-0 px-2 sm:px-3 py-1.5 sm:py-2 text-xs font-medium rounded-lg transition-all cursor-pointer ${
+                      tab === selectedCategory
                         ? "bg-white text-customGreen shadow-none"
                         : "text-gray-500 hover:text-customGreen"
                     }`}
@@ -284,54 +295,63 @@ function Dashboard() {
 
               {/* Therapist List */}
               <div className="space-y-2 sm:space-y-3">
-                {therapistAchievements.map((therapist, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between p-2 sm:p-3 rounded-xl sm:rounded-2xl hover:bg-gray-50 transition-colors group"
-                  >
-                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                      <div className={`w-8 h-8 sm:w-10 sm:h-10 ${therapist.bgColor} rounded-lg sm:rounded-xl flex items-center justify-center ${therapist.textColor} font-bold text-xs sm:text-sm shrink-0`}>
-                        {therapist.avatar}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-semibold text-xs sm:text-sm text-customGreen truncate">
-                          {therapist.name}
-                        </h4>
-                        <p className="text-xs text-gray-500 truncate">{therapist.specialty}</p>
+                {loadingTherapists ? (
+                  // Loading skeleton
+                  [...Array(4)].map((_, idx) => (
+                    <div key={idx} className="flex items-center gap-3 p-2 sm:p-3 animate-pulse">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-200 rounded-lg sm:rounded-xl shrink-0"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                        <div className="h-2 bg-gray-200 rounded w-1/2"></div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                      <span className="text-xs sm:text-sm font-semibold text-customGreen">
-                        {therapist.convRate}
-                      </span>
-                      {/* Mini trend chart - hidden on mobile */}
-                      <div className="w-12 sm:w-16 h-6 sm:h-8 relative hidden sm:block">
-                        <svg className="w-full h-full" viewBox="0 0 60 30">
-                          <path
-                            d={
-                              therapist.trend === "up"
-                                ? "M 0 25 Q 15 20, 30 15 T 60 5"
-                                : "M 0 5 Q 15 10, 30 15 T 60 25"
-                            }
-                            fill="none"
-                            stroke={therapist.trend === "up" ? "#10b981" : "#ef4444"}
-                            strokeWidth="2"
-                            className="opacity-50"
+                  ))
+                ) : filteredTherapists.length > 0 ? (
+                  filteredTherapists.map((therapist, idx) => (
+                    <div
+                      key={therapist._id || idx}
+                      onClick={() => navigate(`/psychologist/${therapist._id}`)}
+                      className="flex items-center justify-between p-2 sm:p-3 rounded-xl sm:rounded-2xl hover:bg-gray-50 transition-colors group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        {therapist.profileImage ? (
+                          <img
+                            src={therapist.profileImage}
+                            alt={therapist.name}
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl object-cover shrink-0"
                           />
-                        </svg>
+                        ) : (
+                          <div className={`w-8 h-8 sm:w-10 sm:h-10 ${avatarColors[idx % avatarColors.length].bgColor} rounded-lg sm:rounded-xl flex items-center justify-center ${avatarColors[idx % avatarColors.length].textColor} font-bold text-xs sm:text-sm shrink-0`}>
+                            {getInitials(therapist.name)}
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-semibold text-xs sm:text-sm text-customGreen truncate">
+                            {therapist.name}
+                          </h4>
+                          <p className="text-xs text-gray-500 truncate">
+                            {therapist.specialties?.slice(0, 2).join(", ") || "General Therapy"}
+                          </p>
+                        </div>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
+                      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                        <span className="text-xs sm:text-sm font-semibold text-customGreen">
+                          {therapist.rating ? `${therapist.rating}★` : "New"}
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-4">No therapists found in this category</p>
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Bottom Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-0">
-          {/* Welcome Card */}
+        {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4 sm:px-0">
           <Card className="rounded-2xl sm:rounded-3xl border shadow-none bg-customGreen text-white overflow-hidden">
             <CardContent className="p-5 sm:p-6">
               <h3 className="text-xl sm:text-2xl font-bold mb-2">Welcome to Mental Wellness</h3>
@@ -347,7 +367,6 @@ function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Stats Cards */}
           <Card className="rounded-2xl sm:rounded-3xl border shadow-none bg-white/80 backdrop-blur">
             <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6">
               <CardDescription className="text-xs sm:text-sm text-gray-500">Expected Sessions</CardDescription>
@@ -401,7 +420,6 @@ function Dashboard() {
               <CardTitle className="text-xl sm:text-2xl font-bold text-customGreen mb-2 sm:mb-3">$14,094</CardTitle>
               <p className="text-xs text-gray-500 mb-3 sm:mb-4">Another $48,348 to Goal</p>
 
-              {/* Mini bar chart */}
               <div className="flex items-end gap-1 h-12 sm:h-16">
                 {[40, 25, 45, 30, 60, 70, 50].map((height, idx) => (
                   <div key={idx} className="flex-1 bg-customGreen rounded-t" style={{ height: `${height}%` }}></div>
@@ -409,7 +427,7 @@ function Dashboard() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
 
         {/* Quick Actions Section */}
         <div className="my-6 sm:my-8 px-4 sm:px-0">
